@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -8,6 +8,13 @@ function Login() {
     });
 
     const navigateTo = useNavigate();
+    const sessionExists = useOutletContext();
+
+    useEffect(() => {
+        if (sessionExists) {
+            navigateTo("/");
+        }
+    });
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -39,12 +46,12 @@ function Login() {
                 const expirationDate = new Date();
                 expirationDate.setDate(expirationDate.getDate() + 7);
 
-                document.cookie = `cookieId=${
+                document.cookie = `session=${
                     data.cookieId
                 }; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
-                
+
                 localStorage.setItem("userId", JSON.stringify(data.userId));
-                navigateTo("/");
+                window.location.href = "/";
             } else {
                 const statusMsg = await response.text();
                 console.log(statusMsg);
@@ -54,53 +61,58 @@ function Login() {
         }
     };
 
-    return (
-        <div className="container mt-5 bg-dark text-light p-4 rounded">
-            <div className="row justify-content-center">
-                <div className="col-lg-6">
-                    <h2 className="mb-4">Login</h2>
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <label htmlFor="email" className="form-label">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                className="form-control bg-dark text-light border-light"
-                                id="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="password" className="form-label">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                className="form-control bg-dark text-light border-light"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="d-grid">
-                            <button
-                                type="submit"
-                                className="btn btn-secondary btn-block"
-                            >
-                                Login
-                            </button>
-                        </div>
-                    </form>
+    if (!sessionExists) {
+        return (
+            <div className="container mt-5 bg-dark text-light p-4 rounded">
+                <div className="row justify-content-center">
+                    <div className="col-lg-6">
+                        <h2 className="mb-4">Login</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-3">
+                                <label htmlFor="email" className="form-label">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    className="form-control bg-dark text-light border-light"
+                                    id="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label
+                                    htmlFor="password"
+                                    className="form-label"
+                                >
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    className="form-control bg-dark text-light border-light"
+                                    id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="d-grid">
+                                <button
+                                    type="submit"
+                                    className="btn btn-secondary btn-block"
+                                >
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
 }
 
 export default Login;

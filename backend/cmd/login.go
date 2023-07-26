@@ -26,7 +26,7 @@ func (app *application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		userId := app.getUserId(loginInfo.Email)
 		sessionId := app.createCookie(w, userId)
-		
+
 		response := models.LoginResponse{
 			UserId:   userId,
 			CookieId: sessionId,
@@ -75,4 +75,22 @@ func (app *application) LogOutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Ended session for user with ID: " + userId))
+}
+
+func (app *application) CookieHandler(w http.ResponseWriter, r *http.Request) {
+	cookieId := r.URL.Query().Get("cookieId")
+	// check if a session exists for the given cookieId
+	var exists bool
+	err := app.db.QueryRow("SELECT EXISTS(SELECT 1 FROM sessions WHERE sessionKey = ?)", cookieId).Scan(&exists)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if exists {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Session exists for user"))
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Session does not exist for user"))
+	}
 }
