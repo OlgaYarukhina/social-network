@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -67,6 +68,7 @@ func (app *application) getUserId(nicknameOrEmail string) int {
 }
 
 func (app *application) LogOutHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Log out")
 	userId := r.URL.Query().Get("userId")
 	_, err := app.db.Exec("DELETE FROM sessions WHERE userId=?", userId) // deletes session when user logs out
 	if err != nil {

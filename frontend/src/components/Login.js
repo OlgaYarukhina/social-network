@@ -10,6 +10,8 @@ function Login() {
     const navigateTo = useNavigate();
     const sessionExists = useOutletContext();
 
+    console.log(sessionExists)
+
     useEffect(() => {
         if (sessionExists) {
             navigateTo("/");
@@ -45,6 +47,7 @@ function Login() {
                 const data = await response.json();
                 const expirationDate = new Date();
                 expirationDate.setDate(expirationDate.getDate() + 7);
+                console.log(data)
 
                 document.cookie = `session=${
                     data.cookieId
