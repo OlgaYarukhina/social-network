@@ -1,8 +1,9 @@
-export function hasSession() {
+export async function hasSession() {
     const cookies = document.cookie.split("; ");
     for (const cookie of cookies) {
         if (cookie.includes("session=")) {
-            if (hasCookie(cookie.replace("session=", ""))) {
+            var isAuthorized = await hasCookie(cookie.replace("session=", ""));
+            if (isAuthorized) {
                 return true;
             }
         }
@@ -12,7 +13,7 @@ export function hasSession() {
 
 const hasCookie = async (cookieId) => {
     try {
-        const url = `/get-cookie?cookieId=${cookieId}`;
+        const url = `http://localhost:8080/get-cookie?cookieId=${cookieId}`;
         const response = await fetch(url);
         if (response.ok) {
             return true;

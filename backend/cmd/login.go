@@ -61,9 +61,9 @@ func verifyPassword(hashedPassword, passwordToVerify string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(passwordToVerify))
 }
 
-func (app *application) getUserId(nicknameOrEmail string) int {
+func (app *application) getUserId(email string) int {
 	var userId int
-	app.db.QueryRow("SELECT userId FROM users WHERE nickname = ? OR email = ?", nicknameOrEmail, nicknameOrEmail).Scan(&userId)
+	app.db.QueryRow("SELECT userId FROM users WHERE email = ?", email).Scan(&userId)
 	return userId
 }
 

@@ -7,11 +7,13 @@ function App() {
     const [sessionExists, setSessionExists] = useState(false);
 
     useEffect(() => {
-        if (hasSession()) {
-            setSessionExists(true);
-        } else {
-            setSessionExists(false);
-        }
+        hasSession().then((isAuthorized) => {
+            if (isAuthorized) {
+                setSessionExists(true);
+            } else {
+                setSessionExists(false);
+            }
+        })
     }, []);
 
     return (
