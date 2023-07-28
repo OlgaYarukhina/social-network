@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -68,15 +67,14 @@ func (app *application) getUserId(email string) int {
 }
 
 func (app *application) LogOutHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Log out")
 	userId := r.URL.Query().Get("userId")
-	_, err := app.db.Exec("DELETE FROM sessions WHERE userId=?", userId) // deletes session when user logs out
+	_, err := app.db.Exec("DELETE FROM sessions WHERE userId = ?", userId) // deletes session when user logs out
 	if err != nil {
 		log.Println(err)
 		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Ended session for user with ID: " + userId))
+	} 
+		w.WriteHeader(http.StatusOK)
+	   // w.Write([]byte("Ended session for user with ID: " + userId))      // Do we need it?
 }
 
 func (app *application) CookieHandler(w http.ResponseWriter, r *http.Request) {
