@@ -78,6 +78,7 @@ func (app *application) LogOutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) CookieHandler(w http.ResponseWriter, r *http.Request) {
+	
 	cookieId := r.URL.Query().Get("cookieId")
 	// check if a session exists for the given cookieId
 	var exists bool

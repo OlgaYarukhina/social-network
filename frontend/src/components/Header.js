@@ -1,4 +1,4 @@
-import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 
 
 function Header() {
@@ -21,7 +21,10 @@ function Header() {
             );
             if (response.ok) {
                 localStorage.removeItem('userId');
+                document.cookie =
+                    'session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; samesite=None; secure';
                 window.location.href = '/login';          // navigateTo('/login'); Why it does not work here?
+
             } else {
                 const statusMsg = await response.text();
                 console.log(statusMsg);
