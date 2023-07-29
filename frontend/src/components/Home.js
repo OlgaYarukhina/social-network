@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import GetPosts from "./Posts";
 
 function Home() {
     const navigateTo = useNavigate();
@@ -14,7 +15,7 @@ function Home() {
     if (sessionExists) {
         return (
             <>
-                <h1>This is the homepage view when logged in</h1>
+                <GetPosts /> 
             </>
         );
     }
