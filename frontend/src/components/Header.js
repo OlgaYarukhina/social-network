@@ -1,5 +1,6 @@
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "./SearchBar";
 
 function Header() {
     const navigateTo = useNavigate();
@@ -34,12 +35,17 @@ function Header() {
         }
     };
 
+    const handleSearch = (text) => {
+        console.log(text);
+    };
+
     return (
         <div>
             <Navbar bg="info" variant="light">
                 <Navbar href="#home">SN</Navbar>
                 <Nav className="mr-auto nav_bar_wrapper"></Nav>
                 <Nav>
+                    <SearchBar onSearch={handleSearch} />
                     <NavDropdown title="Pick of user">
                         <NavDropdown.Item onClick={logOut}>
                             Log out
