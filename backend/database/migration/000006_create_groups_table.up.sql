@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS `groups` (
     `title` TEXT NOT NULL,
     `description` TEXT NOT NULL,
     `img` TEXT,
-    `creationDate` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users (userId) ON DELETE CASCADE
 );
