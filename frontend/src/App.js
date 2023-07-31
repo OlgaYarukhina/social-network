@@ -4,17 +4,17 @@ import { hasSession } from "./components/Auth";
 import Header from "./components/Header";
 
 function App() {
-    const [sessionExists, setSessionExists] = useState(false);
+    const [sessionExists, setSessionExists] = useState(null);
 
     useEffect(() => {
         hasSession().then((isAuthorized) => {
-            if (isAuthorized) {
-                setSessionExists(true);
-            } else {
-                setSessionExists(false);
-            }
-        })
+            setSessionExists(isAuthorized);
+        });
     }, []);
+
+    if (sessionExists === null) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <>

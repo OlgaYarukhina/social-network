@@ -10,7 +10,7 @@ function Login() {
     const navigateTo = useNavigate();
     const sessionExists = useOutletContext();
 
-    console.log(sessionExists)
+    console.log(sessionExists);
 
     useEffect(() => {
         if (sessionExists) {
@@ -47,7 +47,7 @@ function Login() {
                 const data = await response.json();
                 const expirationDate = new Date();
                 expirationDate.setDate(expirationDate.getDate() + 7);
-                console.log(data)
+                console.log(data);
 
                 document.cookie = `session=${
                     data.cookieId
@@ -111,6 +111,16 @@ function Login() {
                                 </button>
                             </div>
                         </form>
+                        <br></br>
+                        <div className="d-grid">
+                            <button
+                                type="submit"
+                                className="btn btn-secondary btn-block"
+                                onClick={() => navigateTo("/register")}
+                            >
+                                Don't have an account? Register here!
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
