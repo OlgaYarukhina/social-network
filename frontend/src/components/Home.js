@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import GetPosts from "./Posts";
+import CreatePost from "./CreatePosts";
 
 function Home() {
     const navigateTo = useNavigate();
@@ -15,6 +16,7 @@ function Home() {
     if (sessionExists) {
         return (
             <>
+                <CreatePost /> 
                 <GetPosts /> 
             </>
         );
