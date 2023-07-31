@@ -14,7 +14,7 @@ function SearchBar({ onSearch }) {
     };
 
     return (
-        <Form inline onSubmit={handleSearchSubmit}>
+        <Form onSubmit={handleSearchSubmit}>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <FormControl
                     type="text"
