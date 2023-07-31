@@ -59,8 +59,3 @@ const GetPosts = () => {
 };
 
 export default GetPosts;
-
-
-
-{/* 
- */}
