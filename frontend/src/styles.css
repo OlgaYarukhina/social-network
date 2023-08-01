@@ -1,3 +1,5 @@
-body {
-    background-color: #343a40;
+.user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

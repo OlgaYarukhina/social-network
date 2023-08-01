@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, FormControl, Button } from "react-bootstrap";
+import { Form, FormControl } from "react-bootstrap";
 
 function SearchBar({ onSearch }) {
     const [searchText, setSearchText] = useState("");
@@ -14,7 +14,7 @@ function SearchBar({ onSearch }) {
     };
 
     return (
-        <Form inline onSubmit={handleSearchSubmit}>
+        <Form onSubmit={handleSearchSubmit}>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <FormControl
                     type="text"
@@ -23,7 +23,6 @@ function SearchBar({ onSearch }) {
                     onChange={handleSearchChange}
                     style={{ marginRight: "8px" }}
                 />
-                <Button type="submit">Submit</Button>
             </div>
         </Form>
     );
