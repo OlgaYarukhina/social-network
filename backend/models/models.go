@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type RegisterInfo struct {
 	FirstName   string `json:"firstName"`
@@ -24,9 +26,11 @@ type LoginResponse struct {
 }
 
 type Post struct {
-	PostID       int       `json:"postId,string"`
-	Title        string    `json:"title"`
-	Content      string    `json:"content"`
-	CreatedAt    time.Time `json:"createdAt"`
+	PostID       int             `json:"postId,string"`
 	UserID       int   
+	Content      string           `json:"content"`
+	Img          string          
+	Likes        int              `json:"likes"`
+	Privacy      string           `json:"privacy"`
+	CreatedAt    time.Time        `json:"createdAt"`
 }

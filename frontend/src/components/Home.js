@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import GetPosts from "./Posts";
-import CreatePost from "./CreatePosts";
+import CreatePost from "./Poster";
 
 function Home() {
     const navigateTo = useNavigate();
@@ -16,8 +16,14 @@ function Home() {
     if (sessionExists) {
         return (
             <>
-                <CreatePost /> 
-                <GetPosts /> 
+                <div className="row">
+                    <div className="col-3"> <div className="col-4">Something here</div></div>
+                    <div className="col-6">
+                        <CreatePost />
+                        <GetPosts />
+                    </div>
+                    <div className="col-3"> <div className="col-4">Something here</div></div>
+                </div>
             </>
         );
     }

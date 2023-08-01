@@ -18,6 +18,7 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/get-cookie", app.CookieHandler)
 	mux.HandleFunc("/logout", app.LogOutHandler)
 	mux.HandleFunc("/posts", app.PostsHandler)
+	mux.HandleFunc("/poster", app.CreatePostHandler)
 
 	return app.handleCORS(mux)
 }
