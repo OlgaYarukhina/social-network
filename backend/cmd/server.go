@@ -19,6 +19,8 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/logout", app.LogOutHandler)
 	mux.HandleFunc("/posts", app.PostsHandler)
 	mux.HandleFunc("/poster", app.CreatePostHandler)
+	mux.HandleFunc("/get-user-data", app.GetUserInfoHandler)
+	mux.HandleFunc("/follow", app.CreateFollowHandler)
 
 	return app.handleCORS(mux)
 }

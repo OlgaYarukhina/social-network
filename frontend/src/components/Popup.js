@@ -1,9 +1,9 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import PopupUser from "./PopupUser";
 
-const Popup = ({ title, users, show, onClose }) => {
-    const navigateTo = useNavigate();
+const Popup = ({ title, users, show, currentUserId, onClose }) => {
+
     return (
         <Modal show={show} onHide={onClose} centered>
             <Modal.Header>
@@ -11,23 +11,16 @@ const Popup = ({ title, users, show, onClose }) => {
             </Modal.Header>
             <Modal.Body style={{ maxHeight: "50vh", overflowY: "auto" }}>
                 {users.map((user) => (
-                    <div key={user.id}>
-                        <div className="user-info">
-                            <div
-                                onClick={() => {
-                                    navigateTo(`/user/${user.id}`);
-                                    onClose()
-                                }}
-                                style={{cursor: "pointer"}}
-                            >
-                                <h5>{user.name}</h5>
-                            </div>
-                            <Button variant="primary" className="follow-button">
-                                Follow
-                            </Button>
-                        </div>
-                        <hr />
-                    </div>
+                    <PopupUser
+                        key={user.userId}
+                        userId={user.userId}
+                        firstName={user.firstName}
+                        lastName={user.lastName}
+                        currentUserId={currentUserId}
+                        followStatus={user.currentUserFollowStatus}
+                        isPublic={user.public}
+                        onClose={onClose}
+                    />
                 ))}
             </Modal.Body>
             <Modal.Footer>

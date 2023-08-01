@@ -11,7 +11,7 @@ import (
 )
 
 func (app *application) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var loginInfo models.LoginInfo
+	var loginInfo models.User
 
 	err := json.NewDecoder(r.Body).Decode(&loginInfo)
 	if err != nil {

@@ -10,7 +10,7 @@ import (
 )
 
 func (app *application) RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	var registerInfo models.RegisterInfo
+	var registerInfo models.User
 
 	err := json.NewDecoder(r.Body).Decode(&registerInfo)
 	if err != nil {

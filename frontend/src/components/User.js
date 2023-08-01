@@ -1,102 +1,182 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import Popup from "./Popup";
-
-const mockUser = {
-    profilePicture: "https://img.freepik.com/free-icon/user_318-563642.jpg",
-    fullName: "John Doe",
-    nickname: "JD",
-    dateOfBirth: "1990-01-01",
-    email: "johndoe@example.com",
-    aboutMe: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-};
+import { useParams } from "react-router-dom";
 
 function User() {
-    const {
-        profilePicture,
-        fullName,
-        nickname,
-        dateOfBirth,
-        email,
-        aboutMe,
-    } = mockUser;
+    const [profileData, setProfileData] = useState({});
+    const [isProfileOwner, setIsProfileOwner] = useState(false);
+
+    const [currentUserFollowStatus, setCurrentUserFollowStatus] = useState("");
+    const { userId } = useParams();
+    const currentUserId = localStorage.getItem("userId");
 
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [showFollowingPopup, setShowFollowingPopup] = useState(false);
 
-    const mockFollowers = [
-        { id: 1, name: "Follower 1" },
-        { id: 2, name: "Follower 2" },
-        { id: 3, name: "Follower 2" },
-        { id: 4, name: "Follower 2" },
-        { id: 5, name: "Follower 2" },
-        { id: 6, name: "Follower 2" },
-        { id: 7, name: "Follower 2" },
-        { id: 8, name: "Follower 2" },
-        { id: 9, name: "Follower 2" },
-    ];
+    useEffect(() => {
+        setIsProfileOwner(currentUserId === userId);
 
-    const mockFollowing = [
-        { id: 3, name: "Following 1" },
-        { id: 4, name: "Following 2" },
-    ];
+        const getProfileData = async () => {
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/get-user-data?userId=${userId}&currentUserId=${currentUserId}`
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    setCurrentUserFollowStatus(data.currentUserFollowStatus);
+                    setProfileData(data);
+                } else {
+                    console.log(response.statusText);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-    return (
-        <div className="container mt-5">
-            <div className="row">
-                <div className="col-md-4">
-                    <img
-                        className="profile-pic m-3"
-                        src={profilePicture}
-                        style={{
-                            height: "150px",
-                            width: "150px",
-                            borderRadius: "100%",
-                            objectFit: "cover",
-                            zIndex: "99999",
-                        }}
-                        alt="profile"
-                    />
-                    <h4>
-                        {fullName}{" "}
-                        {nickname && (
-                            <small className="text-muted">({nickname})</small>
+        getProfileData();
+    }, [currentUserId, userId, currentUserFollowStatus]);
+
+    const handleFollow = () => {
+        if (currentUserFollowStatus === "Follow") {
+            sendFollowRequest(profileData.public ? "Follow" : "RequestFollow", parseInt(userId), parseInt(currentUserId));
+            setCurrentUserFollowStatus(
+                profileData.public ? "Following" : "Requested"
+            );
+        } else {
+            sendFollowRequest("Unfollow", parseInt(userId), parseInt(currentUserId));
+            setCurrentUserFollowStatus("Follow");
+        }
+    };
+
+    if (Array.isArray(profileData.followers) && Array.isArray(profileData.following)) {
+        return (
+            <div className="container mt-5">
+                <div className="row">
+                    <div className="col-md-4">
+                        <img
+                            className="profile-pic m-3"
+                            src={profileData.profilePic}
+                            style={{
+                                height: "150px",
+                                width: "150px",
+                                borderRadius: "100%",
+                                objectFit: "cover",
+                                zIndex: "99999",
+                            }}
+                            alt="profile"
+                        />
+                        <h4>
+                            {profileData.firstName + " " + profileData.lastName}{" "}
+                            {profileData.nickname && (
+                                <small className="text-muted">
+                                    ({profileData.nickname})
+                                </small>
+                            )}
+                        </h4>
+                        {!isProfileOwner && (
+                            <Button
+                                onClick={handleFollow}
+                                variant={
+                                    currentUserFollowStatus === "Follow"
+                                        ? "primary"
+                                        : "success"
+                                }
+                            >
+                                {currentUserFollowStatus}
+                            </Button>
                         )}
-                    </h4>
-                    <Button variant="primary" className="follow-button">
-                        Follow
-                    </Button><br></br>
-                    <p>Born: {dateOfBirth}</p>
-                    <p>Email: {email}</p>
-                    {aboutMe && <p>About me: {aboutMe}</p>}
-                    <Button
-                        variant="primary"
-                        onClick={() => setShowFollowersPopup(true)}
-                    >
-                        Followers {mockFollowers.length}
-                    </Button>{" "}
-                    <Button
-                        variant="primary"
-                        onClick={() => setShowFollowingPopup(true)}
-                    >
-                        Following {mockFollowing.length}
-                    </Button>
-                    <Popup
-                        title="Followers"
-                        users={mockFollowers}
-                        show={showFollowersPopup}
-                        onClose={() => setShowFollowersPopup(false)}
-                    />
-                    <Popup
-                        title="Following"
-                        users={mockFollowing}
-                        show={showFollowingPopup}
-                        onClose={() => setShowFollowingPopup(false)}
-                    />
+                        <br></br>
+                        <p>Born: {profileData.dateOfBirth}</p>
+                        <p>Email: {profileData.email}</p>
+                        {profileData.aboutMe && (
+                            <p>About me: {profileData.aboutMe}</p>
+                        )}
+                        <span
+                            style={{
+                                fontWeight: "bold",
+                                color: "black",
+                                cursor:
+                                    profileData.followers.length > 0
+                                        ? "pointer"
+                                        : "default",
+                            }}
+                            onClick={() =>
+                                setShowFollowersPopup(
+                                    profileData.followers.length ? true : false
+                                )
+                            }
+                        >
+                            Followers {profileData.followers.length}
+                        </span>{" "}
+                        <span
+                            style={{
+                                fontWeight: "bold",
+                                color: "black",
+                                cursor:
+                                    profileData.following.length > 0
+                                        ? "pointer"
+                                        : "default",
+                            }}
+                            onClick={() =>
+                                setShowFollowingPopup(
+                                    profileData.following.length ? true : false
+                                )
+                            }
+                        >
+                            Following {profileData.following.length}
+                        </span>
+                        <Popup
+                            title="Followers"
+                            users={profileData.followers}
+                            show={showFollowersPopup}
+                            currentUserId={currentUserId}
+                            onClose={() => setShowFollowersPopup(false)}
+                        />
+                        <Popup
+                            title="Following"
+                            users={profileData.following}
+                            show={showFollowingPopup}
+                            currentUserId={currentUserId}
+                            onClose={() => setShowFollowingPopup(false)}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
 }
+
+export const sendFollowRequest = async (followType, userId, followerId) => {
+    const payload = {
+        userId,
+        followerId,
+        followType,
+    };
+
+    const options = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    };
+
+    try {
+        const response = await fetch(
+            "http://localhost:8080/follow",
+            options
+        );
+        if (response.ok) {
+            console.log("ok");
+        } else {
+            const statusMsg = await response.text();
+            console.log(statusMsg);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 export default User;

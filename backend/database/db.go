@@ -2,14 +2,14 @@ package database
 
 import (
 	"database/sql"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"
-	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattes/migrate/source/file"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func OpenDatabase() (*sql.DB, error) {
@@ -30,7 +30,7 @@ func OpenDatabase() (*sql.DB, error) {
 
 // checks if the database is empty
 func dbIsEmpty() bool {
-	dbText, err := ioutil.ReadFile("backend/database/database.db")
+	dbText, err := os.ReadFile("backend/database/database.db")
 	if err != nil {
 		log.Println(err)
 	}

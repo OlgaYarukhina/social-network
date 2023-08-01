@@ -14,7 +14,7 @@ import (
 func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	var posts []models.Post
 
-	stmt := `SELECT * FROM posts ORDER BY created ASC LIMIT 200`
+	stmt := `SELECT postId, userId, content, COALESCE(img, ""), likes, privacy, created FROM posts ORDER BY created ASC LIMIT 200`
 	rows, err := app.db.Query(stmt)
 	defer rows.Close()
 
