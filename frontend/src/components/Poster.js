@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState,  useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
     const [formData, setFormData] = useState({
+        userId: localStorage.getItem("userId"),
         content: "",
     });
+    const [selectedImg, setSelectedImg] = useState(null);
+   // const [uploaded, setUploaded] = useState();
+    const imgPicker = useRef(null);
+    const navigateTo = useNavigate();
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -14,21 +19,35 @@ const CreatePost = () => {
         }));
     };
 
-    const navigateTo = useNavigate();
+    const handleChangeImg = (event) => {
+        setSelectedImg(event.target.files[0])
+    };
+    
+    const handleImg = () => {
+        imgPicker.current.click();
+    }
+
+   
   
 
     const handleSubmit = async (event) => {
-        console.log("Try create post")
         event.preventDefault();
+        let payload = new FormData();
+        payload.append("userId", formData.userId);
+        payload.append("content", formData.content);
+        if (selectedImg) {
+            payload.append('img', selectedImg);
+        };
 
-        const payload = formData;
+
+       
         const options = {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
+            body: payload,
         };
+
+        console.log(payload)
+        console.log(payload.has("img")); 
 
         try {
             const response = await fetch(
@@ -36,7 +55,7 @@ const CreatePost = () => {
                 options
             );
             if (response.ok) {
-                navigateTo("/");  // it is easy peasy way how to show new post in page :)
+                navigateTo("/");  // Why it does not work?
             } else {
                 const statusMsg = await response.text();
                 console.log(statusMsg);
@@ -62,6 +81,17 @@ const CreatePost = () => {
                     required> 
                     </textarea>
                 </div>
+              
+                <button 
+                 className="btn btn-dark" 
+                onClick={handleImg}>IMG</button>
+                    <input
+                        className="hidden"
+                        type="file"
+                        ref={imgPicker}
+                        onChange={handleChangeImg}
+                        accept="image/*, .png, .jpg, .gif"
+                    />
                 <div className="mb-3">
                     <button 
                     className="btn btn-dark" 

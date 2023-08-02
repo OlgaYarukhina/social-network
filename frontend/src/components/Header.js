@@ -25,7 +25,7 @@ function Header() {
                 localStorage.removeItem("userId");
                 document.cookie =
                     "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; samesite=None; secure";
-                window.location.href = "/login"; // navigateTo('/login'); Why it does not work here?
+                window.location.href = "/login"; 
             } else {
                 const statusMsg = await response.text();
                 console.log(statusMsg);
@@ -47,15 +47,15 @@ function Header() {
                 <Nav>
                     <SearchBar onSearch={handleSearch} />
                     <NavDropdown title="Pick of user">
-                        <NavDropdown.Item onClick={logOut}>
-                            Log out
-                        </NavDropdown.Item>
                         <NavDropdown.Item
                             onClick={() => {
                                 navigateTo(`/user/${userId}`);
                             }}
                         >
                             My profile
+                        </NavDropdown.Item>
+                        <NavDropdown.Item onClick={logOut}>
+                            Log out
                         </NavDropdown.Item>
                     </NavDropdown>
                 </Nav>

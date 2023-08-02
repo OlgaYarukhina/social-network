@@ -34,10 +34,11 @@ type FollowRequest struct {
 }
 
 type Post struct {
-	PostID    int `json:"postId,string"`
-	UserID    int
-	Content   string `json:"content"`
-	Img       string
+	PostID    int       `json:"postId,string"`
+	UserID    int       `json:"userId,string"`
+	Nickname  string    `json:"nickname"`
+	Content   string    `json:"content"`
+	Img       string    `json:"img"`
 	Likes     int       `json:"likes"`
 	Privacy   string    `json:"privacy"`
 	CreatedAt time.Time `json:"createdAt"`
