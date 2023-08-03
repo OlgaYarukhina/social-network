@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"01.kood.tech/git/aaaspoll/social-network/backend/models"
 )
@@ -58,6 +59,15 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(jsonResp)
 	return
+}
+
+func (app *application) ImageHandler(w http.ResponseWriter, r *http.Request) {
+	wd, err := os.Getwd()
+	imagePath := wd + strings.TrimPrefix(r.URL.Path, "/get-image")
+	if err != nil {
+		log.Println(err)
+	}
+	http.ServeFile(w, r, imagePath)
 }
 
 func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request) {

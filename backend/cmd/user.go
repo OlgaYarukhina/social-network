@@ -33,58 +33,54 @@ func getUserInfo(userId, currentUserId string, db *sql.DB) models.User {
 		log.Println(err)
 	}
 
-	user = getCurrentUserFollowStatus(userId, currentUserId, db, user)
-	user = getViewedUserFollowStatus(userId, currentUserId, db, user)
-	user = getUserFollowers(userId, currentUserId, db, user)
-	user = getUserFollowing(userId, currentUserId, db, user)
+	user.CurrentUserFollowStatus = getCurrentUserFollowStatus(userId, currentUserId, db)
+	user.FollowsCurrentUser = getViewedUserFollowStatus(userId, currentUserId, db)
+	user.Followers = getUserFollowers(userId, currentUserId, db)
+	user.Following = getUserFollowing(userId, currentUserId, db)
 
 	return user
 }
 
-func getCurrentUserFollowStatus(userId, currentUserId string, db *sql.DB, user models.User) models.User {
+func getCurrentUserFollowStatus(userId, currentUserId string, db *sql.DB) string {
 	var isRequest bool
 	// checks if current user is following viewed user
 	err := db.QueryRow("SELECT isRequest FROM followers WHERE userId = ? AND followerId = ?", userId, currentUserId).Scan(&isRequest)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			user.CurrentUserFollowStatus = "Follow"
+			return "Follow"
 		} else {
 			log.Println(err)
 		}
 	} else {
 		if isRequest {
-			user.CurrentUserFollowStatus = "Requested"
-		} else {
-			user.CurrentUserFollowStatus = "Following"
+			return "Requested"
 		}
 	}
 
-	return user
+	return "Following"
 }
 
-func getViewedUserFollowStatus(userId, currentUserId string, db *sql.DB, user models.User) models.User {
+func getViewedUserFollowStatus(userId, currentUserId string, db *sql.DB) bool {
 	var isRequest bool
 	// checks if viewed user is following current user
 	err := db.QueryRow("SELECT isRequest FROM followers WHERE userId = ? AND followerId = ?", currentUserId, userId).Scan(&isRequest)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			user.FollowsCurrentUser = false
+			return false
 		} else {
 			log.Println(err)
 		}
 	} else {
 		if isRequest {
-			user.FollowsCurrentUser = false
-		} else {
-			user.FollowsCurrentUser = true
+			return false
 		}
 	}
 
-	return user
+	return true
 }
 
-func getUserFollowers(userId, currentUserId string, db *sql.DB, user models.User) models.User {
-	user.Followers = []models.User{}
+func getUserFollowers(userId, currentUserId string, db *sql.DB) []models.User {
+	var followers = []models.User{}
 
 	query := `
 		SELECT u.userId, u.firstName, u.lastName, u.profilePic, u.public
@@ -105,16 +101,16 @@ func getUserFollowers(userId, currentUserId string, db *sql.DB, user models.User
 			log.Println(err)
 		}
 
-		follower = getCurrentUserFollowStatus(strconv.Itoa(follower.UserId), currentUserId, db, follower)
+		follower.CurrentUserFollowStatus = getCurrentUserFollowStatus(strconv.Itoa(follower.UserId), currentUserId, db)
 
-		user.Followers = append(user.Followers, follower)
+		followers = append(followers, follower)
 	}
 
-	return user
+	return followers
 }
 
-func getUserFollowing(userId, currentUserId string, db *sql.DB, user models.User) models.User {
-	user.Following = []models.User{}
+func getUserFollowing(userId, currentUserId string, db *sql.DB) []models.User {
+	var following = []models.User{}
 
 	query := `
 		SELECT u.userId, u.firstName, u.lastName, u.profilePic, u.public
@@ -129,15 +125,16 @@ func getUserFollowing(userId, currentUserId string, db *sql.DB, user models.User
 	}
 
 	for rows.Next() {
-		var following models.User
-		err := rows.Scan(&following.UserId, &following.FirstName, &following.LastName, &following.ProfilePic, &following.Public)
+		var followingUser models.User
+		err := rows.Scan(&followingUser.UserId, &followingUser.FirstName, &followingUser.LastName, &followingUser.ProfilePic, &followingUser.Public)
 		if err != nil {
 			log.Println(err)
 		}
 
-		following = getCurrentUserFollowStatus(strconv.Itoa(following.UserId), currentUserId, db, following)
+		followingUser.CurrentUserFollowStatus = getCurrentUserFollowStatus(strconv.Itoa(followingUser.UserId), currentUserId, db)
 
-		user.Following = append(user.Following, following)
+		following = append(following, followingUser)
 	}
-	return user
+
+	return following
 }
