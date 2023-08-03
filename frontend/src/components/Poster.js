@@ -28,8 +28,6 @@ const CreatePost = () => {
     }
 
    
-  
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         let payload = new FormData();
@@ -38,8 +36,6 @@ const CreatePost = () => {
         if (selectedImg) {
             payload.append('img', selectedImg);
         };
-
-
        
         const options = {
             method: "POST",

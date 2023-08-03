@@ -23,23 +23,41 @@ const GetPosts = () => {
         fetchPosts();
     }, []);
 
-
-    if (!Array.isArray(posts)) {              // it needs to avoid mistakes with posts.map while db does not connected
-        return <div><h1>Loading posts...</h1></div>;
-    }
-
     return (
         <div>
             {posts.length > 0 ? (
                 posts.map((post) => (
                     <div key={post.postId}>
-                        <div className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                            <div className="col p-4 d-flex flex-column position-static">
-                                <div className="mb-2 text-body-secondary">{post.createdAt}</div>
-                                <p className="mb-2 text-in-box">
-                                    {post.content}
-                                </p>
-                                <div className="text-body-secondary"> Likes: XXX </div>
+                        <div className="col">
+                            <div className="card shadow-sm posts">
+                                <div className="card-body">
+                                    <div className="d-flex align-items-center">
+                                        <div className="col-2 d-flex" >
+                                            <img
+                                                src={"https://cdn-icons-png.flaticon.com/512/6065/6065522.png"}
+                                                width="60"
+                                                height="60"
+                                            />
+                                        </div>
+                                        <div className="col d-flex align-items-center" >
+                                            <p className="card-text">{post.nickname}</p>
+                                        </div>
+                                        <small className="text-body-secondary">{post.privacy}</small>
+                                    </div>
+                                </div>
+                                <img
+                                    src={post.img}
+                                />
+                                <div className="card-body">
+                                    <p className="card-text posts_content_cut">{post.content}</p>
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div className="btn-group">
+                                            <button type="button" className="btn btn-sm">Like</button>  {post.likes}
+                                            <button type="button" className="btn btn-sm">Coment</button>  ?
+                                        </div>
+                                        <small className="text-body-secondary">{post.createdAt.slice(0, 10)}</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -52,3 +70,9 @@ const GetPosts = () => {
 };
 
 export default GetPosts;
+
+
+
+// if (!Array.isArray(posts)) {              
+//     return <div><h1>Loading posts...</h1></div>;
+// }

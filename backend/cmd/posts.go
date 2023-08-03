@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -32,10 +31,26 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			post.Img = ""
 		}
-		posts = append(posts, post)
 
+		var nickname string
+		if err := app.db.QueryRow("SELECT nickname from users WHERE userId = ?", post.UserID).Scan(&nickname); err != nil {
+			if err == sql.ErrNoRows {
+				log.Println(err)
+			}
+			log.Fatalf(err.Error())
+		}
+
+		var likes int
+		if err := app.db.QueryRow("SELECT likes from posts WHERE postId = ?", post.PostID).Scan(&likes); err != nil {
+			if err == sql.ErrNoRows {
+				log.Println(err)
+			}
+			log.Fatalf(err.Error())
+		}
+
+		post.Nickname = nickname
+		posts = append(posts, post)
 	}
-	fmt.Println(posts)
 	jsonResp, err := json.Marshal(posts)
 	if err != nil {
 		log.Fatalf("Err: %s", err)
@@ -84,8 +99,6 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 
 	post.Content = r.FormValue("content")
 	post.UserID = userID
-
-	fmt.Println(post.Img)
 
 	stmt := `INSERT INTO posts (userId, content, img, created) VALUES (?, ?, ?, current_date)`
 	_, err = app.db.Exec(stmt, post.UserID, post.Content, post.Img)

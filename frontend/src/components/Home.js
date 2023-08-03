@@ -17,12 +17,16 @@ function Home() {
         return (
             <>
                 <div className="row">
-                    <div className="col-3"> <div className="col-4">Something here</div></div>
-                    <div className="col-6">
+                    <div className="col-3">
+                        <div>Something here</div>
+                    </div>
+                    <div className="col-5">
                         <CreatePost />
                         <GetPosts />
                     </div>
-                    <div className="col-3"> <div className="col-4">Something here</div></div>
+                    <div className="col-3">
+                        <div>Something here</div>
+                    </div>
                 </div>
             </>
         );

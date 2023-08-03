@@ -14,3 +14,18 @@
     padding: 0;
     margin: 0;
 }
+
+/*View post */
+
+.posts {
+    margin: 20px;
+    min-width: 440px;
+}
+
+.posts_content_cut{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
