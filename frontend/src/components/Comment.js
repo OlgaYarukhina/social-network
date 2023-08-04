@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-const CreatePost = () => {
+const CreateComment = ({ userId }) => {
     const [formData, setFormData] = useState({
-        userId: localStorage.getItem("userId"),
+        userId,
         content: "",
     });
     const [selectedImg, setSelectedImg] = useState(null);
@@ -104,7 +104,7 @@ const CreatePost = () => {
     );
 };
 
-export default CreatePost;
+export default CreateComment;
 
 
 

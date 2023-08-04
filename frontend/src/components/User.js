@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import Popup from "./Popup";
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 
 function User() {
     const [profileData, setProfileData] = useState({});
@@ -9,7 +9,9 @@ function User() {
 
     const [currentUserFollowStatus, setCurrentUserFollowStatus] = useState("");
     const { userId } = useParams();
-    const currentUserId = localStorage.getItem("userId");
+
+    const sessionData = useOutletContext();
+    const currentUserId = sessionData.userData.userId;
 
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [showFollowingPopup, setShowFollowingPopup] = useState(false);

@@ -7,8 +7,6 @@ function Home() {
     const navigateTo = useNavigate();
     const sessionData = useOutletContext();
 
-    console.log(sessionData)
-
     useEffect(() => {
         if (!sessionData.sessionExists) {
             navigateTo("/login");
@@ -23,8 +21,8 @@ function Home() {
                         <div>Something here</div>
                     </div>
                     <div className="col-5 posts">
-                        <CreatePost />
-                        <GetPosts />
+                        <CreatePost userId={sessionData.userData.userId} />
+                        <GetPosts userId={sessionData.userData.userId} />
                     </div>
                     <div className="col-3">
                         <div>Something here</div>

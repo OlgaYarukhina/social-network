@@ -1,15 +1,13 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 
-const CreatePost = () => {
+const CreatePost = ({ userId }) => {
     const [formData, setFormData] = useState({
-        userId: localStorage.getItem("userId"),
+        userId,
         content: "",
     });
     const [selectedImg, setSelectedImg] = useState(null);
     // const [uploaded, setUploaded] = useState();
     const imgPicker = useRef(null);
-    const navigateTo = useNavigate();
 
     const handleChange = (event) => {
         const { name, value } = event.target;
