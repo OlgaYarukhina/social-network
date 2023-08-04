@@ -26,7 +26,7 @@
     margin: 20px 0px;
 }
 
-.posts_content_cut{
+.posts-content-cut{
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

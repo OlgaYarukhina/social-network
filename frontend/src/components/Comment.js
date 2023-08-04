@@ -42,9 +42,6 @@ const CreatePost = () => {
             body: payload,
         };
 
-        console.log(payload)
-        console.log(payload.has("img"));
-
         try {
             const response = await fetch(
                 "http://localhost:8080/poster",
@@ -66,14 +63,12 @@ const CreatePost = () => {
             <div className="card card-body">
             <form onSubmit={handleSubmit}>
                 <div className="d-flex align-items-center">
-                    <div className="d-flex" >
                         <img
                             src={"https://cdn-icons-png.flaticon.com/512/6065/6065522.png"}
                             width="30"
                             height="30"
                         />
-                    </div>
-                    <div className="col d-flex align-items-center" >
+                    <div className="col d-flex" >
                         <textarea
                             className="form-control"
                             rows="1"
