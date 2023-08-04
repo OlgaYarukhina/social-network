@@ -22,7 +22,7 @@ function Home() {
                     <div className="col-3">
                         <div>Something here</div>
                     </div>
-                    <div className="col-5">
+                    <div className="col-5 posts">
                         <CreatePost />
                         <GetPosts />
                     </div>

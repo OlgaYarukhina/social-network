@@ -19,7 +19,11 @@
 
 .posts {
     margin: 20px;
-    min-width: 440px;
+    min-width: 500px;
+}
+
+.post {
+    margin: 20px 0px;
 }
 
 .posts_content_cut{
@@ -29,3 +33,13 @@
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
 }
+
+.clickable-text {
+    cursor: pointer;
+    
+  }
+
+
+  .expand-link-text {
+    color: rgb(133, 139, 141); /* Optional: Change the color to indicate it's clickable */
+  }
