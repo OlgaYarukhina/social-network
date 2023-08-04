@@ -46,7 +46,7 @@ const GetPosts = () => {
                                     </div>
                                 </div>
                                 <img
-                                    src={`http://localhost:8080/get-image/${post.img}`}
+                                    src={`http://localhost:8080/get-image/posts/${post.img}`}
                                 />
                                 <div className="card-body">
                                     <p className="card-text posts_content_cut">{post.content}</p>

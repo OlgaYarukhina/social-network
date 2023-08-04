@@ -7,10 +7,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
-	"strings"
 
 	"01.kood.tech/git/aaaspoll/social-network/backend/models"
+	"github.com/gofrs/uuid"
 )
 
 func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,15 +62,6 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (app *application) ImageHandler(w http.ResponseWriter, r *http.Request) {
-	wd, err := os.Getwd()
-	imagePath := wd + strings.TrimPrefix(r.URL.Path, "/get-image")
-	if err != nil {
-		log.Println(err)
-	}
-	http.ServeFile(w, r, imagePath)
-}
-
 func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(10 << 20) // 10 MB max memory
 
@@ -83,7 +75,9 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 
 	imgDir := "backend/media/posts"
 
-	newFile, err := os.Create(imgDir + "/" + handler.Filename)
+	imgName := uuid.Must(uuid.NewV4()).String() + filepath.Ext(handler.Filename)
+
+	newFile, err := os.Create(imgDir + "/" + imgName)
 	if err != nil {
 		log.Println(err)
 		return
@@ -96,10 +90,8 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	imgPath := imgDir + "/" + handler.Filename
-
 	var post models.Post
-	post.Img = imgPath
+	post.Img = imgName
 	userIDStr := r.FormValue("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {

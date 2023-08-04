@@ -57,7 +57,7 @@ function User() {
                     <div className="col-md-4">
                         <img
                             className="profile-pic m-3"
-                            src={`http://localhost:8080/get-image/backend/media/users/${profileData.profilePic}`}
+                            src={`http://localhost:8080/get-image/users/${profileData.profilePic}`}
                             style={{
                                 height: "150px",
                                 width: "150px",
