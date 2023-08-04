@@ -18,7 +18,7 @@ import (
 func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	var posts []models.Post
 
-	stmt := `SELECT postId, userId, content, COALESCE(img, ""), likes, privacy, created FROM posts ORDER BY created DESC LIMIT 200`
+	stmt := `SELECT postId, userId, content, COALESCE(img, ""), privacy, created FROM posts ORDER BY created DESC LIMIT 200`
 	
 	rows, err := app.db.Query(stmt)
 	defer rows.Close()
@@ -26,7 +26,7 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		post := models.Post{}
 		var img sql.NullString
-		err = rows.Scan(&post.PostID, &post.UserID, &post.Content, &img, &post.Likes, &post.Privacy, &post.CreatedAt)
+		err = rows.Scan(&post.PostID, &post.UserID, &post.Content, &img, &post.Privacy, &post.CreatedAt)
 		if err != nil {
 			log.Fatalf("Err: %s", err)
 		}
@@ -37,22 +37,21 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var nickname string
-		if err := app.db.QueryRow("SELECT nickname from users WHERE userId = ?", post.UserID).Scan(&nickname); err != nil {
+		var firstName string
+		var lastName string
+		if err := app.db.QueryRow(`SELECT COALESCE(nickname, ""), firstName, lastName, profilePic from users WHERE userId = ?`, post.UserID).Scan(&nickname, &firstName, &lastName, &post.ProfilePic); err != nil {
 			if err == sql.ErrNoRows {
 				log.Println(err)
 			}
 			log.Fatalf(err.Error())
 		}
 
-		var likes int
-		if err := app.db.QueryRow("SELECT likes from posts WHERE postId = ?", post.PostID).Scan(&likes); err != nil {
-			if err == sql.ErrNoRows {
-				log.Println(err)
-			}
-			log.Fatalf(err.Error())
+		if nickname == "" {
+			post.DisplayName = firstName + " " + lastName
+		} else {
+			post.DisplayName = nickname
 		}
 
-		post.Nickname = nickname
 		posts = append(posts, post)
 	}
 	jsonResp, err := json.Marshal(posts)
@@ -116,3 +115,75 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	return
 }
+
+func (app *application) LikeHandler(w http.ResponseWriter, r *http.Request) {
+	var likeInfo models.Like
+
+	err := json.NewDecoder(r.Body).Decode(&likeInfo)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	result, err := app.db.Exec("DELETE FROM post_likes WHERE postId = ? AND userId = ?", likeInfo.PostId, likeInfo.UserId)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if rowsAffected == 0 {
+		app.db.Exec("INSERT INTO post_likes (postId, userId) VALUES (?, ?)", likeInfo.PostId, likeInfo.UserId)
+	}
+	
+	w.WriteHeader(http.StatusOK)
+}
+
+func (app *application) GetLikesHandler(w http.ResponseWriter, r *http.Request) {
+	var likers = []models.User{}
+	currentUserId := r.URL.Query().Get("userId")
+	postId := r.URL.Query().Get("postId")
+
+	query := `
+		SELECT u.userId, u.firstName, u.lastName, u.profilePic, u.public
+		FROM users AS u
+		INNER JOIN post_likes AS pl ON u.userId = pl.userId
+		WHERE pl.postId = ? 
+	`
+
+	rows, err := app.db.Query(query, postId)
+	if err != nil {
+		log.Println(err)
+	}
+
+	for rows.Next() {
+		var liker models.User
+		err := rows.Scan(&liker.UserId, &liker.FirstName, &liker.LastName, &liker.ProfilePic, &liker.Public)
+		if err != nil {
+			log.Println(err)
+		}
+
+		liker.CurrentUserFollowStatus = getCurrentUserFollowStatus(strconv.Itoa(liker.UserId), currentUserId, app.db)
+
+		likers = append(likers, liker)
+	}
+
+	jsonData, err := json.Marshal(likers)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+
+

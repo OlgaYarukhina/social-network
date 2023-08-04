@@ -17,7 +17,7 @@ function User() {
     const [showFollowingPopup, setShowFollowingPopup] = useState(false);
 
     useEffect(() => {
-        setIsProfileOwner(currentUserId === userId);
+        setIsProfileOwner(currentUserId === parseInt(userId));
 
         const getProfileData = async () => {
             try {
@@ -42,17 +42,28 @@ function User() {
 
     const handleFollow = () => {
         if (currentUserFollowStatus === "Follow") {
-            sendFollowRequest(profileData.public ? "Follow" : "RequestFollow", parseInt(userId), parseInt(currentUserId));
+            sendFollowRequest(
+                profileData.public ? "Follow" : "RequestFollow",
+                parseInt(userId),
+                parseInt(currentUserId)
+            );
             setCurrentUserFollowStatus(
                 profileData.public ? "Following" : "Requested"
             );
         } else {
-            sendFollowRequest("Unfollow", parseInt(userId), parseInt(currentUserId));
+            sendFollowRequest(
+                "Unfollow",
+                parseInt(userId),
+                parseInt(currentUserId)
+            );
             setCurrentUserFollowStatus("Follow");
         }
     };
 
-    if (Array.isArray(profileData.followers) && Array.isArray(profileData.following)) {
+    if (
+        Array.isArray(profileData.followers) &&
+        Array.isArray(profileData.following)
+    ) {
         return (
             <div className="container mt-5">
                 <div className="row">
@@ -166,10 +177,7 @@ export const sendFollowRequest = async (followType, userId, followerId) => {
     };
 
     try {
-        const response = await fetch(
-            "http://localhost:8080/follow",
-            options
-        );
+        const response = await fetch("http://localhost:8080/follow", options);
         if (response.ok) {
             console.log("ok");
         } else {
