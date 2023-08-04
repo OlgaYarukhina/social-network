@@ -2,9 +2,8 @@ import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 
-function Header() {
+function Header({ userId, firstName, lastName, profilePic }) {
     const navigateTo = useNavigate();
-    const userId = localStorage.getItem("userId");
 
     const logOut = async (event) => {
         event.preventDefault();
@@ -22,10 +21,9 @@ function Header() {
                 options
             );
             if (response.ok) {
-                localStorage.removeItem("userId");
                 document.cookie =
                     "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; samesite=None; secure";
-                window.location.href = "/login"; 
+                window.location.href = "/login";
             } else {
                 const statusMsg = await response.text();
                 console.log(statusMsg);
@@ -42,11 +40,25 @@ function Header() {
     return (
         <div>
             <Navbar bg="info" variant="light">
-                <Navbar href="#home">SN</Navbar>
+                <Navbar
+                    onClick={() => navigateTo("/")}
+                    style={{ cursor: "pointer" }}
+                >
+                    SN
+                </Navbar>
                 <Nav className="mr-auto nav_bar_wrapper"></Nav>
                 <Nav>
                     <SearchBar onSearch={handleSearch} />
-                    <NavDropdown title="Pick of user">
+                    <img
+                        src={`http://localhost:8080/get-image/users/${profilePic}`}
+                        alt="Small Image"
+                        style={{
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "50%",
+                        }}
+                    />
+                    <NavDropdown title={`${firstName} ${lastName} `}>
                         <NavDropdown.Item
                             onClick={() => {
                                 navigateTo(`/user/${userId}`);

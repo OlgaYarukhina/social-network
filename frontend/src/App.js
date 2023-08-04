@@ -5,10 +5,12 @@ import Header from "./components/Header";
 
 function App() {
     const [sessionExists, setSessionExists] = useState(null);
+    const [userData, setUserData] = useState({});
 
     useEffect(() => {
-        hasSession().then((isAuthorized) => {
-            setSessionExists(isAuthorized);
+        hasSession().then((result) => {
+            setSessionExists(result.isAuthorized);
+            setUserData(result.user);
         });
     }, []);
 
@@ -18,8 +20,15 @@ function App() {
 
     return (
         <>
-            {sessionExists ? <Header /> : null}
-            <Outlet context={sessionExists} />
+            {sessionExists ? (
+                <Header
+                    userId={userData.userId}
+                    firstName={userData.firstName}
+                    lastName={userData.lastName}
+                    profilePic={userData.profilePic}
+                />
+            ) : null}
+            <Outlet context={{ sessionExists, userData }} />
         </>
     );
 }

@@ -5,15 +5,17 @@ import CreatePost from "./Poster";
 
 function Home() {
     const navigateTo = useNavigate();
-    const sessionExists = useOutletContext();
+    const sessionData = useOutletContext();
+
+    console.log(sessionData)
 
     useEffect(() => {
-        if (!sessionExists) {
+        if (!sessionData.sessionExists) {
             navigateTo("/login");
         }
     });
 
-    if (sessionExists) {
+    if (sessionData.sessionExists) {
         return (
             <>
                 <div className="row">

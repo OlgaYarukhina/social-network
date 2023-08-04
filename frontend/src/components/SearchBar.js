@@ -21,7 +21,7 @@ function SearchBar({ onSearch }) {
                     placeholder="Search"
                     value={searchText}
                     onChange={handleSearchChange}
-                    style={{ marginRight: "8px" }}
+                    style={{ marginRight: "20px" }}
                 />
             </div>
         </Form>

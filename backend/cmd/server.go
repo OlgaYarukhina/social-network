@@ -15,7 +15,7 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/", app.Home)
 	mux.HandleFunc("/register", app.RegisterHandler)
 	mux.HandleFunc("/login", app.LoginHandler)
-	mux.HandleFunc("/get-cookie", app.CookieHandler)
+	mux.HandleFunc("/check-auth", app.AuthHandler)
 	mux.HandleFunc("/logout", app.LogOutHandler)
 	mux.HandleFunc("/posts", app.PostsHandler)
 	mux.HandleFunc("/poster", app.CreatePostHandler)

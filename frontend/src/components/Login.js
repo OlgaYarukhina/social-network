@@ -8,12 +8,10 @@ function Login() {
     });
 
     const navigateTo = useNavigate();
-    const sessionExists = useOutletContext();
-
-    console.log(sessionExists);
+    const sessionData = useOutletContext();
 
     useEffect(() => {
-        if (sessionExists) {
+        if (sessionData.sessionExists) {
             navigateTo("/");
         }
     });
@@ -53,7 +51,6 @@ function Login() {
                     data.cookieId
                 }; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
 
-                localStorage.setItem("userId", JSON.stringify(data.userId));
                 window.location.href = "/";
             } else {
                 const statusMsg = await response.text();
@@ -64,7 +61,7 @@ function Login() {
         }
     };
 
-    if (!sessionExists) {
+    if (!sessionData.sessionExists) {
         return (
             <div className="container mt-5 bg-dark text-light p-4 rounded">
                 <div className="row justify-content-center">

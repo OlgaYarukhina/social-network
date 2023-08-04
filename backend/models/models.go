@@ -16,7 +16,7 @@ type User struct {
 	AboutMe                 string `json:"aboutMe,omitempty"`
 	Public                  bool   `json:"public,omitempty"`
 	Online                  bool   `json:"online,omitempty"`
-	CurrentUserFollowStatus string `json:"currentUserFollowStatus"`
+	CurrentUserFollowStatus string `json:"currentUserFollowStatus,omitempty"`
 	FollowsCurrentUser      bool   `json:"followsCurrentUser,omitempty"`
 	Followers               []User `json:"followers"`
 	Following               []User `json:"following"`

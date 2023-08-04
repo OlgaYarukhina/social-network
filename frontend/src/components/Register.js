@@ -22,10 +22,10 @@ function Register() {
     };
 
     const navigateTo = useNavigate();
-    const sessionExists = useOutletContext();
+    const sessionData = useOutletContext();
 
     useEffect(() => {
-        if (sessionExists) {
+        if (sessionData.sessionExists) {
             navigateTo("/");
         }
     });
@@ -61,7 +61,7 @@ function Register() {
         }
     };
 
-    if (!sessionExists) {
+    if (!sessionData.sessionExists) {
         return (
             <div className="container mt-5 bg-dark text-light p-4 rounded">
                 <div className="row justify-content-center">

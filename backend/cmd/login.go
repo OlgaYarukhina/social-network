@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -23,24 +24,24 @@ func (app *application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	app.db.QueryRow("SELECT password FROM users WHERE email = ?", loginInfo.Email).Scan(&passwordQ)
 
 	err = verifyPassword(passwordQ, loginInfo.Password)
-	if err == nil {
-		userId := app.getUserId(loginInfo.Email)
-		sessionId := app.createCookie(w, userId)
-
-		response := models.LoginResponse{
-			UserId:   userId,
-			CookieId: sessionId,
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		err = json.NewEncoder(w).Encode(response)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	} else {
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Login unsuccessful"))
+		return
+	}
+
+	userId := app.getUserId(loginInfo.Email)
+	sessionId := app.createCookie(w, userId)
+
+	response := models.LoginResponse{
+		UserId:   userId,
+		CookieId: sessionId,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		log.Println(err)
 		return
 	}
 }
@@ -72,26 +73,34 @@ func (app *application) LogOutHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 		return
-	} 
-		w.WriteHeader(http.StatusOK)
-	   // w.Write([]byte("Ended session for user with ID: " + userId))      // Do we need it?
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
-func (app *application) CookieHandler(w http.ResponseWriter, r *http.Request) {
-	
+func (app *application) AuthHandler(w http.ResponseWriter, r *http.Request) {
 	cookieId := r.URL.Query().Get("cookieId")
-	// check if a session exists for the given cookieId
-	var exists bool
-	err := app.db.QueryRow("SELECT EXISTS(SELECT 1 FROM sessions WHERE sessionKey = ?)", cookieId).Scan(&exists)
+	// check if a session exists for the given cookieId, get the userId if it exists
+	var userId int
+	err := app.db.QueryRow("SELECT userId FROM sessions WHERE sessionKey = ?", cookieId).Scan(&userId)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Println(err)
+			return
+		}
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Session does not exist for user"))
+	}
+
+	var user models.User
+	err = app.db.QueryRow("SELECT userId, firstName, lastName, profilePic FROM users WHERE userId = ?", userId).Scan(&user.UserId, &user.FirstName, &user.LastName, &user.ProfilePic)
+	if err != nil {
+		log.Println(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
 		log.Println(err)
 		return
-	}
-	if exists {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Session exists for user"))
-	} else {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Session does not exist for user"))
 	}
 }
