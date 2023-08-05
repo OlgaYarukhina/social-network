@@ -30,10 +30,9 @@ const GetPosts = ({ userId }) => {
     return (
         <div>
             {posts.length > 0 ? (
-                posts.map((post, index) => (
+                posts.map((post) => (
                     <SinglePost
                         key={post.postId}
-                        index={index}
                         postId={post.postId}
                         userId={post.userId}
                         displayName={post.displayName}

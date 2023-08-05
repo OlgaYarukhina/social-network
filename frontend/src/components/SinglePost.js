@@ -5,7 +5,6 @@ import Popup from "./Popup";
 import { useNavigate } from "react-router-dom";
 
 function SinglePost({
-    index,
     postId,
     userId,
     displayName,
@@ -16,19 +15,19 @@ function SinglePost({
     currentUserId,
     profilePic,
 }) {
-    const [expandedIndex, setExpandedIndex] = useState(-1); // Initialize to -1 to indicate no post is expanded
+    
 
     const [likes, setLikes] = useState([]);
     const [currentUserLike, setCurrentUserLike] = useState(null);
     const [likeAmount, setLikeAmount] = useState(null);
     const [showLikesPopup, setShowLikesPopup] = useState(false);
+    const [expanded, setExpanded] = useState(false);
+
+    const handlePostClick = () => {
+        setExpanded(!expanded);
+    };
 
     const navigateTo = useNavigate();
-
-    const handlePostClick = (index) => {
-        // Toggle the expansion state for the clicked post
-        setExpandedIndex((prevIndex) => (prevIndex === index ? -1 : index));
-    };
 
     useEffect(() => {
         const getLikes = async () => {
@@ -126,29 +125,23 @@ function SinglePost({
                         )}
                         <div className="card-body">
                             <p
-                                className={`card-text ${
-                                    expandedIndex === index
-                                        ? ""
-                                        : "posts-content-cut"
-                                } clickable-text`}
-                                style={{whiteSpace: "pre-wrap"}}
-                                onClick={() => handlePostClick(index)}
+                                 className={`card-text ${expanded ? "" : "posts-content-cut"} clickable-text`}
+                                 onClick={handlePostClick}
                             >
                                 {content}
                             </p>
-                            {expandedIndex !== index &&
-                                content.length > 100 && (
+                            {(!expanded && content.length > 100) && ( 
                                     <p
                                         className="expand-post-link expand-link-text clickable-text"
-                                        onClick={() => handlePostClick(index)}
+                                        onClick={handlePostClick}
                                     >
                                         Show more
                                     </p>
                                 )}
-                            {expandedIndex === index && (
+                           {expanded && (
                                 <p
                                     className="expand-post-link expand-link-text clickable-text"
-                                    onClick={() => handlePostClick(index)}
+                                    onClick={handlePostClick}
                                 >
                                     Show less
                                 </p>
