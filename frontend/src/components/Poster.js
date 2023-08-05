@@ -43,6 +43,12 @@ const CreatePost = ({ userId }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (!formData.content && !selectedImg) {
+            alert('Please add either some text or an image to create a post.');
+            return;
+        }
+        
         let payload = new FormData();
         payload.append("userId", formData.userId);
         payload.append("content", formData.content);
@@ -93,7 +99,7 @@ const CreatePost = ({ userId }) => {
                             maxLength="2000"
                             ref={textAreaRef} // Attach the ref to the text area
                             onFocus={handleFocus} // Trigger handleFocus when the text area gains focus
-                            required>
+                        >
                         </textarea>
                     </div>
                     <div className="d-flex mb-2 align-items-center">
