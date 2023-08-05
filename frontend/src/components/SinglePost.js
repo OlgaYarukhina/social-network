@@ -157,7 +157,7 @@ function SinglePost({
                                 <div className="btn-group">
                                     <div
                                         style={{
-                                            backgroundImage: `url(http://localhost:3000/icons/icons/Like${currentUserLike ? "" : ""}_72px.png)`,
+                                            backgroundImage: `url(http://localhost:3000/icons/Like${currentUserLike ? "" : "1"}_72px.png)`,
                                             backgroundSize: "cover",
                                             backgroundRepeat: "no-repeat",
                                             backgroundPosition: "center center",
