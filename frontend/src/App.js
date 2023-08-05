@@ -28,7 +28,9 @@ function App() {
                     profilePic={userData.profilePic}
                 />
             ) : null}
-            <Outlet context={{ sessionExists, userData }} />
+            <div style={{marginTop: "55px"}}>
+                <Outlet context={{ sessionExists, userData }} />
+            </div>
         </>
     );
 }

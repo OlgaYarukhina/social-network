@@ -39,7 +39,7 @@ function Header({ userId, firstName, lastName, profilePic }) {
 
     return (
         <div>
-            <Navbar bg="info" variant="light">
+            <Navbar bg="info" variant="light" className="fixed-top">
                 <Navbar
                     onClick={() => navigateTo("/")}
                     style={{ cursor: "pointer" }}

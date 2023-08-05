@@ -11,6 +11,7 @@ function PopupUser({
     followStatus,
     isPublic,
     onClose,
+    profilePic,
 }) {
     const [currentUserFollowStatus, setCurrentUserFollowStatus] =
         useState(followStatus);
@@ -37,14 +38,21 @@ function PopupUser({
     return (
         <div key={userId}>
             <div className="user-info">
-                <div
-                    onClick={() => {
-                        navigateTo(`/user/${userId}`);
-                        onClose();
-                    }}
-                    style={{ cursor: "pointer" }}
-                >
-                    <h5>{firstName + " " + lastName}</h5>
+                <div className="d-flex align-items-center">
+                    <img
+                        src={`http://localhost:8080/get-image/users/${profilePic}`}
+                        width="50"
+                        height="50"
+                    />
+                    <div
+                        onClick={() => {
+                            navigateTo(`/user/${userId}`);
+                            onClose();
+                        }}
+                        style={{ cursor: "pointer", marginLeft: "10px" }}
+                    >
+                        <h5>{firstName + " " + lastName}</h5>
+                    </div>
                 </div>
                 {userId != currentUserId && (
                     <Button

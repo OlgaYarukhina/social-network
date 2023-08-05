@@ -20,6 +20,7 @@ const Popup = ({ title, users, show, currentUserId, onClose }) => {
                         followStatus={user.currentUserFollowStatus}
                         isPublic={user.public}
                         onClose={onClose}
+                        profilePic={user.profilePic}
                     />
                 ))}
             </Modal.Body>

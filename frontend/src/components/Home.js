@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import GetPosts from "./Posts";
 import CreatePost from "./Poster";
+import ChatSidebar from "./ChatSidebar";
 
 function Home() {
     const navigateTo = useNavigate();
@@ -25,7 +26,7 @@ function Home() {
                         <GetPosts userId={sessionData.userData.userId} />
                     </div>
                     <div className="col-3">
-                        <div>Something here</div>
+                        <ChatSidebar userId={sessionData.userData.userId}/>
                     </div>
                 </div>
             </>

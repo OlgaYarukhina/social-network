@@ -5,6 +5,7 @@ import Popup from "./Popup";
 import { useNavigate } from "react-router-dom";
 
 function SinglePost({
+    index,
     postId,
     userId,
     displayName,
@@ -15,19 +16,19 @@ function SinglePost({
     currentUserId,
     profilePic,
 }) {
-    
+    const [expandedIndex, setExpandedIndex] = useState(-1); // Initialize to -1 to indicate no post is expanded
 
     const [likes, setLikes] = useState([]);
     const [currentUserLike, setCurrentUserLike] = useState(null);
     const [likeAmount, setLikeAmount] = useState(null);
     const [showLikesPopup, setShowLikesPopup] = useState(false);
-    const [expanded, setExpanded] = useState(false);
-
-    const handlePostClick = () => {
-        setExpanded(!expanded);
-    };
 
     const navigateTo = useNavigate();
+
+    const handlePostClick = (index) => {
+        // Toggle the expansion state for the clicked post
+        setExpandedIndex((prevIndex) => (prevIndex === index ? -1 : index));
+    };
 
     useEffect(() => {
         const getLikes = async () => {
@@ -125,43 +126,51 @@ function SinglePost({
                         )}
                         <div className="card-body">
                             <p
-                                 className={`card-text ${expanded ? "" : "posts-content-cut"} clickable-text`}
-                                 onClick={handlePostClick}
+                                className={`card-text ${
+                                    expandedIndex === index
+                                        ? ""
+                                        : "posts-content-cut"
+                                } clickable-text`}
+                                style={{whiteSpace: "pre-wrap"}}
+                                onClick={() => handlePostClick(index)}
                             >
                                 {content}
                             </p>
-                            {(!expanded && content.length > 100) && ( 
+                            {expandedIndex !== index &&
+                                content.length > 100 && (
                                     <p
                                         className="expand-post-link expand-link-text clickable-text"
-                                        onClick={handlePostClick}
+                                        onClick={() => handlePostClick(index)}
                                     >
                                         Show more
                                     </p>
                                 )}
-                           {expanded && (
+                            {expandedIndex === index && (
                                 <p
                                     className="expand-post-link expand-link-text clickable-text"
-                                    onClick={handlePostClick}
+                                    onClick={() => handlePostClick(index)}
                                 >
                                     Show less
                                 </p>
                             )}
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="btn-group">
-                                    <button
-                                        type="button"
-                                        className="btn btn-sm"
+                                    <div
                                         style={{
-                                            background: currentUserLike
-                                                ? "green"
-                                                : "white",
+                                            backgroundImage: `url(http://localhost:3000/icons/icons/Like${currentUserLike ? "" : "1"}_72px.png)`,
+                                            backgroundSize: "cover",
+                                            backgroundRepeat: "no-repeat",
+                                            backgroundPosition: "center center",
+                                            width: "22px",
+                                            height: "22px",
+                                            marginRight: "5px",
+                                            cursor: "pointer",
                                         }}
                                         onClick={() =>
                                             handlePostLike(parseInt(postId))
                                         }
                                     >
-                                        👍
-                                    </button>{" "}
+                                    </div>{" "}
                                     <small
                                         style={{
                                             fontWeight: "bold",

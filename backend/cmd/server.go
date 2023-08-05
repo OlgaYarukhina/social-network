@@ -23,6 +23,7 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/follow", app.CreateFollowHandler)
 	mux.HandleFunc("/post-like", app.LikeHandler)
 	mux.HandleFunc("/get-likes", app.GetLikesHandler)
+	mux.HandleFunc("/get-chatbar-data", app.GetChatbarDataHandler)
 	mux.HandleFunc("/get-image/", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/get-image/", http.FileServer(http.Dir("backend/media"))).ServeHTTP(w, r)
 	})
