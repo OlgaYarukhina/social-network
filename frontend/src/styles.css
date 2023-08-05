@@ -26,7 +26,7 @@
     margin: 20px 0px;
 }
 
-.posts-content-cut{
+.posts-content-cut {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -36,10 +36,84 @@
 
 .clickable-text {
     cursor: pointer;
-    
+
+}
+
+.expand-link-text {
+    color: rgb(133, 139, 141);
+}
+
+.textarea-resize {
+    height: 1rem;
+    transition: height 0.2s ease;
+}
+
+.image-button {
+    width: 40px;
+    height: 40px; 
+    padding: 0;
+    border: none;
+    background-image: url("/./public/icons/Image_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.image-comment-button {
+    width: 20px;
+    height: 20px; 
+    padding: 0;
+    border: none;
+    background-image: url("/./public/icons/Image_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.send-comment-button {
+    width: 20px;
+    height: 20px; 
+    padding: 0;
+    border: none;
+    background-image: url("/./public/icons/Send_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+
+/* Checkbox */
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
   }
-
-
-  .expand-link-text {
-    color: rgb(133, 139, 141); /* Optional: Change the color to indicate it's clickable */
+  
+  .custom-checkbox {
+    /* Hide the default checkbox */
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .checkmark {
+    /* Create the custom checkbox design */
+    position: relative;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    margin-right: 8px;
+  }
+  
+  /* Style the custom checkbox when checked */
+  .custom-checkbox:checked + .checkmark::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    background-color: #443a72; 
   }

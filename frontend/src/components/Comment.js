@@ -61,43 +61,47 @@ const CreateComment = ({ userId }) => {
     return (
         <div>
             <div className="card card-body">
-            <form onSubmit={handleSubmit}>
-                <div className="d-flex align-items-center">
+                <form onSubmit={handleSubmit}>
+                    <div className="d-flex align-items-center">
                         <img
                             src={"https://cdn-icons-png.flaticon.com/512/6065/6065522.png"}
                             width="30"
                             height="30"
                         />
-                    <div className="col d-flex" >
-                        <textarea
-                            className="form-control"
-                            rows="1"
-                            placeholder="Leave comment..."
-                            id="content"
-                            name="content"
-                            value={formData.content}
-                            onChange={handleChange}
-                            maxLength="100"
-                            required>
-                        </textarea>
+                        <div className="col d-flex" >
+                            <textarea
+                                className="form-control"
+                                rows="1"
+                                placeholder="Leave comment..."
+                                id="content"
+                                name="content"
+                                value={formData.content}
+                                onChange={handleChange}
+                                maxLength="100"
+                                required>
+                            </textarea>
+                        </div>
+                        <div>
+                            <button
+                                className="btn image-comment-button"
+                                onClick={handleImg}></button>
+                            <input
+                                className="hidden"
+                                type="file"
+                                ref={imgPicker}
+                                onChange={handleChangeImg}
+                                accept="image/*, .png, .jpg, .gif"
+                            />
+                        </div>
+                        <div>
+                            <button
+                                className="btn send-comment-button"
+                                type="submit"
+                            >
+                            </button>
+                        </div>
+
                     </div>
-                    <button
-                        className="btn btn-dark"
-                        onClick={handleImg}>IMG</button>
-                    <input
-                        className="hidden"
-                        type="file"
-                        ref={imgPicker}
-                        onChange={handleChangeImg}
-                        accept="image/*, .png, .jpg, .gif"
-                    />
-                    <button
-                        className="btn btn-dark"
-                        type="submit"
-                    >Save
-                    </button>
-                    
-                </div>
                 </form>
             </div>
         </div>

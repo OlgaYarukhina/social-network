@@ -67,10 +67,10 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	r.ParseMultipartForm(10 << 20) // 10 MB max memory
 
 	var post models.Post
-	post.Img = "" // Initialize the image to an empty string
+	post.Img = "" 
 
 	file, handler, err := r.FormFile("img")
-	if err == nil { // Check if an image is uploaded
+	if err == nil { 
 		defer file.Close()
 
 		imgDir := "backend/media/posts"
@@ -100,12 +100,13 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	post.Content = r.FormValue("content")
 	post.UserID = userID
+	post.Content = r.FormValue("content")
+	post.Privacy = r.FormValue("privacy")
 	post.CreatedAt = time.Now()
 
-		stmt := `INSERT INTO posts (userId, content, img, created) VALUES (?, ?, ?, ?)`
-		_, err = app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.CreatedAt)
+		stmt := `INSERT INTO posts (userId, content, img, privacy, created) VALUES (?, ?, ?, ?, ?)`
+		_, err = app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.Privacy, post.CreatedAt)
 	
 
 	if err != nil {
