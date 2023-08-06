@@ -35,13 +35,25 @@ type FollowRequest struct {
 }
 
 type Post struct {
+	PostID        int       `json:"postId,string"`
+	UserID        int       `json:"userId,string"`
+	DisplayName   string    `json:"displayName"`
+	ProfilePic    string    `json:"profilePic"`
+	Content       string    `json:"content"`
+	Img           string    `json:"img"`
+	Privacy       string    `json:"privacy"`
+	CreatedAt     time.Time `json:"createdAt"`
+	CommentAmount int       `json:"commentAmount"`
+}
+
+type Comment struct {
+	CommentId   int       `json:"commentId,string"`
 	PostID      int       `json:"postId,string"`
 	UserID      int       `json:"userId,string"`
 	DisplayName string    `json:"displayName"`
 	ProfilePic  string    `json:"profilePic"`
 	Content     string    `json:"content"`
 	Img         string    `json:"img"`
-	Privacy     string    `json:"privacy"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
 

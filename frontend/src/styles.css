@@ -83,11 +83,11 @@
     width: 26px;
     height: 22px; 
     margin-left: 20px;
+    margin-right: 8px;
     border: none;
     background-image: url("http://localhost:3000/icons/Comment_72px.png");
     background-size: cover;
     background-repeat: no-repeat;
-    cursor: pointer;
 }
 
 

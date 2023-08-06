@@ -1,15 +1,17 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
-const CreateComment = ({ userId }) => {
+const CreateComment = ({ userId, postId, updateCommentAmount }) => {
     const [formData, setFormData] = useState({
         userId,
+        postId,
         content: "",
     });
     const [selectedImg, setSelectedImg] = useState(null);
     // const [uploaded, setUploaded] = useState();
     const imgPicker = useRef(null);
-    const navigateTo = useNavigate();
+
+    const sessionData = useOutletContext();
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -20,22 +22,24 @@ const CreateComment = ({ userId }) => {
     };
 
     const handleChangeImg = (event) => {
-        setSelectedImg(event.target.files[0])
+        setSelectedImg(event.target.files[0]);
     };
 
     const handleImg = () => {
         imgPicker.current.click();
-    }
-
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         let payload = new FormData();
         payload.append("userId", formData.userId);
+        payload.append("postId", formData.postId);
         payload.append("content", formData.content);
         if (selectedImg) {
-            payload.append('img', selectedImg);
-        };
+            payload.append("img", selectedImg);
+        }
+
+        setFormData({ userId, postId, content: "" });
 
         const options = {
             method: "POST",
@@ -44,11 +48,12 @@ const CreateComment = ({ userId }) => {
 
         try {
             const response = await fetch(
-                "http://localhost:8080/poster",
+                "http://localhost:8080/create-comment",
                 options
             );
             if (response.ok) {
-                navigateTo("/");  // Why it does not work?
+                updateCommentAmount();
+                console.log("posted");
             } else {
                 const statusMsg = await response.text();
                 console.log(statusMsg);
@@ -64,11 +69,11 @@ const CreateComment = ({ userId }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="d-flex align-items-center">
                         <img
-                            src={"https://cdn-icons-png.flaticon.com/512/6065/6065522.png"}
+                            src={`http://localhost:8080/get-image/users/${sessionData.userData.profilePic}`}
                             width="30"
                             height="30"
                         />
-                        <div className="col d-flex" >
+                        <div className="col d-flex">
                             <textarea
                                 className="form-control"
                                 rows="1"
@@ -78,13 +83,14 @@ const CreateComment = ({ userId }) => {
                                 value={formData.content}
                                 onChange={handleChange}
                                 maxLength="100"
-                                required>
-                            </textarea>
+                                required
+                            ></textarea>
                         </div>
                         <div>
                             <button
                                 className="btn image-comment-button"
-                                onClick={handleImg}></button>
+                                onClick={handleImg}
+                            ></button>
                             <input
                                 className="hidden"
                                 type="file"
@@ -97,10 +103,8 @@ const CreateComment = ({ userId }) => {
                             <button
                                 className="btn send-comment-button"
                                 type="submit"
-                            >
-                            </button>
+                            ></button>
                         </div>
-
                     </div>
                 </form>
             </div>
@@ -110,9 +114,8 @@ const CreateComment = ({ userId }) => {
 
 export default CreateComment;
 
+{
+    /* 
 
-
-
-{/* 
-
- */}
+ */
+}

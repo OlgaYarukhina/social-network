@@ -36,6 +36,12 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 			post.Img = ""
 		}
 
+		err = app.db.QueryRow("SELECT COUNT(*) FROM comments WHERE postId = ?", post.PostID).Scan(&post.CommentAmount)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
 		var nickname string
 		var firstName string
 		var lastName string

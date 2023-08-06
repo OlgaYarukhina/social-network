@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import Popup from "./Popup";
 import { useOutletContext, useParams } from "react-router-dom";
+import Popup from "./Popup";
 
 function User() {
     const [profileData, setProfileData] = useState({});

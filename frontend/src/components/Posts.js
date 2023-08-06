@@ -40,6 +40,7 @@ const GetPosts = ({ userId }) => {
                         img={post.img}
                         createdAt={post.createdAt}
                         content={post.content}
+                        comments={post.commentAmount}
                         currentUserId={userId}
                         profilePic={post.profilePic}
                     />

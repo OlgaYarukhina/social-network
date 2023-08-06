@@ -137,7 +137,6 @@ const CreatePost = ({ userId }) => {
                     </div>
                 </div>
             </form>
-
         </div>
     );
 };

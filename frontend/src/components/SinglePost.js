@@ -3,6 +3,7 @@ import CreateComment from "./Comment";
 import { getTimeDiff } from "./Posts";
 import Popup from "./Popup";
 import { useNavigate } from "react-router-dom";
+import GetComments from "./GetComments";
 
 function SinglePost({
     postId,
@@ -12,6 +13,7 @@ function SinglePost({
     img,
     createdAt,
     content,
+    comments,
     currentUserId,
     profilePic,
 }) {
@@ -19,12 +21,16 @@ function SinglePost({
     const [currentUserLike, setCurrentUserLike] = useState(null);
     const [likeAmount, setLikeAmount] = useState(null);
     const [showLikesPopup, setShowLikesPopup] = useState(false);
-    const [comments, setComments] = useState([]);
+    const [commentAmount, setCommentAmount] = useState(comments);
     const [showComments, setShowComments] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
     const handlePostClick = () => {
         setExpanded(!expanded);
+    };
+
+    const updateCommentAmount = () => {
+        setCommentAmount((prevAmount) => prevAmount + 1);
     };
 
     const navigateTo = useNavigate();
@@ -89,27 +95,6 @@ function SinglePost({
         }
     };
 
-    const handleCommentClick = async () => {
-        setShowComments(!showComments);
-    
-        if (!showComments) {
-            try {
-                const response = await fetch(
-                    `http://localhost:8080/get-comments?postId=${postId}`
-                );
-                if (response.ok) {
-                    const data = await response.json();
-                    setComments(data);
-                } else {
-                    console.log(response.statusText);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    };
-    
-
     if (currentUserLike !== null) {
         return (
             <div>
@@ -145,12 +130,14 @@ function SinglePost({
                         )}
                         <div className="card-body">
                             <p
-                                className={`card-text ${expanded ? "" : "posts-content-cut"} clickable-text`}
+                                className={`card-text ${
+                                    expanded ? "" : "posts-content-cut"
+                                } clickable-text`}
                                 onClick={handlePostClick}
                             >
                                 {content}
                             </p>
-                            {(!expanded && content.length > 100) && (
+                            {!expanded && content.length > 100 && (
                                 <p
                                     className="expand-post-link expand-link-text clickable-text"
                                     onClick={handlePostClick}
@@ -170,7 +157,9 @@ function SinglePost({
                                 <div className="btn-group">
                                     <div
                                         style={{
-                                            backgroundImage: `url(http://localhost:3000/icons/Like${currentUserLike ? "" : "1"}_72px.png)`,
+                                            backgroundImage: `url(http://localhost:3000/icons/Like${
+                                                currentUserLike ? "" : "1"
+                                            }_72px.png)`,
                                             backgroundSize: "cover",
                                             backgroundRepeat: "no-repeat",
                                             backgroundPosition: "center center",
@@ -182,8 +171,7 @@ function SinglePost({
                                         onClick={() =>
                                             handlePostLike(parseInt(postId))
                                         }
-                                    >
-                                    </div>{" "}
+                                    ></div>{" "}
                                     <small
                                         style={{
                                             cursor:
@@ -209,23 +197,38 @@ function SinglePost({
                                     />
                                     <div
                                         className="comment-button"
-                                        onClick={handleCommentClick}
-                                    >
-                                    </div>
+                                        style={{
+                                            cursor: commentAmount
+                                                ? "pointer"
+                                                : "default",
+                                        }}
+                                        onClick={() =>
+                                            setShowComments(
+                                                commentAmount
+                                                    ? !showComments
+                                                    : false
+                                            )
+                                        }
+                                    ></div>
+                                    <small>{commentAmount}</small>
                                 </div>
                                 <small className="text-body-secondary">
                                     {getTimeDiff(createdAt)}
                                 </small>
                             </div>
                         </div>
-                        {showComments && comments.map((comment) => (
-                        <div className="comments-field">
-                            <p>{comment.text}</p> 
-                        </div>
-                    ))}
-                        <CreateComment userId={currentUserId} />
+                        <GetComments
+                            showComments={showComments}
+                            postId={postId}
+                            userId={currentUserId}
+                            commentAmount={commentAmount}
+                        />
+                        <CreateComment
+                            userId={currentUserId}
+                            postId={postId}
+                            updateCommentAmount={updateCommentAmount}
+                        />
                     </div>
-                  
                 </div>
             </div>
         );
