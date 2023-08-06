@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"01.kood.tech/git/aaaspoll/social-network/backend/models"
 	"github.com/gofrs/uuid"
@@ -89,6 +90,7 @@ func (app *application) AuthHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Session does not exist for user"))
+		return
 	}
 
 	var user models.User
@@ -96,6 +98,8 @@ func (app *application) AuthHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	user.ChattableUsers = getChattableUsers(strconv.Itoa(userId), app.db)
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(user)

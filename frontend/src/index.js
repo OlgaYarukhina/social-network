@@ -7,6 +7,7 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import User from "./components/User";
+import UserChat from "./components/UserChat";
 
 const router = createBrowserRouter([
     {
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
             { path: "/register", element: <Register /> },
             { path: "/login", element: <Login /> },
             { path: "/user/:userId", element: <User /> },
+            { path: "/chat/user/:userId", element: <UserChat /> },
         ],
     },
 ]);

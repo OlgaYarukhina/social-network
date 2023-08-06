@@ -1,45 +1,24 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
-
-	"01.kood.tech/git/aaaspoll/social-network/backend/models"
 )
 
-func (app *application) GetChatbarDataHandler(w http.ResponseWriter, r *http.Request) {
-	currentUserId := r.URL.Query().Get("userId")
+func (app *application) GetChatDataHandler(w http.ResponseWriter, r *http.Request) {
+	var chatData SendChatDataEvent
 
-	var chattableUsers = []models.User{}
-
-	query := `
-		SELECT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
-		FROM users AS u
-		INNER JOIN followers AS f ON u.userId = f.userId
-		WHERE f.followerId = ?
-	`
-
-	rows, err := app.db.Query(query, currentUserId)
+	err := json.NewDecoder(r.Body).Decode(&chatData)
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
-	for rows.Next() {
-		var chattableUser models.User
-		err := rows.Scan(&chattableUser.UserId, &chattableUser.FirstName, &chattableUser.LastName, &chattableUser.Nickname, &chattableUser.ProfilePic, &chattableUser.Public)
-		if err != nil {
-			log.Println(err)
-		}
+	returnData := getChatData(chatData.CurrentChatterId, chatData.OtherChatterId, chatData.Amount, app.db)
 
-		if chattableUser.Public || getViewedUserFollowStatus(strconv.Itoa(chattableUser.UserId), currentUserId, app.db) {
-			chattableUsers = append(chattableUsers, chattableUser)
-		}
-	}
-
-	jsonData, err := json.Marshal(chattableUsers)
-
+	jsonData, err := json.Marshal(returnData)
 	if err != nil {
 		log.Println(err)
 		return
@@ -48,4 +27,44 @@ func (app *application) GetChatbarDataHandler(w http.ResponseWriter, r *http.Req
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
+}
+
+func addMessageToTable(messageData ReturnMessageEvent, db *sql.DB) {
+	statement, err := db.Prepare("INSERT INTO user_messages (senderId, receiverId, content) VALUES (?, ?, ?)")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = statement.Exec(messageData.SenderId, messageData.ReceiverId, messageData.Content)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
+func getChatData(currentChatterId, otherChatterId, amount int, db *sql.DB) ReturnChatDataEvent {
+	var returnChatData ReturnChatDataEvent
+
+	returnChatData.CurrentChatterDisplayname = getDisplaynameById(currentChatterId, db)
+	returnChatData.OtherChatterDisplayname = getDisplaynameById(otherChatterId, db)
+
+	rows, err := db.Query(`
+		SELECT messageId, senderId, receiverId, content, sent FROM user_messages 
+		WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)
+		ORDER BY sent DESC LIMIT ?`, currentChatterId, otherChatterId, otherChatterId, currentChatterId, amount)
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var messageData ReturnMessageEvent
+
+		rows.Scan(&messageData.MessageId, &messageData.SenderId, &messageData.ReceiverId, &messageData.Content, &messageData.Sent)
+		returnChatData.Messages = append(returnChatData.Messages, messageData)
+	}
+	reverseSlice(returnChatData.Messages)
+
+	return returnChatData
 }

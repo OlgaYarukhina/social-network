@@ -22,7 +22,7 @@ function ChatSidebarUser({
                     />
                     <div className="d-flex align-items-center"
                         onClick={() => {
-                            navigateTo(`/chat/${userId}`);
+                            navigateTo(`/chat/user/${userId}`);
                         }}
                     >
                         <h5 style={{marginLeft: "10px"}}>

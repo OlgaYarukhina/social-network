@@ -20,6 +20,7 @@ type User struct {
 	FollowsCurrentUser      bool   `json:"followsCurrentUser,omitempty"`
 	Followers               []User `json:"followers"`
 	Following               []User `json:"following"`
+	ChattableUsers          []User `json:"chattableUsers"`
 }
 
 type LoginResponse struct {

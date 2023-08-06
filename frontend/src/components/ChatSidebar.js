@@ -1,37 +1,13 @@
-import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import ChatSidebarUser from "./ChatSidebarUser";
 
-function ChatSidebar({ userId }) {
-    const [chattableUsers, setChattableUsers] = useState(null);
-
-    useEffect(() => {
-        const getChattableUsers = async () => {
-            try {
-                const response = await fetch(
-                    `http://localhost:8080/get-chatbar-data?userId=${userId}`
-                );
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(data);
-                    setChattableUsers(data);
-                } else {
-                    console.error(
-                        "Failed to fetch chattable users:",
-                        response.status
-                    );
-                }
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            }
-        };
-        console.log(chattableUsers);
-
-        getChattableUsers();
-    }, []);
+function ChatSidebar() {
+    const sessionData = useOutletContext();
+    const chattableUsers = sessionData.userData.chattableUsers;
 
     if (chattableUsers) {
         return (
-            <div style={{position: "fixed"}}>
+            <div style={{ position: "fixed" }}>
                 <div className="d-flex align-items-center">
                     <hr className="flex-grow-1 m-1" />
                     <div className="p-2 font-weight-bold">

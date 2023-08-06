@@ -138,3 +138,33 @@ func getUserFollowing(userId, currentUserId string, db *sql.DB) []models.User {
 
 	return following
 }
+
+func getChattableUsers(currentUserId string, db *sql.DB) []models.User {
+	var chattableUsers = []models.User{}
+
+	query := `
+		SELECT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
+		FROM users AS u
+		INNER JOIN followers AS f ON u.userId = f.userId
+		WHERE f.followerId = ?
+	`
+
+	rows, err := db.Query(query, currentUserId)
+	if err != nil {
+		log.Println(err)
+	}
+
+	for rows.Next() {
+		var chattableUser models.User
+		err := rows.Scan(&chattableUser.UserId, &chattableUser.FirstName, &chattableUser.LastName, &chattableUser.Nickname, &chattableUser.ProfilePic, &chattableUser.Public)
+		if err != nil {
+			log.Println(err)
+		}
+
+		if chattableUser.Public || getViewedUserFollowStatus(strconv.Itoa(chattableUser.UserId), currentUserId, db) {
+			chattableUsers = append(chattableUsers, chattableUser)
+		}
+	}
+
+	return chattableUsers
+}
