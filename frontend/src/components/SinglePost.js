@@ -5,7 +5,6 @@ import Popup from "./Popup";
 import { useNavigate } from "react-router-dom";
 
 function SinglePost({
-    index,
     postId,
     userId,
     displayName,
@@ -16,20 +15,19 @@ function SinglePost({
     currentUserId,
     profilePic,
 }) {
-    const [expandedIndex, setExpandedIndex] = useState(-1); // Initialize to -1 to indicate no post is expanded
-
     const [likes, setLikes] = useState([]);
     const [currentUserLike, setCurrentUserLike] = useState(null);
     const [likeAmount, setLikeAmount] = useState(null);
     const [showLikesPopup, setShowLikesPopup] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [showComments, setShowComments] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
-    const navigateTo = useNavigate();
-
-    const handlePostClick = (index) => {
-        // Toggle the expansion state for the clicked post
-        setExpandedIndex((prevIndex) => (prevIndex === index ? -1 : index));
+    const handlePostClick = () => {
+        setExpanded(!expanded);
     };
 
+    const navigateTo = useNavigate();
     useEffect(() => {
         const getLikes = async () => {
             try {
@@ -91,6 +89,27 @@ function SinglePost({
         }
     };
 
+    const handleCommentClick = async () => {
+        setShowComments(!showComments);
+    
+        if (!showComments) {
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/get-comments?postId=${postId}`
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    setComments(data);
+                } else {
+                    console.log(response.statusText);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
+    
+
     if (currentUserLike !== null) {
         return (
             <div>
@@ -126,29 +145,23 @@ function SinglePost({
                         )}
                         <div className="card-body">
                             <p
-                                className={`card-text ${
-                                    expandedIndex === index
-                                        ? ""
-                                        : "posts-content-cut"
-                                } clickable-text`}
-                                style={{whiteSpace: "pre-wrap"}}
-                                onClick={() => handlePostClick(index)}
+                                className={`card-text ${expanded ? "" : "posts-content-cut"} clickable-text`}
+                                onClick={handlePostClick}
                             >
                                 {content}
                             </p>
-                            {expandedIndex !== index &&
-                                content.length > 100 && (
-                                    <p
-                                        className="expand-post-link expand-link-text clickable-text"
-                                        onClick={() => handlePostClick(index)}
-                                    >
-                                        Show more
-                                    </p>
-                                )}
-                            {expandedIndex === index && (
+                            {(!expanded && content.length > 100) && (
                                 <p
                                     className="expand-post-link expand-link-text clickable-text"
-                                    onClick={() => handlePostClick(index)}
+                                    onClick={handlePostClick}
+                                >
+                                    Show more
+                                </p>
+                            )}
+                            {expanded && (
+                                <p
+                                    className="expand-post-link expand-link-text clickable-text"
+                                    onClick={handlePostClick}
                                 >
                                     Show less
                                 </p>
@@ -163,7 +176,7 @@ function SinglePost({
                                             backgroundPosition: "center center",
                                             width: "22px",
                                             height: "22px",
-                                            marginRight: "5px",
+                                            marginRight: "8px",
                                             cursor: "pointer",
                                         }}
                                         onClick={() =>
@@ -173,7 +186,6 @@ function SinglePost({
                                     </div>{" "}
                                     <small
                                         style={{
-                                            fontWeight: "bold",
                                             cursor:
                                                 likes.length > 0
                                                     ? "pointer"
@@ -186,7 +198,7 @@ function SinglePost({
                                             )
                                         }
                                     >
-                                        Likes: {likeAmount}
+                                        {likeAmount}
                                     </small>
                                     <Popup
                                         title="Liked by"
@@ -195,23 +207,25 @@ function SinglePost({
                                         currentUserId={currentUserId}
                                         onClose={() => setShowLikesPopup(false)}
                                     />
-                                    <button
-                                        type="button"
-                                        className="btn btn-sm"
+                                    <div
+                                        className="comment-button"
+                                        onClick={handleCommentClick}
                                     >
-                                        Comments
-                                    </button>{" "}
-                                    <small className="text-body-secondary">
-                                        ?
-                                    </small>
+                                    </div>
                                 </div>
                                 <small className="text-body-secondary">
                                     {getTimeDiff(createdAt)}
                                 </small>
                             </div>
                         </div>
+                        {showComments && comments.map((comment) => (
+                        <div className="comments-field">
+                            <p>{comment.text}</p> 
+                        </div>
+                    ))}
                         <CreateComment userId={currentUserId} />
                     </div>
+                  
                 </div>
             </div>
         );
