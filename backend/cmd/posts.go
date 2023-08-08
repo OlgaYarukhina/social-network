@@ -103,7 +103,7 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	userIDStr := r.FormValue("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
-		log.Printf("Error converting userId to int: %s", err)
+		log.Println(err)
 		return
 	}
 
@@ -112,53 +112,51 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	post.Privacy = r.FormValue("privacy")
 	input := r.FormValue("selectedFollowers")
 
-	// Remove brackets and spaces
-	input = strings.ReplaceAll(input, "[", "")
-	input = strings.ReplaceAll(input, "]", "")
-	input = strings.ReplaceAll(input, " ", "")
+	if input != "[]" {
+		// Remove brackets and spaces
+		input = strings.ReplaceAll(input, "[", "")
+		input = strings.ReplaceAll(input, "]", "")
+		input = strings.ReplaceAll(input, " ", "")
 
-	// Split the string into individual values
-	values := strings.Split(input, ",")
+		// Split the string into individual values
+		values := strings.Split(input, ",")
 
-	// Convert string values to integers
-	var array []int
-	for _, value := range values {
-		num, err := strconv.Atoi(value)
-		if err != nil {
-			log.Printf("Err: %s", err)
-			return
+		// Convert string values to integers
+		var arrayFollowersId []int
+		for _, value := range values {
+			num, err := strconv.Atoi(value)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			arrayFollowersId = append(arrayFollowersId, num)
 		}
-		array = append(array, num)
-	}
-	post.Followers = array
-	post.CreatedAt = time.Now()
 
-	stmt := `INSERT INTO posts (userId, content, img, privacy, created) VALUES (?, ?, ?, ?, ?)`
-	id, err := app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.Privacy, post.CreatedAt)
-	if err != nil {
-		log.Printf("Err: %s", err)
-	}
+		post.CreatedAt = time.Now()
 
-	if len(post.Followers) > 0 {
+		stmt := `INSERT INTO posts (userId, content, img, privacy, created) VALUES (?, ?, ?, ?, ?)`
+		id, err := app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.Privacy, post.CreatedAt)
+		if err != nil {
+			log.Println(err)
+		}
 
 		postId, err := id.LastInsertId()
 
-		for _, selectedUserId := range post.Followers {
+		for _, selectedUserId := range arrayFollowersId {
 			stmt := `INSERT INTO exclusive_posts (postId, selectedUserId) VALUES (?, ?)`
 			_, err = app.db.Exec(stmt, postId, selectedUserId)
 
 			if err != nil {
-				log.Printf("Err: %s", err)
+				log.Println(err)
 			}
 		}
 		if err != nil {
-			log.Printf("Err: %s", err)
+			log.Println(err)
 		}
 
 	}
-	
+
 	w.WriteHeader(http.StatusOK)
-	return
 }
 
 func (app *application) LikeHandler(w http.ResponseWriter, r *http.Request) {
