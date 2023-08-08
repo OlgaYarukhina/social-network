@@ -21,6 +21,7 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/poster", app.CreatePostHandler)
 	mux.HandleFunc("/get-user-data", app.GetUserInfoHandler)
 	mux.HandleFunc("/follow", app.CreateFollowHandler)
+	mux.HandleFunc("/followers", app.FollowersHandler)
 	mux.HandleFunc("/post-like", app.LikeHandler)
 	mux.HandleFunc("/get-likes", app.GetLikesHandler)
 	mux.HandleFunc("/get-chat-data", app.GetChatDataHandler)

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -168,3 +169,42 @@ func getChattableUsers(currentUserId string, db *sql.DB) []models.User {
 
 	return chattableUsers
 }
+
+
+func (app *application) FollowersHandler(w http.ResponseWriter, r *http.Request) {
+	userId := r.URL.Query().Get("userId")
+	var followers = []models.User{}
+
+	query := `
+		SELECT u.userId, u.firstName, u.lastName, u.profilePic, u.public
+		FROM users AS u
+		INNER JOIN followers AS f ON u.userId = f.followerId
+		WHERE f.userId = ? 
+	`
+	
+	rows, err := app.db.Query(query, userId)
+	if err != nil {
+		log.Println(err)
+	}
+	
+	for rows.Next() {
+		var follower models.User
+		err := rows.Scan(&follower.UserId, &follower.FirstName, &follower.LastName, &follower.ProfilePic, &follower.Public)
+		if err != nil {
+			log.Println(err)
+		}
+	
+		followers = append(followers, follower)
+	}
+	
+	jsonResp, err := json.Marshal(followers)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+
+	fmt.Println(followers)
+
+	w.Write(jsonResp)
+}
+
+

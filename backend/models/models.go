@@ -42,6 +42,7 @@ type Post struct {
 	Content       string    `json:"content"`
 	Img           string    `json:"img"`
 	Privacy       string    `json:"privacy"`
+	Followers     []int     `json:"selectedFollowers"`
 	CreatedAt     time.Time `json:"createdAt"`
 	CommentAmount int       `json:"commentAmount"`
 }

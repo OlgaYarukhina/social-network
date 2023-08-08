@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"01.kood.tech/git/aaaspoll/social-network/backend/models"
@@ -19,7 +20,7 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	var posts []models.Post
 
 	stmt := `SELECT postId, userId, content, COALESCE(img, ""), privacy, created FROM posts ORDER BY created DESC LIMIT 200`
-	
+
 	rows, err := app.db.Query(stmt)
 	defer rows.Close()
 
@@ -73,10 +74,10 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	r.ParseMultipartForm(10 << 20) // 10 MB max memory
 
 	var post models.Post
-	post.Img = "" 
+	post.Img = ""
 
 	file, handler, err := r.FormFile("img")
-	if err == nil { 
+	if err == nil {
 		defer file.Close()
 
 		imgDir := "backend/media/posts"
@@ -109,16 +110,53 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	post.UserID = userID
 	post.Content = r.FormValue("content")
 	post.Privacy = r.FormValue("privacy")
+	input := r.FormValue("selectedFollowers")
+
+	// Remove brackets and spaces
+	input = strings.ReplaceAll(input, "[", "")
+	input = strings.ReplaceAll(input, "]", "")
+	input = strings.ReplaceAll(input, " ", "")
+
+	// Split the string into individual values
+	values := strings.Split(input, ",")
+
+	// Convert string values to integers
+	var array []int
+	for _, value := range values {
+		num, err := strconv.Atoi(value)
+		if err != nil {
+			log.Printf("Err: %s", err)
+			return
+		}
+		array = append(array, num)
+	}
+	post.Followers = array
 	post.CreatedAt = time.Now()
 
-		stmt := `INSERT INTO posts (userId, content, img, privacy, created) VALUES (?, ?, ?, ?, ?)`
-		_, err = app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.Privacy, post.CreatedAt)
-	
-
+	stmt := `INSERT INTO posts (userId, content, img, privacy, created) VALUES (?, ?, ?, ?, ?)`
+	id, err := app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.Privacy, post.CreatedAt)
 	if err != nil {
 		log.Printf("Err: %s", err)
 	}
 
+	if len(post.Followers) > 0 {
+
+		postId, err := id.LastInsertId()
+
+		for _, selectedUserId := range post.Followers {
+			stmt := `INSERT INTO exclusive_posts (postId, selectedUserId) VALUES (?, ?)`
+			_, err = app.db.Exec(stmt, postId, selectedUserId)
+
+			if err != nil {
+				log.Printf("Err: %s", err)
+			}
+		}
+		if err != nil {
+			log.Printf("Err: %s", err)
+		}
+
+	}
+	
 	w.WriteHeader(http.StatusOK)
 	return
 }
@@ -147,7 +185,7 @@ func (app *application) LikeHandler(w http.ResponseWriter, r *http.Request) {
 	if rowsAffected == 0 {
 		app.db.Exec("INSERT INTO post_likes (postId, userId) VALUES (?, ?)", likeInfo.PostId, likeInfo.UserId)
 	}
-	
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -191,6 +229,3 @@ func (app *application) GetLikesHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
 }
-
-
-

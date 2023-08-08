@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import PopupAddPrivacy from "./PopupPrivacy";
 
 const CreatePost = ({ userId }) => {
     const [formData, setFormData] = useState({
@@ -7,13 +8,14 @@ const CreatePost = ({ userId }) => {
     });
     const [selectedImg, setSelectedImg] = useState(null);
     const [isChecked, setIsChecked] = useState(false);
+    const [showFollowersPopup, setShowFollowersPopup] = useState(false);
+    const [selectedFollowers, setSelectedFollowers] = useState([]);
     // const [uploaded, setUploaded] = useState();
     const imgPicker = useRef(null);
     const textAreaRef = useRef(null);
-    const rows = 10;
 
     const handleFocus = () => {
-        textAreaRef.current.style.height = `${rows}rem`;
+        textAreaRef.current.style.height = `10rem`;
     };
 
     const handleChange = (event) => {
@@ -40,6 +42,18 @@ const CreatePost = ({ userId }) => {
         setIsChecked(event.target.checked);
     };
 
+    useEffect(() => {
+        if (isChecked) {
+            setShowFollowersPopup(true);
+        } else {
+            setShowFollowersPopup(false);
+        }
+    }, [isChecked]);
+
+    const handleFollowersSelection = (selectedIds) => {
+        setSelectedFollowers(selectedIds);
+    };
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -48,7 +62,7 @@ const CreatePost = ({ userId }) => {
             alert('Please add either some text or an image to create a post.');
             return;
         }
-        
+
         let payload = new FormData();
         payload.append("userId", formData.userId);
         payload.append("content", formData.content);
@@ -56,14 +70,18 @@ const CreatePost = ({ userId }) => {
             payload.append("img", selectedImg || "");
         };
         if (isChecked) {
-            payload.append("privacy", "Private" || "Public");
-        };
+            payload.append("privacy", "Private");
+        } else {
+            payload.append("privacy", "Public");
+        }
+        payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
 
         const options = {
             method: "POST",
             body: payload,
         };
 
+        console.log("payload")
         console.log(payload)
 
         try {
@@ -115,24 +133,32 @@ const CreatePost = ({ userId }) => {
                                 accept="image/*, .png, .jpg, .gif"
                             />
                         </div>
-                        <div className="col d-flex align-items-center" >
+                        <div className="col d-flex align-items-center">
                             <label className="checkbox-label">
                                 <input
                                     type="checkbox"
-                                    checked={isChecked}
+                                    checked={isChecked || selectedFollowers.length > 0}
                                     onChange={handleCheckboxChange}
                                     className="custom-checkbox"
                                 />
                                 <span className="checkmark"></span>
-                               Private
+                                Private
                             </label>
                         </div>
+                        <PopupAddPrivacy
+                            title="Choose users"
+                            show={showFollowersPopup}
+                            currentUserId={userId}
+                            onClose={() => setShowFollowersPopup(false)}
+                            onFollowersSelection={handleFollowersSelection} 
+                            selectedFollowers={selectedFollowers} // Pass the state
+                        />
                         <div className="d-flex" >
-                        <button
-                            className="btn btn-danger"
-                            onClick={handleSubmit} type="submit"
-                        >Publish
-                        </button>
+                            <button
+                                className="btn btn-danger"
+                                onClick={handleSubmit} type="submit"
+                            >Publish
+                            </button>
                         </div>
                     </div>
                 </div>
