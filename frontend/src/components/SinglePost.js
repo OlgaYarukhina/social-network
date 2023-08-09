@@ -38,7 +38,7 @@ function SinglePost({
         const getLikes = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:8080/get-likes?userId=${currentUserId}&postId=${postId}`
+                    `http://localhost:8080/get-post-likes?userId=${currentUserId}&postId=${postId}`
                 );
                 if (response.ok) {
                     const data = await response.json();
@@ -65,11 +65,11 @@ function SinglePost({
         getLikes();
     }, [currentUserLike]);
 
-    const handlePostLike = async (postId) => {
+    const handlePostLike = async () => {
         setCurrentUserLike(!currentUserLike);
 
         const payload = {
-            postId,
+            postId: parseInt(postId),
             userId: currentUserId,
         };
         const options = {
@@ -102,8 +102,6 @@ function SinglePost({
                     <div className="card shadow-sm post">
                         <div className="card">
                             <div
-                                onClick={() => navigateTo(`/user/${userId}`)}
-                                style={{ cursor: "pointer" }}
                                 className="d-flex align-items-center"
                             >
                                 <div className="col-2 d-flex">
@@ -111,10 +109,22 @@ function SinglePost({
                                         src={`http://localhost:8080/get-image/users/${profilePic}`}
                                         width="60"
                                         height="60"
+                                        onClick={() =>
+                                            navigateTo(`/user/${userId}`)
+                                        }
+                                        style={{ cursor: "pointer" }}
                                     />
                                 </div>
                                 <div className="col d-flex align-items-center">
-                                    <p className="card-text">{displayName}</p>
+                                    <p
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() =>
+                                            navigateTo(`/user/${userId}`)
+                                        }
+                                        className="card-text"
+                                    >
+                                        {displayName}
+                                    </p>
                                 </div>
                                 <div className="col-2">
                                     <small className="text-body-secondary">
@@ -168,9 +178,7 @@ function SinglePost({
                                             marginRight: "8px",
                                             cursor: "pointer",
                                         }}
-                                        onClick={() =>
-                                            handlePostLike(parseInt(postId))
-                                        }
+                                        onClick={handlePostLike}
                                     ></div>{" "}
                                     <small
                                         style={{

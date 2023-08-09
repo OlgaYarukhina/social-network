@@ -170,7 +170,18 @@ func (app *application) LikeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := app.db.Exec("DELETE FROM post_likes WHERE postId = ? AND userId = ?", likeInfo.PostId, likeInfo.UserId)
+	// checks if the request sent was for a comment or post
+	if likeInfo.CommentId == 0 {
+		addPostOrCommentLike("post", likeInfo.PostId, likeInfo.UserId, app.db)
+	} else {
+		addPostOrCommentLike("comment", likeInfo.CommentId, likeInfo.UserId, app.db)
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func addPostOrCommentLike(targetName string, targetId, userId int, db *sql.DB) {
+	result, err := db.Exec("DELETE FROM " + targetName + "_likes WHERE " + targetName + "Id = ? AND userId = ?", targetId, userId)
 	if err != nil {
 		log.Println(err)
 		return
@@ -183,13 +194,11 @@ func (app *application) LikeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if rowsAffected == 0 {
-		app.db.Exec("INSERT INTO post_likes (postId, userId) VALUES (?, ?)", likeInfo.PostId, likeInfo.UserId)
+		db.Exec("INSERT INTO " + targetName + "_likes (" + targetName + "Id, userId) VALUES (?, ?)", targetId, userId)
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
-func (app *application) GetLikesHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) GetPostLikesHandler(w http.ResponseWriter, r *http.Request) {
 	var likers = []models.User{}
 	currentUserId := r.URL.Query().Get("userId")
 	postId := r.URL.Query().Get("postId")

@@ -119,3 +119,44 @@ func (app *application) GetCommentsHandler(w http.ResponseWriter, r *http.Reques
 
 	w.Write(jsonResp)
 }
+
+func (app *application) GetCommentLikesHandler(w http.ResponseWriter, r *http.Request) {
+	var likers = []models.User{}
+	currentUserId := r.URL.Query().Get("userId")
+	commentId := r.URL.Query().Get("commentId")
+
+	query := `
+		SELECT u.userId, u.firstName, u.lastName, u.profilePic, u.public
+		FROM users AS u
+		INNER JOIN comment_likes AS cl ON u.userId = cl.userId
+		WHERE cl.commentId = ? 
+	`
+
+	rows, err := app.db.Query(query, commentId)
+	if err != nil {
+		log.Println(err)
+	}
+
+	for rows.Next() {
+		var liker models.User
+		err := rows.Scan(&liker.UserId, &liker.FirstName, &liker.LastName, &liker.ProfilePic, &liker.Public)
+		if err != nil {
+			log.Println(err)
+		}
+
+		liker.CurrentUserFollowStatus = getCurrentUserFollowStatus(strconv.Itoa(liker.UserId), currentUserId, app.db)
+
+		likers = append(likers, liker)
+	}
+
+	jsonData, err := json.Marshal(likers)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}

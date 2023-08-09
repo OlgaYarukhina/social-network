@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getTimeDiff } from "./Posts";
+import { useNavigate } from "react-router-dom";
+import Popup from "./Popup";
 
 function SingleComment({
     commentId,
@@ -11,9 +13,71 @@ function SingleComment({
     currentUserId,
     profilePic,
 }) {
-    const [currentUserLike, setCurrentUserLike] = useState(false);
-    const handleCommentLike = () => {
-        console.log(`${currentUserId} liked the comment ${commentId}`);
+    const [likes, setLikes] = useState([]);
+    const [currentUserLike, setCurrentUserLike] = useState(null);
+    const [likeAmount, setLikeAmount] = useState(null);
+    const [showLikesPopup, setShowLikesPopup] = useState(false);
+
+    const navigateTo = useNavigate();
+    useEffect(() => {
+        const getLikes = async () => {
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/get-comment-likes?userId=${currentUserId}&commentId=${commentId}`
+                );
+                if (response.ok) {
+                    const data = await response.json();
+
+                    var hasLiked = false;
+                    data.forEach((like) => {
+                        if (like.userId === currentUserId) {
+                            hasLiked = true;
+                        }
+                    });
+
+                    console.log(data);
+                    setLikeAmount(data.length);
+                    setCurrentUserLike(hasLiked);
+                    setLikes(data);
+                } else {
+                    console.log(response.statusText);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        getLikes();
+    }, [currentUserLike]);
+
+    const handleCommentLike = async () => {
+        setCurrentUserLike(!currentUserLike);
+
+        const payload = {
+            commentId: parseInt(commentId),
+            userId: currentUserId,
+        };
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        };
+
+        try {
+            const response = await fetch(
+                "http://localhost:8080/post-like",
+                options
+            );
+            if (response.ok) {
+                console.log("ok");
+            } else {
+                console.log(":(");
+            }
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
@@ -26,9 +90,17 @@ function SingleComment({
                         width="30"
                         height="30"
                         className="rounded-circle mr-2"
+                        onClick={() => navigateTo(`/user/${userId}`)}
+                        style={{ cursor: "pointer" }}
                     />
                     <div>
-                        <small className="text-muted">{displayName}</small>
+                        <small
+                            onClick={() => navigateTo(`/user/${userId}`)}
+                            className="text-muted"
+                            style={{ cursor: "pointer" }}
+                        >
+                            {displayName}
+                        </small>
                         <p>{content}</p>
                     </div>
                 </div>
@@ -57,7 +129,25 @@ function SingleComment({
                             }}
                             onClick={handleCommentLike}
                         ></div>
-                        <small>3</small>
+                        <small
+                            style={{
+                                cursor:
+                                    likes.length > 0 ? "pointer" : "default",
+                            }}
+                            className="text-body-secondary"
+                            onClick={() =>
+                                setShowLikesPopup(likes.length ? true : false)
+                            }
+                        >
+                            {likeAmount}
+                        </small>
+                        <Popup
+                            title="Liked by"
+                            users={likes}
+                            show={showLikesPopup}
+                            currentUserId={currentUserId}
+                            onClose={() => setShowLikesPopup(false)}
+                        />
                     </div>
                     <small className="text-body-secondary">
                         {getTimeDiff(createdAt)}

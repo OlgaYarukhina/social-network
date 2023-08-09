@@ -58,6 +58,7 @@ type Comment struct {
 }
 
 type Like struct {
-	PostId int `json:"postId"`
-	UserId int `json:"userId"`
+	PostId    int `json:"postId"`
+	CommentId int `json:"commentId"`
+	UserId    int `json:"userId"`
 }
