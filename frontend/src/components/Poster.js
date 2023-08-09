@@ -10,7 +10,6 @@ const CreatePost = ({ userId }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [selectedFollowers, setSelectedFollowers] = useState([]);
-    // const [uploaded, setUploaded] = useState();
     const imgPicker = useRef(null);
     const textAreaRef = useRef(null);
 
@@ -36,24 +35,21 @@ const CreatePost = ({ userId }) => {
 
     const handleImg = () => {
         imgPicker.current.click();
-    }
-
-    const handleCheckboxChange = (event) => {
-        setIsChecked(event.target.checked);
     };
 
-    useEffect(() => {
-        if (isChecked) {
-            setShowFollowersPopup(true);
-        } else {
-            setShowFollowersPopup(false);
-        }
-    }, [isChecked]);
 
     const handleFollowersSelection = (selectedIds) => {
         setSelectedFollowers(selectedIds);
     };
 
+    const handlePrivacyClick = () => {
+        setIsChecked(!isChecked);
+        setShowFollowersPopup(!isChecked);
+        
+        if (!isChecked) {
+            setSelectedFollowers([]); // Clear selected followers if switching to private
+        }
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -68,27 +64,18 @@ const CreatePost = ({ userId }) => {
         payload.append("content", formData.content);
         if (selectedImg) {
             payload.append("img", selectedImg || "");
-        };
-        if (isChecked) {
-            payload.append("privacy", "Private");
-        } else {
-            payload.append("privacy", "Public");
         }
+        payload.append("privacy", isChecked ? "Private" : "Public");
         payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
 
         const options = {
             method: "POST",
             body: payload,
         };
-
-        console.log("payload")
         console.log(payload)
 
         try {
-            const response = await fetch(
-                "http://localhost:8080/poster",
-                options
-            );
+            const response = await fetch("http://localhost:8080/poster", options);
             if (response.ok) {
                 window.location.href = "/";
             } else {
@@ -108,23 +95,22 @@ const CreatePost = ({ userId }) => {
                         <textarea
                             className="form-control textarea-resize"
                             rows="1"
-                            placeholder="What do you want you to say to this World?"
+                            placeholder="What do you want to say to this World?"
                             id="content"
                             name="content"
-                            type="button"
                             value={formData.content}
                             onChange={handleChange}
                             maxLength="2000"
-                            ref={textAreaRef} // Attach the ref to the text area
-                            onFocus={handleFocus} // Trigger handleFocus when the text area gains focus
-                        >
-                        </textarea>
+                            ref={textAreaRef}
+                            onFocus={handleFocus}
+                        />
                     </div>
                     <div className="d-flex mb-2 align-items-center">
                         <div className="col-2 d-flex" >
                             <button
                                 className="btn image-button"
-                                onClick={handleImg}></button>
+                                onClick={handleImg}
+                            />
                             <input
                                 className="hidden"
                                 type="file"
@@ -137,27 +123,31 @@ const CreatePost = ({ userId }) => {
                             <label className="checkbox-label">
                                 <input
                                     type="checkbox"
-                                    checked={isChecked || selectedFollowers.length > 0}
-                                    onChange={handleCheckboxChange}
+                                    checked={isChecked}
+                                    onChange={handlePrivacyClick}
                                     className="custom-checkbox"
                                 />
                                 <span className="checkmark"></span>
-                                Private
+                                Only for followers
                             </label>
                         </div>
-                        <PopupAddPrivacy
-                            title="Choose users"
-                            show={showFollowersPopup}
-                            currentUserId={userId}
-                            onClose={() => setShowFollowersPopup(false)}
-                            onFollowersSelection={handleFollowersSelection} 
-                            selectedFollowers={selectedFollowers} // Pass the state
-                        />
+                        {isChecked && (
+                            <PopupAddPrivacy
+                                title="Show to individual followers?"
+                                show={showFollowersPopup}
+                                currentUserId={userId}
+                                onClose={() => setShowFollowersPopup(false)}
+                                onFollowersSelection={handleFollowersSelection}
+                                selectedFollowers={selectedFollowers}
+                            />
+                        )}
                         <div className="d-flex" >
                             <button
                                 className="btn btn-danger"
-                                onClick={handleSubmit} type="submit"
-                            >Publish
+                                onClick={handleSubmit}
+                                type="submit"
+                            >
+                                Publish
                             </button>
                         </div>
                     </div>
@@ -168,10 +158,3 @@ const CreatePost = ({ userId }) => {
 };
 
 export default CreatePost;
-
-
-
-
-{/* 
-
- */}

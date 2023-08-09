@@ -15,13 +15,13 @@ function PopupGetChecked({
     const handleFollow = (isChecked) => {
         console.log("isChecked:", isChecked);
         if (isChecked) {
-          onFollowersSelection((prevSelected) => [...prevSelected, userId]);
+            onFollowersSelection((prevSelected) => [...prevSelected, userId]);
         } else {
-          onFollowersSelection((prevSelected) =>
-            prevSelected.filter((id) => id !== userId)
-          );
+            onFollowersSelection((prevSelected) =>
+                prevSelected.filter((id) => id !== userId)
+            );
         }
-      };
+    };
 
     return (
         <div key={userId}>

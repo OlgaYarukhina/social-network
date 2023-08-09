@@ -27,7 +27,7 @@ const PopupAddPrivacy = ({ title, show, currentUserId, onClose, onFollowersSelec
 
 
     if (followers.length === 0) {
-        return 
+        return null;
     }
 
     return (

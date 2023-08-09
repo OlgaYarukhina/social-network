@@ -112,7 +112,7 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	post.Privacy = r.FormValue("privacy")
 	input := r.FormValue("selectedFollowers")
 
-	if input != "[]" {
+	if input != "" {
 		// Remove brackets and spaces
 		input = strings.ReplaceAll(input, "[", "")
 		input = strings.ReplaceAll(input, "]", "")
@@ -124,12 +124,14 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 		// Convert string values to integers
 		var arrayFollowersId []int
 		for _, value := range values {
-			num, err := strconv.Atoi(value)
-			if err != nil {
-				log.Println(err)
-				return
+			if value != "" {
+				num, err := strconv.Atoi(value)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+				arrayFollowersId = append(arrayFollowersId, num)
 			}
-			arrayFollowersId = append(arrayFollowersId, num)
 		}
 
 		post.CreatedAt = time.Now()

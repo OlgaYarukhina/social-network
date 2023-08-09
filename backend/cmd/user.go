@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -201,8 +200,6 @@ func (app *application) FollowersHandler(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		log.Fatalf("Err: %s", err)
 	}
-
-	fmt.Println(followers)
 
 	w.Write(jsonResp)
 }
