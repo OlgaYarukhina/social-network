@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { useOutletContext, useParams } from "react-router-dom";
 import Popup from "./Popup";
+import CreatePost from "./Poster";
+import GetUserPosts from "./UserPosts.js";
 
 function User() {
     const [profileData, setProfileData] = useState({});
@@ -155,6 +157,10 @@ function User() {
                             onClose={() => setShowFollowingPopup(false)}
                         />
                     </div>
+                    <div className="col">
+                        <CreatePost userId={sessionData.userData.userId} />
+                        <GetUserPosts userId={sessionData.userData.userId} /> 
+                    </div>
                 </div>
             </div>
         );
@@ -190,3 +196,19 @@ export const sendFollowRequest = async (followType, userId, followerId) => {
 };
 
 export default User;
+
+
+{/* <>
+<div className="row">
+    <div className="col-3">
+        <div>Something here</div>
+    </div>
+    <div className="col-5 posts">
+        <CreatePost userId={sessionData.userData.userId} />
+        <GetPosts userId={sessionData.userData.userId} />
+    </div>
+    <div className="col-3">
+        <ChatSidebar userId={sessionData.userData.userId}/>
+    </div>
+</div>
+</> */}

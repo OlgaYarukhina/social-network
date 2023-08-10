@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import CreateComment from "./Comment";
-import { getTimeDiff } from "./Posts";
 import Popup from "./Popup";
 import { useNavigate } from "react-router-dom";
 import GetComments from "./GetComments";
@@ -242,5 +241,36 @@ function SinglePost({
         );
     }
 }
+
+ export const getTimeDiff = (dateStr) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+
+    const timeDiffInMilliseconds = now - date;
+    const timeDiffInSeconds = timeDiffInMilliseconds / 1000;
+
+    if (timeDiffInSeconds < 60) {
+        return "just now";
+    } else if (timeDiffInSeconds < 60 * 60) {
+        const minutesAgo = Math.floor(timeDiffInSeconds / 60);
+        return `${minutesAgo} minute${minutesAgo !== 1 ? "s" : ""} ago`;
+    } else if (timeDiffInSeconds < 24 * 60 * 60) {
+        const hoursAgo = Math.floor(timeDiffInSeconds / (60 * 60));
+        return `${hoursAgo} hour${hoursAgo !== 1 ? "s" : ""} ago`;
+    } else if (timeDiffInSeconds < 7 * 24 * 60 * 60) {
+        const daysAgo = Math.floor(timeDiffInSeconds / (24 * 60 * 60));
+        return `${daysAgo} day${daysAgo !== 1 ? "s" : ""} ago`;
+    } else if (timeDiffInSeconds < 30 * 24 * 60 * 60) {
+        const weeksAgo = Math.floor(timeDiffInSeconds / (7 * 24 * 60 * 60));
+        return `${weeksAgo} week${weeksAgo !== 1 ? "s" : ""} ago`;
+    } else if (timeDiffInSeconds < 12 * 30 * 24 * 60 * 60) {
+        const monthsAgo = Math.floor(timeDiffInSeconds / (30 * 24 * 60 * 60));
+        return `${monthsAgo} month${monthsAgo !== 1 ? "s" : ""} ago`;
+    } else {
+        const yearsAgo = Math.floor(timeDiffInSeconds / (365 * 24 * 60 * 60));
+        return `${yearsAgo} year${yearsAgo !== 1 ? "s" : ""} ago`;
+    }
+};
+
 
 export default SinglePost;

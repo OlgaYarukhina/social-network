@@ -70,6 +70,69 @@ func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Request) {
+	var posts = []models.Post{}
+	currentUserId := r.URL.Query().Get("userId")
+
+	stmt := `
+	SELECT postId, userId, content, COALESCE(img, ""), privacy, created 
+	FROM posts 
+	WHERE userId = ?
+	ORDER BY created DESC LIMIT 200
+	`
+
+	rows, err := app.db.Query(stmt, currentUserId)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+	defer rows.Close()
+	
+	for rows.Next() {
+		post := models.Post{}
+		var img sql.NullString
+		err = rows.Scan(&post.PostID, &post.UserID, &post.Content, &img, &post.Privacy, &post.CreatedAt)
+		if err != nil {
+			log.Fatalf("Err: %s", err)
+		}
+		if img.Valid {
+			post.Img = img.String
+		} else {
+			post.Img = ""
+		}
+
+		err = app.db.QueryRow("SELECT COUNT(*) FROM comments WHERE postId = ?", post.PostID).Scan(&post.CommentAmount)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		var nickname string
+		var firstName string
+		var lastName string
+		if err := app.db.QueryRow(`SELECT COALESCE(nickname, ""), firstName, lastName, profilePic from users WHERE userId = ?`, post.UserID).Scan(&nickname, &firstName, &lastName, &post.ProfilePic); err != nil {
+			if err == sql.ErrNoRows {
+				log.Println(err)
+			}
+			log.Fatalf(err.Error())
+		}
+
+		if nickname == "" {
+			post.DisplayName = firstName + " " + lastName
+		} else {
+			post.DisplayName = nickname
+		}
+
+		posts = append(posts, post)
+	}
+	jsonResp, err := json.Marshal(posts)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+
+	w.Write(jsonResp)
+	return
+}
+
 func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(10 << 20) // 10 MB max memory
 

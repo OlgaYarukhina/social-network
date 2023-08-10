@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getTimeDiff } from "./Posts";
+import { getTimeDiff } from "./SinglePost";
 import { useNavigate } from "react-router-dom";
 import Popup from "./Popup";
 

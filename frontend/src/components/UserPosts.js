@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import SinglePost from "./SinglePost";
 
-const GetPosts = ({ userId }) => {
-    const [posts, setPosts] = useState([]);
+const GetUserPosts = ({ userId }) => {
+    const [posts, setUserPosts] = useState([]);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await fetch("http://localhost:8080/posts");
+                const response = await fetch(
+                    `http://localhost:8080/get-user-posts?userId=${userId}`
+                    );
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
-                    setPosts(data);
+                    setUserPosts(data);
                 } else {
                     console.error("Failed to fetch posts:", response.status);
                 }
@@ -53,4 +55,5 @@ const GetPosts = ({ userId }) => {
 };
 
 
-export default GetPosts;
+
+export default GetUserPosts;

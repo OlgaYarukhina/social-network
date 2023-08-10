@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import PopupAddPrivacy from "./PopupPrivacy";
 
+
 const CreatePost = ({ userId }) => {
     const [formData, setFormData] = useState({
         userId,
@@ -65,7 +66,7 @@ const CreatePost = ({ userId }) => {
         if (selectedImg) {
             payload.append("img", selectedImg || "");
         }
-        payload.append("privacy", isChecked ? "Private" : "Public");
+        payload.append("privacy", !isChecked ? "Public" : selectedFollowers.length === 0 ? "Private" : "Specific");
         payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
 
         const options = {
