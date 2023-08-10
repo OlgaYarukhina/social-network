@@ -111,6 +111,7 @@ const CreatePost = ({ userId }) => {
                             <button
                                 className="btn image-button"
                                 onClick={handleImg}
+                                type="button"
                             />
                             <input
                                 className="hidden"

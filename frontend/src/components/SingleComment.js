@@ -91,7 +91,7 @@ function SingleComment({
                         height="30"
                         className="rounded-circle mr-2"
                         onClick={() => navigateTo(`/user/${userId}`)}
-                        style={{ cursor: "pointer" }}
+                        style={{ cursor: "pointer", borderRadius: "100%", }}
                     />
                     <div>
                         <small

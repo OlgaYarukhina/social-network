@@ -7,6 +7,11 @@ function Login() {
         password: "",
     });
 
+    const [formErrors, setFormErrors] = useState({
+        email: "",
+        password: "",
+    });
+
     const navigateTo = useNavigate();
     const sessionData = useOutletContext();
 
@@ -22,10 +27,45 @@ function Login() {
             ...prevFormData,
             [name]: value,
         }));
+
+        const err = getErr(name, value);
+        setFormErrors((prevErrs) => ({
+            ...prevErrs,
+            [name]: err,
+        }));
+    };
+
+    const getErr = (name, value) => {
+        if (
+            name === "email" &&
+            !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
+        ) {
+            return "Not a valid email address";
+        }
+        if (name === "password" && value.length < 6) {
+            return "Password is too short";
+        }
+        return "";
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        for (const key in formData) {
+            if (formData[key] === "") {
+                setFormErrors((prevErrs) => ({
+                    ...prevErrs,
+                    [key]: "This field is required",
+                }));
+            }
+        }
+
+        for (const key in formErrors) {
+            if (formErrors[key] !== "" || formData[key] === "") {
+                return;
+            }
+        }
+
         const payload = formData;
 
         const options = {
@@ -54,7 +94,17 @@ function Login() {
                 window.location.href = "/";
             } else {
                 const statusMsg = await response.text();
-                console.log(statusMsg);
+                if (statusMsg.includes("password")) {
+                    setFormErrors({
+                        email: "",
+                        password: statusMsg,
+                    });
+                } else {
+                    setFormErrors({
+                        email: statusMsg,
+                        password: "",
+                    });
+                }
             }
         } catch (error) {
             console.error(error);
@@ -63,24 +113,29 @@ function Login() {
 
     if (!sessionData.sessionExists) {
         return (
-            <div className="container mt-5 bg-dark text-light p-4 rounded">
+            <div className="container mt-5 p-4 rounded">
                 <div className="row justify-content-center">
                     <div className="col-lg-6">
                         <h2 className="mb-4">Login</h2>
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit} noValidate>
                             <div className="mb-3">
                                 <label htmlFor="email" className="form-label">
                                     Email
                                 </label>
                                 <input
                                     type="email"
-                                    className="form-control bg-dark text-light border-light"
+                                    className={`form-control ${
+                                        formErrors.email ? "is-invalid" : ""
+                                    }`}
                                     id="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
                                     required
                                 />
+                                <div className="invalid-feedback">
+                                    {formErrors.email}
+                                </div>
                             </div>
                             <div className="mb-3">
                                 <label
@@ -91,18 +146,23 @@ function Login() {
                                 </label>
                                 <input
                                     type="password"
-                                    className="form-control bg-dark text-light border-light"
+                                    className={`form-control ${
+                                        formErrors.password ? "is-invalid" : ""
+                                    }`}
                                     id="password"
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
                                 />
+                                <div className="invalid-feedback">
+                                    {formErrors.password}
+                                </div>
                             </div>
                             <div className="d-grid">
                                 <button
                                     type="submit"
-                                    className="btn btn-secondary btn-block"
+                                    className="btn btn-primary btn-block"
                                 >
                                     Login
                                 </button>
@@ -112,7 +172,7 @@ function Login() {
                         <div className="d-grid">
                             <button
                                 type="submit"
-                                className="btn btn-secondary btn-block"
+                                className="btn btn-primary btn-block"
                                 onClick={() => navigateTo("/register")}
                             >
                                 Don't have an account? Register here!

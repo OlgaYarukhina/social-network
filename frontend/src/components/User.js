@@ -77,6 +77,7 @@ function User() {
                                 height: "150px",
                                 width: "150px",
                                 borderRadius: "100%",
+                                border: "black 1px solid",
                                 objectFit: "cover",
                                 zIndex: "99999",
                             }}

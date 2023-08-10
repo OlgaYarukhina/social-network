@@ -72,6 +72,7 @@ const CreateComment = ({ userId, postId, updateCommentAmount }) => {
                             src={`http://localhost:8080/get-image/users/${sessionData.userData.profilePic}`}
                             width="30"
                             height="30"
+                            style={{borderRadius: "100%"}}
                         />
                         <div className="col d-flex">
                             <textarea

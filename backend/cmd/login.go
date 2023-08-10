@@ -22,12 +22,21 @@ func (app *application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var passwordQ string
-	app.db.QueryRow("SELECT password FROM users WHERE email = ?", loginInfo.Email).Scan(&passwordQ)
+	err = app.db.QueryRow("SELECT password FROM users WHERE email = ?", loginInfo.Email).Scan(&passwordQ)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("This user does not exist"))
+			return
+		}
+		log.Println(err)
+		return
+	}
 
 	err = verifyPassword(passwordQ, loginInfo.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Login unsuccessful"))
+		w.Write([]byte("Incorrect password"))
 		return
 	}
 

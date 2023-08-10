@@ -100,9 +100,7 @@ function SinglePost({
                 <div className="col">
                     <div className="card shadow-sm post">
                         <div className="card">
-                            <div
-                                className="d-flex align-items-center"
-                            >
+                            <div className="d-flex align-items-center">
                                 <div className="col-2 d-flex">
                                     <img
                                         src={`http://localhost:8080/get-image/users/${profilePic}`}
@@ -111,7 +109,10 @@ function SinglePost({
                                         onClick={() =>
                                             navigateTo(`/user/${userId}`)
                                         }
-                                        style={{ cursor: "pointer" }}
+                                        style={{
+                                            cursor: "pointer",
+                                            borderRadius: "100%",
+                                        }}
                                     />
                                 </div>
                                 <div className="col d-flex align-items-center">
@@ -242,7 +243,7 @@ function SinglePost({
     }
 }
 
- export const getTimeDiff = (dateStr) => {
+export const getTimeDiff = (dateStr) => {
     const date = new Date(dateStr);
     const now = new Date();
 
@@ -271,6 +272,5 @@ function SinglePost({
         return `${yearsAgo} year${yearsAgo !== 1 ? "s" : ""} ago`;
     }
 };
-
 
 export default SinglePost;
