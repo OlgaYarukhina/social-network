@@ -16,12 +16,23 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func (app *application) PostsHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var posts []models.Post
+	currentUserId := r.URL.Query().Get("userId")
 
-	stmt := `SELECT postId, userId, content, COALESCE(img, ""), privacy, created FROM posts ORDER BY created DESC LIMIT 200`
+	stmt := `
+	     SELECT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
+         FROM posts AS p
+         INNER JOIN followers AS f ON p.userId = f.userId 
+         LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
+         WHERE ((p.userId = ? OR f.followerId = ?) AND f.isRequest = false) 
+         AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
+    `
 
-	rows, err := app.db.Query(stmt)
+	rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -75,18 +86,21 @@ func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Reque
 	currentUserId := r.URL.Query().Get("userId")
 
 	stmt := `
-	SELECT postId, userId, content, COALESCE(img, ""), privacy, created 
-	FROM posts 
-	WHERE userId = ?
-	ORDER BY created DESC LIMIT 200
-	`
+	     SELECT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
+         FROM posts AS p
+         INNER JOIN followers AS f ON p.userId = f.userId 
+         LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
+         WHERE p.userId = ? AND ((p.userId = ? OR f.followerId = ?) AND f.isRequest = false) 
+         AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
+    `
 
-	rows, err := app.db.Query(stmt, currentUserId)
+
+	rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId, currentUserId)
 	if err != nil {
 		log.Fatalf("Err: %s", err)
 	}
 	defer rows.Close()
-	
+
 	for rows.Next() {
 		post := models.Post{}
 		var img sql.NullString
@@ -244,7 +258,7 @@ func (app *application) LikeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addPostOrCommentLike(targetName string, targetId, userId int, db *sql.DB) {
-	result, err := db.Exec("DELETE FROM " + targetName + "_likes WHERE " + targetName + "Id = ? AND userId = ?", targetId, userId)
+	result, err := db.Exec("DELETE FROM "+targetName+"_likes WHERE "+targetName+"Id = ? AND userId = ?", targetId, userId)
 	if err != nil {
 		log.Println(err)
 		return
@@ -257,7 +271,7 @@ func addPostOrCommentLike(targetName string, targetId, userId int, db *sql.DB) {
 	}
 
 	if rowsAffected == 0 {
-		db.Exec("INSERT INTO " + targetName + "_likes (" + targetName + "Id, userId) VALUES (?, ?)", targetId, userId)
+		db.Exec("INSERT INTO "+targetName+"_likes ("+targetName+"Id, userId) VALUES (?, ?)", targetId, userId)
 	}
 }
 

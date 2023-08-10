@@ -7,7 +7,9 @@ const GetPosts = ({ userId }) => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await fetch("http://localhost:8080/posts");
+                const response = await fetch(
+                    `http://localhost:8080/get-posts?userId=${userId}`
+                    );
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
