@@ -49,7 +49,7 @@ function SinglePost({
                         }
                     });
 
-                    console.log(data);
+                  //  console.log(data);
                     setLikeAmount(data.length);
                     setCurrentUserLike(hasLiked);
                     setLikes(data);

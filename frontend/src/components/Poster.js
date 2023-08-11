@@ -11,8 +11,9 @@ const CreatePost = ({ userId }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [selectedFollowers, setSelectedFollowers] = useState([]);
-    const imgPicker = useRef(null);
     const textAreaRef = useRef(null);
+    const imgPicker = useRef(null);
+    const imagePreviewRef = useRef(null);
 
     const handleFocus = () => {
         textAreaRef.current.style.height = `10rem`;
@@ -28,11 +29,26 @@ const CreatePost = ({ userId }) => {
 
     const handleChangeImg = (event) => {
         if (event.target.files.length > 0) {
-            setSelectedImg(event.target.files[0]);
+          setSelectedImg(event.target.files[0]);
+          showImagePreview(event.target.files[0]);
         } else {
-            setSelectedImg(null);
+          setSelectedImg(null);
+          hideImagePreview();
         }
-    };
+      };
+
+      const showImagePreview = (file) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imagePreviewRef.current.src = e.target.result;
+          imagePreviewRef.current.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      };
+    
+      const hideImagePreview = () => {
+        imagePreviewRef.current.style.display = "none";
+      };
 
     const handleImg = () => {
         imgPicker.current.click();
@@ -46,7 +62,7 @@ const CreatePost = ({ userId }) => {
     const handlePrivacyClick = () => {
         setIsChecked(!isChecked);
         setShowFollowersPopup(!isChecked);
-        
+
         if (!isChecked) {
             setSelectedFollowers([]); // Clear selected followers if switching to private
         }
@@ -106,6 +122,17 @@ const CreatePost = ({ userId }) => {
                             onFocus={handleFocus}
                         />
                     </div>
+
+                    <div className="image-preview">
+                        <img
+                            ref={imagePreviewRef}
+                            src=""
+                            alt="Image preview"
+                            style={{ maxWidth: "100%", maxHeight: "80px", display: "none" }}
+                        />
+                    </div>
+
+
                     <div className="d-flex mb-2 align-items-center">
                         <div className="col-2 d-flex" >
                             <button

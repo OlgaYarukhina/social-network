@@ -22,6 +22,8 @@ function User() {
 
     useEffect(() => {
         setIsProfileOwner(currentUserId === parseInt(userId));
+        console.log("Current user")
+        console.log(currentUserId)
 
         const getProfileData = async () => {
             try {
@@ -100,6 +102,11 @@ function User() {
             console.error(error);
         }
     };
+
+    console.log("user1")
+    console.log(userId)
+    console.log("usecurr")
+    console.log(currentUserId)
 
     if (
         Array.isArray(profileData.followers) &&
@@ -227,13 +234,18 @@ function User() {
                             </h4>
                         )}
                     </div>
-                    {currentUserCanView && (
-                        <div className="col">
-                            <CreatePost userId={sessionData.userData.userId} />
-                            <GetUserPosts userId={userId} currentUserId = {sessionData.userData.userId}
+                    <div className="col-md-7">
+                        {currentUserId == userId ? (
+                            <CreatePost
+                                userId={sessionData.userData.userId}
                             />
-                        </div>
-                    )}
+                        ) : null}
+                        {currentUserCanView && (
+                            <GetUserPosts
+                                userId={userId} currentUserId={sessionData.userData.userId}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
         );
