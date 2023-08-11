@@ -48,7 +48,7 @@
 
 .image-button {
     width: 50px;
-    height: 40px; 
+    height: 40px;
     padding: 0;
     border: none;
     background-image: url("/./public/icons/Image_72px.png");
@@ -59,7 +59,7 @@
 
 .image-comment-button {
     width: 30px;
-    height: 20px; 
+    height: 20px;
     padding: 0;
     border: none;
     background-image: url("/./public/icons/Image_72px.png");
@@ -70,7 +70,7 @@
 
 .send-comment-button {
     width: 30px;
-    height: 30px; 
+    height: 30px;
     margin-left: 5px;
     border: none;
     background-image: url("/./public/icons/Send_72px.png");
@@ -81,7 +81,7 @@
 
 .comment-button {
     width: 26px;
-    height: 22px; 
+    height: 22px;
     margin-left: 20px;
     margin-right: 8px;
     border: none;
@@ -92,7 +92,7 @@
 
 .chat-button {
     width: 30px;
-    height: 30px; 
+    height: 30px;
     margin: 30px 25px 30px 0px;
     border: none;
     background-image: url("/./public/icons/Chat_72px.png");
@@ -100,9 +100,6 @@
     background-repeat: no-repeat;
     cursor: pointer;
 }
-
-
-
 
 /* Checkbox */
 
@@ -154,7 +151,7 @@
 }
 
 textarea {
-   resize: none;
+    resize: none;
 }
 
 .messageContainerSent {

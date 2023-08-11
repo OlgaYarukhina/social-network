@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Dropdown } from "react-bootstrap";
 import { useOutletContext, useParams } from "react-router-dom";
 import Popup from "./Popup";
 import CreatePost from "./Poster";
@@ -8,8 +8,10 @@ import GetUserPosts from "./UserPosts.js";
 function User() {
     const [profileData, setProfileData] = useState({});
     const [isProfileOwner, setIsProfileOwner] = useState(false);
+    const [privacy, setPrivacy] = useState(null);
 
     const [currentUserFollowStatus, setCurrentUserFollowStatus] = useState("");
+    const [currentUserCanView, setCurrentUserCanView] = useState(null);
     const { userId } = useParams();
 
     const sessionData = useOutletContext();
@@ -29,6 +31,8 @@ function User() {
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
+                    setPrivacy(data.public ? "Public" : "Private");
+                    handleCurrentUserAuth(data);
                     setCurrentUserFollowStatus(data.currentUserFollowStatus);
                     setProfileData(data);
                 } else {
@@ -62,6 +66,41 @@ function User() {
         }
     };
 
+    const handleSelect = (option) => {
+        setPrivacy(option);
+        if (option !== privacy) {
+            changePrivacy(option);
+        }
+    };
+
+    const handleCurrentUserAuth = (data) => {
+        if (
+            (data.currentUserFollowStatus === "Follow" ||
+                data.currentUserFollowStatus === "Requested") &&
+            !isProfileOwner &&
+            !data.public
+        ) {
+            setCurrentUserCanView(false);
+        } else {
+            setCurrentUserCanView(true);
+        }
+    };
+
+    const changePrivacy = async (privacy) => {
+        try {
+            const response = await fetch(
+                `http://localhost:8080/set-privacy?userId=${userId}&privacy=${privacy}`
+            );
+            if (response.ok) {
+                console.log("Privacy status updated");
+            } else {
+                console.log("Privacy status update failed");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     if (
         Array.isArray(profileData.followers) &&
         Array.isArray(profileData.following)
@@ -91,7 +130,7 @@ function User() {
                                 </small>
                             )}
                         </h4>
-                        {!isProfileOwner && (
+                        {!isProfileOwner ? (
                             <Button
                                 onClick={handleFollow}
                                 variant={
@@ -102,66 +141,100 @@ function User() {
                             >
                                 {currentUserFollowStatus}
                             </Button>
+                        ) : (
+                            <Dropdown onSelect={handleSelect}>
+                                <Dropdown.Toggle
+                                    variant="primary"
+                                    id="privacy-dropdown"
+                                >
+                                    {privacy}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    <Dropdown.Item eventKey="Public">
+                                        Public
+                                    </Dropdown.Item>
+                                    <Dropdown.Item eventKey="Private">
+                                        Private
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         )}
-                        <br></br>
-                        <p>Born: {profileData.dateOfBirth}</p>
-                        <p>Email: {profileData.email}</p>
-                        {profileData.aboutMe && (
-                            <p>About me: {profileData.aboutMe}</p>
+                        {currentUserCanView ? (
+                            <>
+                                <br></br>
+                                <p>Born: {profileData.dateOfBirth}</p>
+                                <p>Email: {profileData.email}</p>
+                                {profileData.aboutMe && (
+                                    <p>About me: {profileData.aboutMe}</p>
+                                )}
+                                <span
+                                    style={{
+                                        fontWeight: "bold",
+                                        color: "black",
+                                        cursor:
+                                            profileData.followers.length > 0
+                                                ? "pointer"
+                                                : "default",
+                                    }}
+                                    onClick={() =>
+                                        setShowFollowersPopup(
+                                            profileData.followers.length
+                                                ? true
+                                                : false
+                                        )
+                                    }
+                                >
+                                    Followers {profileData.followers.length}
+                                </span>{" "}
+                                <span
+                                    style={{
+                                        fontWeight: "bold",
+                                        color: "black",
+                                        cursor:
+                                            profileData.following.length > 0
+                                                ? "pointer"
+                                                : "default",
+                                    }}
+                                    onClick={() =>
+                                        setShowFollowingPopup(
+                                            profileData.following.length
+                                                ? true
+                                                : false
+                                        )
+                                    }
+                                >
+                                    Following {profileData.following.length}
+                                </span>
+                                <Popup
+                                    title="Followers"
+                                    users={profileData.followers}
+                                    show={showFollowersPopup}
+                                    currentUserId={currentUserId}
+                                    onClose={() => setShowFollowersPopup(false)}
+                                />
+                                <Popup
+                                    title="Following"
+                                    users={profileData.following}
+                                    show={showFollowingPopup}
+                                    currentUserId={currentUserId}
+                                    onClose={() => setShowFollowingPopup(false)}
+                                />
+                            </>
+                        ) : (
+                            <h4 style={{ marginTop: "10px" }}>
+                                This profile is private
+                            </h4>
                         )}
-                        <span
-                            style={{
-                                fontWeight: "bold",
-                                color: "black",
-                                cursor:
-                                    profileData.followers.length > 0
-                                        ? "pointer"
-                                        : "default",
-                            }}
-                            onClick={() =>
-                                setShowFollowersPopup(
-                                    profileData.followers.length ? true : false
-                                )
-                            }
-                        >
-                            Followers {profileData.followers.length}
-                        </span>{" "}
-                        <span
-                            style={{
-                                fontWeight: "bold",
-                                color: "black",
-                                cursor:
-                                    profileData.following.length > 0
-                                        ? "pointer"
-                                        : "default",
-                            }}
-                            onClick={() =>
-                                setShowFollowingPopup(
-                                    profileData.following.length ? true : false
-                                )
-                            }
-                        >
-                            Following {profileData.following.length}
-                        </span>
-                        <Popup
-                            title="Followers"
-                            users={profileData.followers}
-                            show={showFollowersPopup}
-                            currentUserId={currentUserId}
-                            onClose={() => setShowFollowersPopup(false)}
-                        />
-                        <Popup
-                            title="Following"
-                            users={profileData.following}
-                            show={showFollowingPopup}
-                            currentUserId={currentUserId}
-                            onClose={() => setShowFollowingPopup(false)}
-                        />
                     </div>
-                    <div className="col">
-                        <CreatePost userId={sessionData.userData.userId} />
-                        <GetUserPosts userId={sessionData.userData.userId} /> 
-                    </div>
+                    {currentUserCanView && (
+                        <div className="col">
+                            <CreatePost userId={sessionData.userData.userId} />
+                            <GetUserPosts
+                                userId={sessionData.userData.userId}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -198,8 +271,8 @@ export const sendFollowRequest = async (followType, userId, followerId) => {
 
 export default User;
 
-
-{/* <>
+{
+    /* <>
 <div className="row">
     <div className="col-3">
         <div>Something here</div>
@@ -212,4 +285,5 @@ export default User;
         <ChatSidebar userId={sessionData.userData.userId}/>
     </div>
 </div>
-</> */}
+</> */
+}

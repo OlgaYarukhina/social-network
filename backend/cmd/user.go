@@ -204,4 +204,28 @@ func (app *application) FollowersHandler(w http.ResponseWriter, r *http.Request)
 	w.Write(jsonResp)
 }
 
+func (app *application) PrivacyHandler(w http.ResponseWriter, r *http.Request) {
+	userId := r.URL.Query().Get("userId")
+	privacyStr := r.URL.Query().Get("privacy")
+	isPublic := true
+
+	if privacyStr == "Private" {
+		isPublic = false
+	}
+
+	statement, err := app.db.Prepare("UPDATE users SET public = ? WHERE userId = ?")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	
+	_, err = statement.Exec(isPublic, userId)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 
