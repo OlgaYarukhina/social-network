@@ -27,6 +27,7 @@ func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) 
          LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
          WHERE ((p.userId = ? OR f.followerId = ?) AND f.isRequest = false) 
          AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
+		 ORDER BY p.created DESC LIMIT 200
     `
 
 	rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId)
@@ -83,7 +84,8 @@ func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) 
 
 func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var posts = []models.Post{}
-	currentUserId := r.URL.Query().Get("userId")
+	userId := r.URL.Query().Get("userId")
+	currentUserId := r.URL.Query().Get("currentUserId")
 
 	stmt := `
 	     SELECT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
@@ -92,10 +94,11 @@ func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Reque
          LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
          WHERE p.userId = ? AND ((p.userId = ? OR f.followerId = ?) AND f.isRequest = false) 
          AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
+		 ORDER BY p.created DESC LIMIT 200
     `
 
 
-	rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId, currentUserId)
+	rows, err := app.db.Query(stmt, userId, currentUserId, currentUserId, currentUserId, currentUserId)
 	if err != nil {
 		log.Fatalf("Err: %s", err)
 	}

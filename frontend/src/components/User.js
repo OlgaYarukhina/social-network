@@ -230,8 +230,7 @@ function User() {
                     {currentUserCanView && (
                         <div className="col">
                             <CreatePost userId={sessionData.userData.userId} />
-                            <GetUserPosts
-                                userId={sessionData.userData.userId}
+                            <GetUserPosts userId={userId} currentUserId = {sessionData.userData.userId}
                             />
                         </div>
                     )}
