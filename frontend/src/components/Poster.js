@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import PopupAddPrivacy from "./PopupPrivacy";
 import SinglePost from "./SinglePost";
 
-const CreatePost = ({ userId }) => {
+const CreatePost = ({ userId, updatePostAmount }) => {
     const [formData, setFormData] = useState({
         userId,
         content: "",
@@ -11,11 +11,9 @@ const CreatePost = ({ userId }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [selectedFollowers, setSelectedFollowers] = useState([]);
-    const [posts, setPosts] = useState([]);
     const textAreaRef = useRef(null);
     const imgPicker = useRef(null);
     const imagePreviewRef = useRef(null);
-
 
     const handleFocus = () => {
         textAreaRef.current.style.height = `10rem`;
@@ -56,7 +54,6 @@ const CreatePost = ({ userId }) => {
         imgPicker.current.click();
     };
 
-
     const handleFollowersSelection = (selectedIds) => {
         setSelectedFollowers(selectedIds);
     };
@@ -76,7 +73,7 @@ const CreatePost = ({ userId }) => {
         }
 
         if (!formData.content && !selectedImg) {
-            alert('Please add either some text or an image to create a post.');
+            alert("Please add either some text or an image to create a post.");
             return;
         }
 
@@ -86,22 +83,32 @@ const CreatePost = ({ userId }) => {
         if (selectedImg) {
             payload.append("img", selectedImg || "");
         }
-        payload.append("privacy", !isChecked ? "Public" : selectedFollowers.length === 0 ? "Private" : "Specific");
+        payload.append(
+            "privacy",
+            !isChecked
+                ? "Public"
+                : selectedFollowers.length === 0
+                ? "Private"
+                : "Specific"
+        );
         payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
 
         const options = {
             method: "POST",
             body: payload,
         };
-        console.log(payload)
+        console.log(payload);
 
         try {
-            const response = await fetch("http://localhost:8080/poster", options);
+            const response = await fetch(
+                "http://localhost:8080/poster",
+                options
+            );
             if (response.ok) {
-                const newPost = await response.json(); 
-                handleLocalPostUpdate(newPost);               // Update local state with the new post
+                const newPost = await response.json();
                 setFormData({ userId, content: "" });
                 setSelectedImg(null);
+                updatePostAmount();
                 hideImagePreview();
             } else {
                 console.log("Error creating post:", response.status);
@@ -111,10 +118,6 @@ const CreatePost = ({ userId }) => {
         } catch (error) {
             console.error("An error occurred:", error);
         }
-    };
-
-    const handleLocalPostUpdate = (newPost) => {
-        setPosts((prevPosts) => [newPost, ...prevPosts]);   // Add the new post to the existing posts array
     };
 
     return (
@@ -141,13 +144,16 @@ const CreatePost = ({ userId }) => {
                             ref={imagePreviewRef}
                             src=""
                             alt="Image preview"
-                            style={{ maxWidth: "100%", maxHeight: "80px", display: "none" }}
+                            style={{
+                                maxWidth: "100%",
+                                maxHeight: "80px",
+                                display: "none",
+                            }}
                         />
                     </div>
 
-
                     <div className="d-flex mb-2 align-items-center">
-                        <div className="col-2 d-flex" >
+                        <div className="col-2 d-flex">
                             <button
                                 className="btn image-button"
                                 onClick={handleImg}
@@ -183,7 +189,7 @@ const CreatePost = ({ userId }) => {
                                 selectedFollowers={selectedFollowers}
                             />
                         )}
-                        <div className="d-flex" >
+                        <div className="d-flex">
                             <button
                                 className="btn btn-danger"
                                 onClick={handleSubmit}
@@ -195,26 +201,6 @@ const CreatePost = ({ userId }) => {
                     </div>
                 </div>
             </form>
-            <div>
-            {posts.length > 0 ? (
-                posts.map((post) => (
-                    <SinglePost
-                        key={post.postId}
-                        postId={post.postId}
-                        userId={post.userId}
-                        displayName={post.displayName}
-                        privacy={post.privacy}
-                        img={post.img}
-                        createdAt={post.createdAt}
-                        content={post.content}
-                        comments={post.commentAmount}
-                        currentUserId={userId}
-                        profilePic={post.profilePic}
-                    />
-                ))
-            ) : null}
-        </div>
-
         </div>
     );
 };

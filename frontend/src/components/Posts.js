@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SinglePost from "./SinglePost";
 
-const GetPosts = ({ userId }) => {
+const GetPosts = ({ userId, postAmount }) => {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -9,7 +9,7 @@ const GetPosts = ({ userId }) => {
             try {
                 const response = await fetch(
                     `http://localhost:8080/get-posts?userId=${userId}`
-                    );
+                );
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
@@ -23,7 +23,7 @@ const GetPosts = ({ userId }) => {
         };
 
         fetchPosts();
-    }, []);
+    }, [postAmount]);
 
     if (!Array.isArray(posts)) {
         return <div>Loading posts...</div>;
@@ -53,6 +53,5 @@ const GetPosts = ({ userId }) => {
         </div>
     );
 };
-
 
 export default GetPosts;

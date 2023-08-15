@@ -4,15 +4,15 @@ import SinglePost from "./SinglePost";
 const GetUserPosts = ({ userId, currentUserId }) => {
     const [posts, setUserPosts] = useState([]);
 
-    console.log(currentUserId)
-    console.log(userId)
+    console.log(currentUserId);
+    console.log(userId);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const response = await fetch(
                     `http://localhost:8080/get-user-posts?userId=${userId}&currentUserId=${currentUserId}`
-                    );
+                );
                 if (response.ok) {
                     const data = await response.json();
                     setUserPosts(data);
@@ -25,7 +25,7 @@ const GetUserPosts = ({ userId, currentUserId }) => {
         };
 
         fetchPosts();
-    }, []);
+    }, [userId]);
 
     if (!Array.isArray(posts)) {
         return <div>Loading posts...</div>;
@@ -55,7 +55,5 @@ const GetUserPosts = ({ userId, currentUserId }) => {
         </div>
     );
 };
-
-
 
 export default GetUserPosts;
