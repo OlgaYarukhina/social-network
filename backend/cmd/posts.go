@@ -21,7 +21,7 @@ func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) 
 	currentUserId := r.URL.Query().Get("userId")
 
 	stmt := `
-	     SELECT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
+	     SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
          FROM posts AS p
          INNER JOIN followers AS f ON p.userId = f.userId 
          LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
@@ -88,7 +88,7 @@ func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Reque
 	currentUserId := r.URL.Query().Get("currentUserId")
 
 	stmt := `
-	     SELECT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
+	     SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
          FROM posts AS p
          INNER JOIN followers AS f ON p.userId = f.userId 
          LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
@@ -154,6 +154,8 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	r.ParseMultipartForm(10 << 20) // 10 MB max memory
 
 	var post models.Post
+	var postId int64
+	
 	post.Img = ""
 
 	file, handler, err := r.FormFile("img")
@@ -222,7 +224,7 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 			log.Println(err)
 		}
 
-		postId, err := id.LastInsertId()
+		postId, err = id.LastInsertId()
 
 		for _, selectedUserId := range arrayFollowersId {
 			stmt := `INSERT INTO exclusive_posts (postId, selectedUserId) VALUES (?, ?)`
@@ -238,7 +240,31 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	    var nickname string
+		var firstName string
+		var lastName string
+		if err := app.db.QueryRow(`SELECT COALESCE(nickname, ""), firstName, lastName, profilePic from users WHERE userId = ?`, post.UserID).Scan(&nickname, &firstName, &lastName, &post.ProfilePic); err != nil {
+			if err == sql.ErrNoRows {
+				log.Println(err)
+			}
+			log.Fatalf(err.Error())
+		}
+
+		if nickname == "" {
+			post.DisplayName = firstName + " " + lastName
+		} else {
+			post.DisplayName = nickname
+		}
+
+	jsonResponse, err := json.Marshal(post)
+    if err != nil {
+        http.Error(w, "Error creating JSON response", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    _, _ = w.Write(jsonResponse)
 }
 
 func (app *application) LikeHandler(w http.ResponseWriter, r *http.Request) {

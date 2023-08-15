@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import PopupAddPrivacy from "./PopupPrivacy";
-
+import SinglePost from "./SinglePost";
 
 const CreatePost = ({ userId }) => {
     const [formData, setFormData] = useState({
@@ -11,9 +11,11 @@ const CreatePost = ({ userId }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [selectedFollowers, setSelectedFollowers] = useState([]);
+    const [posts, setPosts] = useState([]);
     const textAreaRef = useRef(null);
     const imgPicker = useRef(null);
     const imagePreviewRef = useRef(null);
+
 
     const handleFocus = () => {
         textAreaRef.current.style.height = `10rem`;
@@ -29,26 +31,26 @@ const CreatePost = ({ userId }) => {
 
     const handleChangeImg = (event) => {
         if (event.target.files.length > 0) {
-          setSelectedImg(event.target.files[0]);
-          showImagePreview(event.target.files[0]);
+            setSelectedImg(event.target.files[0]);
+            showImagePreview(event.target.files[0]);
         } else {
-          setSelectedImg(null);
-          hideImagePreview();
+            setSelectedImg(null);
+            hideImagePreview();
         }
-      };
+    };
 
-      const showImagePreview = (file) => {
+    const showImagePreview = (file) => {
         const reader = new FileReader();
         reader.onload = function (e) {
-          imagePreviewRef.current.src = e.target.result;
-          imagePreviewRef.current.style.display = "block";
+            imagePreviewRef.current.src = e.target.result;
+            imagePreviewRef.current.style.display = "block";
         };
         reader.readAsDataURL(file);
-      };
-    
-      const hideImagePreview = () => {
+    };
+
+    const hideImagePreview = () => {
         imagePreviewRef.current.style.display = "none";
-      };
+    };
 
     const handleImg = () => {
         imgPicker.current.click();
@@ -69,7 +71,9 @@ const CreatePost = ({ userId }) => {
     };
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
 
         if (!formData.content && !selectedImg) {
             alert('Please add either some text or an image to create a post.');
@@ -94,14 +98,23 @@ const CreatePost = ({ userId }) => {
         try {
             const response = await fetch("http://localhost:8080/poster", options);
             if (response.ok) {
-                window.location.href = "/";
+                const newPost = await response.json(); 
+                handleLocalPostUpdate(newPost);               // Update local state with the new post
+                setFormData({ userId, content: "" });
+                setSelectedImg(null);
+                hideImagePreview();
             } else {
+                console.log("Error creating post:", response.status);
                 const statusMsg = await response.text();
                 console.log(statusMsg);
             }
         } catch (error) {
-            console.error(error);
+            console.error("An error occurred:", error);
         }
+    };
+
+    const handleLocalPostUpdate = (newPost) => {
+        setPosts((prevPosts) => [newPost, ...prevPosts]);   // Add the new post to the existing posts array
     };
 
     return (
@@ -182,6 +195,26 @@ const CreatePost = ({ userId }) => {
                     </div>
                 </div>
             </form>
+            <div>
+            {posts.length > 0 ? (
+                posts.map((post) => (
+                    <SinglePost
+                        key={post.postId}
+                        postId={post.postId}
+                        userId={post.userId}
+                        displayName={post.displayName}
+                        privacy={post.privacy}
+                        img={post.img}
+                        createdAt={post.createdAt}
+                        content={post.content}
+                        comments={post.commentAmount}
+                        currentUserId={userId}
+                        profilePic={post.profilePic}
+                    />
+                ))
+            ) : null}
+        </div>
+
         </div>
     );
 };
