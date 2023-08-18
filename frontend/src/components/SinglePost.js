@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CreateComment from "./Comment";
 import Popup from "./Popup";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +22,30 @@ function SinglePost({
     const [showLikesPopup, setShowLikesPopup] = useState(false);
     const [commentAmount, setCommentAmount] = useState(comments);
     const [showComments, setShowComments] = useState(false);
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(false)
+    const [isContentOverflowing, setIsContentOverflowing] = useState(null);
+    const [userExpanded, setUserExpanded] = useState(false);
+    const contentRef = useRef(null);
+
+    const attachRef = (element) => {
+        if (element) {
+            const isOverflowing = element.clientHeight < element.scrollHeight;
+            setIsContentOverflowing(isOverflowing);
+        }
+    };
+  
+    useEffect(() => {
+        if (contentRef.current) {
+            const isOverflowing = contentRef.current.clientHeight < contentRef.current.scrollHeight;
+            setIsContentOverflowing(isOverflowing);
+        }
+    }, [content, expanded]);
+
+    
 
     const handlePostClick = () => {
         setExpanded(!expanded);
+        setUserExpanded(true);
     };
 
     const updateCommentAmount = () => {
@@ -139,30 +159,30 @@ function SinglePost({
                             />
                         )}
                         <div className="card-body">
-                            <p style={{whiteSpace: "pre-wrap"}}
-                                className={`card-text ${
-                                    expanded ? "" : "posts-content-cut"
-                                } clickable-text`}
+                        <p 
+                            ref={attachRef}
+                            style={{whiteSpace: "pre-wrap"}}
+                            className={`card-text ${expanded ? "expanded-content" : "posts-content-cut"}`}
+                        >
+                            {content}
+                        </p>
+                             {isContentOverflowing === true && !expanded && (
+                            <p
+                                className="expand-post-link expand-link-text clickable-text"
                                 onClick={handlePostClick}
                             >
-                                {content}
+                                Show more
                             </p>
-                            {!expanded && content.length > 100 && (
-                                <p
-                                    className="expand-post-link expand-link-text clickable-text"
-                                    onClick={handlePostClick}
-                                >
-                                    Show more
-                                </p>
-                            )}
-                            {expanded && (
-                                <p
-                                    className="expand-post-link expand-link-text clickable-text"
-                                    onClick={handlePostClick}
-                                >
-                                    Show less
-                                </p>
-                            )}
+                        )}
+
+                        {userExpanded && expanded && (
+                            <p
+                                className="expand-post-link expand-link-text clickable-text"
+                                onClick={handlePostClick}
+                            >
+                                Show less
+                            </p>
+                        )}
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="btn-group">
                                     <div

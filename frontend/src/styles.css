@@ -33,6 +33,12 @@
     -webkit-box-orient: vertical;
 }
 
+.expanded-content {
+    display: block;
+    overflow: visible;
+    text-overflow: clip;
+}
+
 .clickable-text {
     cursor: pointer;
 }
