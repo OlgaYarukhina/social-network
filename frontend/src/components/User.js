@@ -312,20 +312,3 @@ export const sendFollowRequest = async (followType, userId, followerId) => {
 };
 
 export default User;
-
-{
-    /* <>
-<div className="row">
-    <div className="col-3">
-        <div>Something here</div>
-    </div>
-    <div className="col-5 posts">
-        <CreatePost userId={sessionData.userData.userId} />
-        <GetPosts userId={sessionData.userData.userId} />
-    </div>
-    <div className="col-3">
-        <ChatSidebar userId={sessionData.userData.userId}/>
-    </div>
-</div>
-</> */
-}

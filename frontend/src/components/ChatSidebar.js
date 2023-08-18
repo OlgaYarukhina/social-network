@@ -28,7 +28,7 @@ function ChatSidebar() {
                         />
                     ))
                 ) : (
-                    <div>Loading posts...</div>
+                    <div>Loading chats...</div>
                 )}
             </div>
         );
