@@ -252,6 +252,7 @@ function Register() {
                                     name="nickname"
                                     value={formData.nickname}
                                     onChange={handleChange}
+                                    maxLength="14"
                                 />
                             </div>
                             <div className="mb-3">

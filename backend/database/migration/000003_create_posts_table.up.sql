@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS posts (
     userId INTEGER NOT NULL,
     content TEXT NOT NULL,
     img TEXT,
+    groupId INTEGER,
     privacy TEXT NOT NULL DEFAULT "Public",
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userId) REFERENCES users (userId) ON DELETE CASCADE
+    FOREIGN KEY (userId) REFERENCES users (userId) ON DELETE CASCADE,
+    FOREIGN KEY (groupId) REFERENCES `groups` (groupId) ON DELETE CASCADE
 );

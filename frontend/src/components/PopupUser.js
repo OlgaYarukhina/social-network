@@ -13,8 +13,23 @@ function PopupUser({
     onClose,
     profilePic,
 }) {
+    const getBtnVariant = (currentUserFollowStatus) => {
+        switch (currentUserFollowStatus) {
+            case "Follow":
+                return "primary";
+            case "Following":
+                return "success";
+            case "Requested":
+                return "secondary";
+        }
+    };
+
     const [currentUserFollowStatus, setCurrentUserFollowStatus] =
         useState(followStatus);
+    const [followBtnVariant, setFollowBtnVariant] = useState(
+        getBtnVariant(followStatus)
+    );
+
     const navigateTo = useNavigate();
 
     const handleFollow = () => {
@@ -25,6 +40,9 @@ function PopupUser({
                 parseInt(currentUserId)
             );
             setCurrentUserFollowStatus(isPublic ? "Following" : "Requested");
+            setFollowBtnVariant(
+                getBtnVariant(isPublic ? "Following" : "Requested")
+            );
         } else {
             sendFollowRequest(
                 "Unfollow",
@@ -32,6 +50,7 @@ function PopupUser({
                 parseInt(currentUserId)
             );
             setCurrentUserFollowStatus("Follow");
+            setFollowBtnVariant(getBtnVariant("Follow"));
         }
     };
 
@@ -57,13 +76,26 @@ function PopupUser({
                 {userId != currentUserId && (
                     <Button
                         onClick={() => handleFollow(userId)}
-                        variant={
-                            currentUserFollowStatus === "Follow"
-                                ? "primary"
-                                : "success"
+                        variant={followBtnVariant}
+                        disabled={currentUserFollowStatus === "Requested"}
+                        onMouseEnter={() =>
+                            setFollowBtnVariant(
+                                currentUserFollowStatus === "Following"
+                                    ? "danger"
+                                    : followBtnVariant
+                            )
+                        }
+                        onMouseLeave={() =>
+                            setFollowBtnVariant(
+                                currentUserFollowStatus === "Following"
+                                    ? "success"
+                                    : followBtnVariant
+                            )
                         }
                     >
-                        {currentUserFollowStatus}
+                        {followBtnVariant === "danger"
+                            ? "Unfollow"
+                            : currentUserFollowStatus}
                     </Button>
                 )}
             </div>

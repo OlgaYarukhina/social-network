@@ -21,13 +21,15 @@ func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) 
 	currentUserId := r.URL.Query().Get("userId")
 
 	stmt := `
-	     SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
-         FROM posts AS p
-         INNER JOIN followers AS f ON p.userId = f.userId 
-         LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
-         WHERE ((p.userId = ? OR f.followerId = ?) AND f.isRequest = false) 
-         AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
-		 ORDER BY p.created DESC LIMIT 200
+		SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
+    	FROM posts AS p
+    	LEFT JOIN followers AS f ON p.userId = f.userId AND f.followerId = ?
+    	LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
+    	WHERE (
+    	    (p.userId = ? OR f.followerId IS NOT NULL) AND (f.isRequest = false OR f.followerId IS NULL)
+    	)
+    	AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
+    	ORDER BY p.created DESC LIMIT 200;
     `
 
 	rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId)

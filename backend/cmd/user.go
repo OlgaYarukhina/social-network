@@ -86,7 +86,7 @@ func getUserFollowers(userId, currentUserId string, db *sql.DB) []models.User {
 		SELECT u.userId, u.firstName, u.lastName, u.profilePic, u.public
 		FROM users AS u
 		INNER JOIN followers AS f ON u.userId = f.followerId
-		WHERE f.userId = ? 
+		WHERE f.userId = ? AND f.isRequest = 'false' 
 	`
 
 	rows, err := db.Query(query, userId)

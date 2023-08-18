@@ -139,7 +139,7 @@ function SinglePost({
                             />
                         )}
                         <div className="card-body">
-                            <p
+                            <p style={{whiteSpace: "pre-wrap"}}
                                 className={`card-text ${
                                     expanded ? "" : "posts-content-cut"
                                 } clickable-text`}

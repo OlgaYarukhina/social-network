@@ -45,7 +45,7 @@ const GetUserPosts = ({ userId, currentUserId }) => {
                         createdAt={post.createdAt}
                         content={post.content}
                         comments={post.commentAmount}
-                        currentUserId={userId}
+                        currentUserId={currentUserId}
                         profilePic={post.profilePic}
                     />
                 ))

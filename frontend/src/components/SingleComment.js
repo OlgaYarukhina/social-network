@@ -101,7 +101,7 @@ function SingleComment({
                         >
                             {displayName}
                         </small>
-                        <p>{content}</p>
+                        <p style={{whiteSpace: "pre-wrap"}}>{content}</p>
                     </div>
                 </div>
                 {img && (

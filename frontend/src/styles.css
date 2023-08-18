@@ -101,6 +101,15 @@
     cursor: pointer;
 }
 
+.user-icon {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background-image: url("/./public/avatars/User_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
 
 /* Create post */
 

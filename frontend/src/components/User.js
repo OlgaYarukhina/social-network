@@ -9,6 +9,7 @@ function User() {
     const [profileData, setProfileData] = useState({});
     const [isProfileOwner, setIsProfileOwner] = useState(false);
     const [privacy, setPrivacy] = useState(null);
+    const [followBtnVariant, setFollowBtnVariant] = useState("");
 
     const [currentUserFollowStatus, setCurrentUserFollowStatus] = useState("");
     const [currentUserCanView, setCurrentUserCanView] = useState(null);
@@ -22,8 +23,8 @@ function User() {
 
     useEffect(() => {
         setIsProfileOwner(currentUserId === parseInt(userId));
-        console.log("Current user")
-        console.log(currentUserId)
+        console.log("Current user");
+        console.log(currentUserId);
 
         const getProfileData = async () => {
             try {
@@ -36,6 +37,7 @@ function User() {
                     setPrivacy(data.public ? "Public" : "Private");
                     handleCurrentUserAuth(data);
                     setCurrentUserFollowStatus(data.currentUserFollowStatus);
+                    changeBtnVariant(data.currentUserFollowStatus);
                     setProfileData(data);
                 } else {
                     console.log(response.statusText);
@@ -58,6 +60,7 @@ function User() {
             setCurrentUserFollowStatus(
                 profileData.public ? "Following" : "Requested"
             );
+            setFollowBtnVariant(profileData.public ? "success" : "secondary");
         } else {
             sendFollowRequest(
                 "Unfollow",
@@ -65,6 +68,21 @@ function User() {
                 parseInt(currentUserId)
             );
             setCurrentUserFollowStatus("Follow");
+            setFollowBtnVariant("primary");
+        }
+    };
+
+    const changeBtnVariant = (currentUserFollowStatus) => {
+        switch (currentUserFollowStatus) {
+            case "Follow":
+                setFollowBtnVariant("primary");
+                break;
+            case "Following":
+                setFollowBtnVariant("success");
+                break;
+            case "Requested":
+                setFollowBtnVariant("secondary");
+                break;
         }
     };
 
@@ -103,11 +121,6 @@ function User() {
         }
     };
 
-    console.log("user1")
-    console.log(userId)
-    console.log("usecurr")
-    console.log(currentUserId)
-
     if (
         Array.isArray(profileData.followers) &&
         Array.isArray(profileData.following)
@@ -140,18 +153,37 @@ function User() {
                         {!isProfileOwner ? (
                             <Button
                                 onClick={handleFollow}
-                                variant={
-                                    currentUserFollowStatus === "Follow"
-                                        ? "primary"
-                                        : "success"
+                                variant={followBtnVariant}
+                                disabled={
+                                    currentUserFollowStatus === "Requested"
+                                }
+                                onMouseEnter={() =>
+                                    setFollowBtnVariant(
+                                        currentUserFollowStatus === "Following"
+                                            ? "danger"
+                                            : followBtnVariant
+                                    )
+                                }
+                                onMouseLeave={() =>
+                                    setFollowBtnVariant(
+                                        currentUserFollowStatus === "Following"
+                                            ? "success"
+                                            : followBtnVariant
+                                    )
                                 }
                             >
-                                {currentUserFollowStatus}
+                                {followBtnVariant === "danger"
+                                    ? "Unfollow"
+                                    : currentUserFollowStatus}
                             </Button>
                         ) : (
                             <Dropdown onSelect={handleSelect}>
                                 <Dropdown.Toggle
-                                    variant="primary"
+                                    variant={
+                                        privacy === "Public"
+                                            ? "success"
+                                            : "danger"
+                                    }
                                     id="privacy-dropdown"
                                 >
                                     {privacy}
@@ -236,13 +268,12 @@ function User() {
                     </div>
                     <div className="col-md-7">
                         {currentUserId == userId ? (
-                            <CreatePost
-                                userId={sessionData.userData.userId}
-                            />
+                            <CreatePost userId={sessionData.userData.userId} />
                         ) : null}
                         {currentUserCanView && (
                             <GetUserPosts
-                                userId={userId} currentUserId={sessionData.userData.userId}
+                                userId={userId}
+                                currentUserId={sessionData.userData.userId}
                             />
                         )}
                     </div>

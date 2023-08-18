@@ -62,3 +62,7 @@ type Like struct {
 	CommentId int `json:"commentId"`
 	UserId    int `json:"userId"`
 }
+
+type SearchResponse struct {
+	Users []User `json:"users"`
+}
