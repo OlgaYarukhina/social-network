@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import PopupAddPrivacy from "./PopupPrivacy";
-import SinglePost from "./SinglePost";
 
 const CreatePost = ({ userId, updatePostAmount }) => {
     const [formData, setFormData] = useState({
@@ -14,6 +13,7 @@ const CreatePost = ({ userId, updatePostAmount }) => {
     const textAreaRef = useRef(null);
     const imgPicker = useRef(null);
     const imagePreviewRef = useRef(null);
+    
 
     const handleFocus = () => {
         textAreaRef.current.style.height = `10rem`;
@@ -72,6 +72,16 @@ const CreatePost = ({ userId, updatePostAmount }) => {
             event.preventDefault();
         }
 
+        if (!(/\S/.test(formData.content)) && !selectedImg) {
+            alert("Please add either some text or an image to create a post.");
+            textAreaRef.current.style.height = `2rem`;
+            return;
+        }
+
+        if (!(/\S/.test(formData.content)) && selectedImg) {
+            formData.content = "";
+        }
+
         if (!formData.content && !selectedImg) {
             alert("Please add either some text or an image to create a post.");
             return;
@@ -126,6 +136,7 @@ const CreatePost = ({ userId, updatePostAmount }) => {
                 <div className=" card-header posts">
                     <div className="mb-3">
                         <textarea
+                            style={{ resize: 'vertical' }}
                             className="form-control textarea-resize"
                             rows="1"
                             placeholder="What do you want to say to this World?"
