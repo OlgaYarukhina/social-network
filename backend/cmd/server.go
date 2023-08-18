@@ -31,6 +31,8 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/get-comment-likes", app.GetCommentLikesHandler)
 	mux.HandleFunc("/set-privacy", app.PrivacyHandler)
 	mux.HandleFunc("/search", app.SearchHandler)
+	mux.HandleFunc("/add-notification", app.AddNotificationHandler)
+	mux.HandleFunc("/set-notifications-to-seen", app.SetAllNotificationsToSeenHandler)
 	mux.HandleFunc("/ws", NewManager().ServeWS)
 	mux.HandleFunc("/get-image/", func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/get-image/", http.FileServer(http.Dir("backend/media"))).ServeHTTP(w, r)

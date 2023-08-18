@@ -34,6 +34,7 @@ function App() {
                     firstName={userData.firstName}
                     lastName={userData.lastName}
                     profilePic={userData.profilePic}
+                    notifications={userData.notifications}
                 />
             ) : null}
             <div style={{ marginTop: sessionExists ? "55px" : "0" }}>

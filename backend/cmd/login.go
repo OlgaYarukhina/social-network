@@ -109,6 +109,7 @@ func (app *application) AuthHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.ChattableUsers = getChattableUsers(strconv.Itoa(userId), app.db)
+	user.Notifications = getNotifications(strconv.Itoa(userId), app.db)
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(user)

@@ -1,9 +1,15 @@
 import React, { useState, useRef } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
+import { sendNotification } from "./Notifications";
 
-const CreateComment = ({ userId, postId, updateCommentAmount }) => {
+const CreateComment = ({
+    currentUserId,
+    postId,
+    updateCommentAmount,
+    postCreatorId,
+}) => {
     const [formData, setFormData] = useState({
-        userId,
+        currentUserId,
         postId,
         content: "",
     });
@@ -32,14 +38,14 @@ const CreateComment = ({ userId, postId, updateCommentAmount }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         let payload = new FormData();
-        payload.append("userId", formData.userId);
+        payload.append("userId", formData.currentUserId);
         payload.append("postId", formData.postId);
         payload.append("content", formData.content);
         if (selectedImg) {
             payload.append("img", selectedImg);
         }
 
-        setFormData({ userId, postId, content: "" });
+        setFormData({ currentUserId, postId, content: "" });
 
         const options = {
             method: "POST",
@@ -53,6 +59,13 @@ const CreateComment = ({ userId, postId, updateCommentAmount }) => {
             );
             if (response.ok) {
                 updateCommentAmount();
+                if (postCreatorId != currentUserId) {
+                    sendNotification(
+                        parseInt(postId),
+                        parseInt(postCreatorId),
+                        "comment"
+                    );
+                }
                 console.log("posted");
             } else {
                 const statusMsg = await response.text();
@@ -72,7 +85,7 @@ const CreateComment = ({ userId, postId, updateCommentAmount }) => {
                             src={`http://localhost:8080/get-image/users/${sessionData.userData.profilePic}`}
                             width="30"
                             height="30"
-                            style={{borderRadius: "100%"}}
+                            style={{ borderRadius: "100%" }}
                         />
                         <div className="col d-flex">
                             <textarea

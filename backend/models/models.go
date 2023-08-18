@@ -5,22 +5,23 @@ import (
 )
 
 type User struct {
-	UserId                  int    `json:"userId,omitempty"`
-	FirstName               string `json:"firstName"`
-	LastName                string `json:"lastName"`
-	Email                   string `json:"email,omitempty"`
-	Nickname                string `json:"nickname,omitempty"`
-	DateOfBirth             string `json:"dateOfBirth,omitempty"`
-	Password                string `json:"password,omitempty"`
-	ProfilePic              string `json:"profilePic"`
-	AboutMe                 string `json:"aboutMe,omitempty"`
-	Public                  bool   `json:"public,omitempty"`
-	Online                  bool   `json:"online,omitempty"`
-	CurrentUserFollowStatus string `json:"currentUserFollowStatus,omitempty"`
-	FollowsCurrentUser      bool   `json:"followsCurrentUser,omitempty"`
-	Followers               []User `json:"followers"`
-	Following               []User `json:"following"`
-	ChattableUsers          []User `json:"chattableUsers"`
+	UserId                  int            `json:"userId,omitempty"`
+	FirstName               string         `json:"firstName"`
+	LastName                string         `json:"lastName"`
+	Email                   string         `json:"email,omitempty"`
+	Nickname                string         `json:"nickname,omitempty"`
+	DateOfBirth             string         `json:"dateOfBirth,omitempty"`
+	Password                string         `json:"password,omitempty"`
+	ProfilePic              string         `json:"profilePic"`
+	AboutMe                 string         `json:"aboutMe,omitempty"`
+	Public                  bool           `json:"public,omitempty"`
+	Online                  bool           `json:"online,omitempty"`
+	CurrentUserFollowStatus string         `json:"currentUserFollowStatus,omitempty"`
+	FollowsCurrentUser      bool           `json:"followsCurrentUser,omitempty"`
+	Followers               []User         `json:"followers"`
+	Following               []User         `json:"following"`
+	ChattableUsers          []User         `json:"chattableUsers"`
+	Notifications           []Notification `json:"notifications"`
 }
 
 type LoginResponse struct {
@@ -65,4 +66,14 @@ type Like struct {
 
 type SearchResponse struct {
 	Users []User `json:"users"`
+}
+
+type Notification struct {
+	NotificationId   int       `json:"notificationId"`
+	SourceId         int       `json:"sourceId"`
+	ReceiverId       int       `json:"receiverId,omitempty"`
+	NotificationType string    `json:"notificationType"`
+	Seen             bool      `json:"seen"`
+	ClickedOn        bool      `json:"clickedOn"`
+	Created          time.Time `json:"created"`
 }

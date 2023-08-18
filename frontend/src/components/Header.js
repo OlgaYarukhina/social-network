@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import Notifications from "./Notifications";
 
-function Header({ userId, firstName, lastName, profilePic }) {
+function Header({ userId, firstName, lastName, profilePic, notifications }) {
     const navigateTo = useNavigate();
 
     const logOut = async (event) => {
@@ -47,7 +47,7 @@ function Header({ userId, firstName, lastName, profilePic }) {
                 >
                     SN
                 </Navbar>
-                <Notifications />
+                <Notifications notifications={notifications} userId={userId}/>
                 <Nav className="mr-auto nav_bar_wrapper"></Nav>
                 <Nav>
                     <SearchBar onSearch={handleSearch} />

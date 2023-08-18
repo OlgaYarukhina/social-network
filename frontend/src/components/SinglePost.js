@@ -252,7 +252,8 @@ function SinglePost({
                             commentAmount={commentAmount}
                         />
                         <CreateComment
-                            userId={currentUserId}
+                            postCreatorId={userId}
+                            currentUserId={currentUserId}
                             postId={postId}
                             updateCommentAmount={updateCommentAmount}
                         />

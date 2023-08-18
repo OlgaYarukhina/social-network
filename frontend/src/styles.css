@@ -114,7 +114,6 @@
     background-image: url("/./public/icons/Notification_72px.png");
     background-size: cover;
     background-repeat: no-repeat;
-    cursor: pointer;
 }
 
 .notification-count {
@@ -134,6 +133,7 @@
 .notification-container {
     position: relative;
     display: inline-block;
+    cursor: pointer;
 }
 
 .user-icon {
