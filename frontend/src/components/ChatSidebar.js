@@ -7,14 +7,12 @@ function ChatSidebar() {
 
     if (chattableUsers) {
         return (
-            <div style={{ position: "fixed" }}>
+            <div style={{ position: "fixed", width: "100%" }}>
                 <div className="d-flex align-items-center">
-                    <hr className="flex-grow-1 m-1" />
                     <div className="p-2 font-weight-bold">
                         <div className="btn chat-button"></div>
                         Users you can chat with:
                     </div>
-                    <hr className="flex-grow-1 m-1" />
                 </div>
                 {chattableUsers.length > 0 ? (
                     chattableUsers.map((user) => (

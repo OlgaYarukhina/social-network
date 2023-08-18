@@ -22,7 +22,7 @@ function Home() {
     if (sessionData.sessionExists) {
         return (
             <>
-                <div className="row">
+                <div className="row" style={{margin: "auto"}}>
                     <div className="col-3">
                         <div>Something here</div>
                     </div>

@@ -1,6 +1,7 @@
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
+import Notifications from "./Notifications";
 
 function Header({ userId, firstName, lastName, profilePic }) {
     const navigateTo = useNavigate();
@@ -46,6 +47,7 @@ function Header({ userId, firstName, lastName, profilePic }) {
                 >
                     SN
                 </Navbar>
+                <Notifications />
                 <Nav className="mr-auto nav_bar_wrapper"></Nav>
                 <Nav>
                     <SearchBar onSearch={handleSearch} />

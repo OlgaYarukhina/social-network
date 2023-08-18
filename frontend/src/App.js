@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom"; // Import useNavigate
 import { hasSession } from "./components/Auth";
 import Header from "./components/Header";
 
 function App() {
     const [sessionExists, setSessionExists] = useState(null);
     const [userData, setUserData] = useState({});
+    const location = useLocation();
 
     useEffect(() => {
-        hasSession().then((result) => {
-            setSessionExists(result.isAuthorized);
-            setUserData(result.user);
-        });
-    }, []);
+        const fetchSessionData = async () => {
+            try {
+                const result = await hasSession();
+                setSessionExists(result.isAuthorized);
+                setUserData(result.user);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchSessionData();
+    }, [location]);
 
     if (sessionExists === null) {
         return <div>Loading...</div>;

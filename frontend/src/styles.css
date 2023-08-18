@@ -101,6 +101,35 @@
     cursor: pointer;
 }
 
+.notification-button {
+    width: 28px;
+    height: 33px;
+    border: none;
+    background-image: url("/./public/icons/Notification_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+.notification-container {
+    position: relative;
+    display: inline-block;
+}
+
 .user-icon {
     width: 20px;
     height: 20px;
@@ -110,21 +139,19 @@
     background-repeat: no-repeat;
 }
 
-
 /* Create post */
 
 .image-preview {
     margin: 10px;
-    overflow: hidden; 
-  }
-  
-  .image-preview img {
+    overflow: hidden;
+}
+
+.image-preview img {
     width: auto;
-    max-width: 100%; 
-    max-height: 100%; 
+    max-width: 100%;
+    max-height: 100%;
     display: block;
-  }
-  
+}
 
 .checkbox-label {
     display: flex;

@@ -4,8 +4,6 @@ import SinglePost from "./SinglePost";
 const GetUserPosts = ({ userId, currentUserId }) => {
     const [posts, setUserPosts] = useState([]);
 
-    console.log(currentUserId);
-    console.log(userId);
 
     useEffect(() => {
         const fetchPosts = async () => {
