@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
-function ChatSidebarUser({
+function GroupsSidebarGroup({
     userId,
-    firstName,
-    lastName,
-    nickname,
-    profilePic,
+    groupId,
+    title,
+    groupPic,
+    isOwner,
 }) {
     const navigateTo = useNavigate();
     return (
@@ -16,26 +16,29 @@ function ChatSidebarUser({
                     className="d-flex align-items-center"
                 >
                     <img
-                        src={`http://localhost:8080/get-image/users/${profilePic}`}
+                        src={`http://localhost:8080/get-image/groups/${groupPic}`}
                         width="38"
                         height="38"
                     />
                     <div className="d-flex align-items-center"
                         onClick={() => {
-                            navigateTo(`/chat/user/${userId}`);
+                            navigateTo(`/group/${groupId}`);
                         }}
                     >
                         <h5 style={{marginLeft: "10px"}}>
-                            {firstName + " " + lastName}
-                        </h5>
-                        <h5 style={{marginLeft: "5px"}}>
-                        {nickname && (
-                                <small className="text-muted">
-                                    ({nickname})
-                                </small>
-                            )}
+                            { title }
                         </h5>
                     </div>
+                    {isOwner ? (
+                          <img
+                          src={`http://localhost:3000/icons/Star_72px.png`}
+                          width="20"
+                          height="20"
+                          marginLeft="30px"
+                      />
+                         ) : (
+                         null
+                    )}
                 </div>
             </div>
             <hr />
@@ -43,4 +46,4 @@ function ChatSidebarUser({
     );
 }
 
-export default ChatSidebarUser;
+export default GroupsSidebarGroup;

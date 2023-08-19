@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import GetPosts from "./Posts";
 import CreatePost from "./Poster";
 import ChatSidebar from "./ChatSidebar";
+import GroupsSidebar from "./GroupsSidebar";
 
 function Home() {
     const navigateTo = useNavigate();
@@ -23,8 +24,8 @@ function Home() {
         return (
             <>
                 <div className="row" style={{margin: "auto"}}>
-                    <div className="col-3">
-                        <div>Something here</div>
+                <div className="col-3">
+                        <GroupsSidebar userId={sessionData.userData.userId} />
                     </div>
                     <div className="col-5 posts">
                         <CreatePost
