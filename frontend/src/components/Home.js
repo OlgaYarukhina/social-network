@@ -4,6 +4,7 @@ import GetPosts from "./Posts";
 import CreatePost from "./Poster";
 import ChatSidebar from "./ChatSidebar";
 import GroupsSidebar from "./GroupsSidebar";
+import FollowRequests from "./FollowRequests";
 
 function Home() {
     const navigateTo = useNavigate();
@@ -23,9 +24,18 @@ function Home() {
     if (sessionData.sessionExists) {
         return (
             <>
-                <div className="row" style={{margin: "auto"}}>
-                <div className="col-3">
-                        <GroupsSidebar userId={sessionData.userData.userId} />
+                <div className="row" style={{ margin: "auto" }}>
+                    <div className="col-3">
+                        <div className="col-3" style={{ position: "fixed" }}>
+                            <div style={{ width: "100%" }}>
+                                <GroupsSidebar
+                                    userId={sessionData.userData.userId}
+                                />
+                                <FollowRequests
+                                    userId={sessionData.userData.userId}
+                                />
+                            </div>
+                        </div>
                     </div>
                     <div className="col-5 posts">
                         <CreatePost

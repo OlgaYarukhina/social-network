@@ -15,6 +15,8 @@ function SingleNotification({
         switch (notificationType) {
             case "comment":
                 return "Someone left a comment on your post!";
+            case "followRequest":
+                return "You have a new follower request!"
         }
     };
 
@@ -22,6 +24,9 @@ function SingleNotification({
         switch (notificationType) {
             case "comment":
                 navigateTo(`/post/${sourceId}`);
+                break;
+            case "followRequest":
+                navigateTo(`/`);
                 break;
         }
     };

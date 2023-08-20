@@ -4,6 +4,7 @@ import { useOutletContext, useParams } from "react-router-dom";
 import Popup from "./Popup";
 import CreatePost from "./Poster";
 import GetUserPosts from "./UserPosts.js";
+import { sendNotification } from "./Notifications";
 
 function User() {
     const [profileData, setProfileData] = useState({});
@@ -61,6 +62,9 @@ function User() {
                 profileData.public ? "Following" : "Requested"
             );
             setFollowBtnVariant(profileData.public ? "success" : "secondary");
+            if(!profileData.public) {
+                sendNotification(parseInt(currentUserId), parseInt(userId), "followRequest")
+            }
         } else {
             sendFollowRequest(
                 "Unfollow",

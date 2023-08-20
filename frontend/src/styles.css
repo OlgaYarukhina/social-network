@@ -118,6 +118,17 @@
     cursor: pointer;
 }
 
+.follow-requests-icon {
+    width: 30px;
+    height: 30px;
+    margin: 30px 25px 30px 0px;
+    border: none;
+    background-image: url("/./public/avatars/User_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
 
 .notification-button {
     width: 28px;

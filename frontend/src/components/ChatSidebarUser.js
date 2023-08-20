@@ -19,6 +19,14 @@ function ChatSidebarUser({
                         src={`http://localhost:8080/get-image/users/${profilePic}`}
                         width="38"
                         height="38"
+                        onClick={() =>
+                            navigateTo(`/chat/user/${userId}`)
+                        }
+                        style={{
+                            cursor: "pointer",
+                            borderRadius: "100%",
+                            objectFit: "cover",
+                        }}
                     />
                     <div className="d-flex align-items-center"
                         onClick={() => {

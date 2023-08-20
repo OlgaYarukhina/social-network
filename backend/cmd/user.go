@@ -146,7 +146,7 @@ func getChattableUsers(currentUserId string, db *sql.DB) []models.User {
 		SELECT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
 		FROM users AS u
 		INNER JOIN followers AS f ON u.userId = f.userId
-		WHERE f.followerId = ?
+		WHERE f.followerId = ? AND isRequest = false
 	`
 
 	rows, err := db.Query(query, currentUserId)
