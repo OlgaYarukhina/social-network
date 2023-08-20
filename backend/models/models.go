@@ -77,3 +77,12 @@ type Notification struct {
 	ClickedOn        bool      `json:"clickedOn"`
 	Created          time.Time `json:"created"`
 }
+
+type Group struct {
+	GroupID       int       `json:"groupId,string"`
+	UserID        int       `json:"userId,string"`
+	Title         string    `json:"groupTitle"`
+	GroupPic      string    `json:"groupPic"`
+	Privacy       string    `json:"privacy"`
+	CreatedAt     time.Time `json:"createdAt"`
+}
