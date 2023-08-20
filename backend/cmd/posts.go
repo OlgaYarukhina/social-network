@@ -89,6 +89,69 @@ func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) 
 	return
 }
 
+func (app *application) GetSinglePostHandler(w http.ResponseWriter, r *http.Request) {
+	var post models.Post
+	postId := r.URL.Query().Get("postId")
+
+	query := `
+			SELECT 
+			    p.postId, 
+			    p.userId, 
+			    p.content, 
+			    COALESCE(p.img, "") AS img, 
+			    p.privacy, 
+			    p.created, 
+			    COALESCE(u.nickname, "") AS nickname, 
+			    u.firstName, 
+			    u.lastName, 
+			    u.profilePic,
+			    COUNT(c.postId) AS commentCount
+			FROM 
+			    posts AS p
+			LEFT JOIN 
+			    comments AS c ON p.postId = c.postId
+			LEFT JOIN 
+			    users AS u ON p.userId = u.userId
+			WHERE
+			    p.postId = ?
+			GROUP BY 
+			    p.postId, 
+			    p.userId, 
+			    p.content, 
+			    p.img, 
+			    p.privacy, 
+			    p.created,
+			    u.nickname, 
+			    u.firstName, 
+			    u.lastName, 
+			    u.profilePic
+			ORDER BY 
+			    p.created DESC;
+    `
+
+	var nickname string
+	var firstName string
+	var lastName string
+	err := app.db.QueryRow(query, postId).Scan(&post.PostID, &post.UserID, &post.Content, &post.Img, &post.Privacy, &post.CreatedAt, &nickname, &firstName, &lastName, &post.ProfilePic, &post.CommentAmount)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if nickname == "" {
+		post.DisplayName = firstName + " " + lastName
+	} else {
+		post.DisplayName = nickname
+	}
+
+	jsonResp, err := json.Marshal(post)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+
+	w.Write(jsonResp)
+}
+
 func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var posts = []models.Post{}
 	userId := r.URL.Query().Get("userId")
@@ -103,7 +166,7 @@ func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Reque
          AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
          ORDER BY p.created DESC LIMIT 200
          `
-    rows, err := app.db.Query(stmt, userId, currentUserId, currentUserId, currentUserId, currentUserId)
+	rows, err := app.db.Query(stmt, userId, currentUserId, currentUserId, currentUserId, currentUserId)
 	if err != nil {
 		log.Fatalf("Err: %s", err)
 	}
@@ -375,4 +438,3 @@ func (app *application) GetPostLikesHandler(w http.ResponseWriter, r *http.Reque
 // `
 
 //rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId)
-

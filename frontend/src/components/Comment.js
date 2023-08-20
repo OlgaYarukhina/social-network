@@ -85,7 +85,7 @@ const CreateComment = ({
                             src={`http://localhost:8080/get-image/users/${sessionData.userData.profilePic}`}
                             width="30"
                             height="30"
-                            style={{ borderRadius: "100%" }}
+                            style={{ borderRadius: "100%", objectFit: "cover" }}
                         />
                         <div className="col d-flex">
                             <textarea

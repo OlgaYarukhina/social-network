@@ -15,14 +15,14 @@ function SinglePost({
     comments,
     currentUserId,
     profilePic,
+    showComments,
 }) {
     const [likes, setLikes] = useState([]);
     const [currentUserLike, setCurrentUserLike] = useState(null);
     const [likeAmount, setLikeAmount] = useState(null);
     const [showLikesPopup, setShowLikesPopup] = useState(false);
     const [commentAmount, setCommentAmount] = useState(comments);
-    const [showComments, setShowComments] = useState(false);
-    const [expanded, setExpanded] = useState(false)
+    const [expanded, setExpanded] = useState(false);
     const [isContentOverflowing, setIsContentOverflowing] = useState(null);
     const [userExpanded, setUserExpanded] = useState(false);
     const contentRef = useRef(null);
@@ -33,15 +33,15 @@ function SinglePost({
             setIsContentOverflowing(isOverflowing);
         }
     };
-  
+
     useEffect(() => {
         if (contentRef.current) {
-            const isOverflowing = contentRef.current.clientHeight < contentRef.current.scrollHeight;
+            const isOverflowing =
+                contentRef.current.clientHeight <
+                contentRef.current.scrollHeight;
             setIsContentOverflowing(isOverflowing);
         }
     }, [content, expanded]);
-
-    
 
     const handlePostClick = () => {
         setExpanded(!expanded);
@@ -69,7 +69,7 @@ function SinglePost({
                         }
                     });
 
-                  //  console.log(data);
+                    //  console.log(data);
                     setLikeAmount(data.length);
                     setCurrentUserLike(hasLiked);
                     setLikes(data);
@@ -120,37 +120,41 @@ function SinglePost({
                 <div className="col">
                     <div className="card shadow-sm post">
                         <div className="card">
-                            <div className="d-flex align-items-center">
-                                <div className="col-2 d-flex">
-                                    <img
-                                        src={`http://localhost:8080/get-image/users/${profilePic}`}
-                                        width="60"
-                                        height="60"
-                                        onClick={() =>
-                                            navigateTo(`/user/${userId}`)
-                                        }
-                                        style={{
-                                            cursor: "pointer",
-                                            borderRadius: "100%",
-                                        }}
-                                    />
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex">
+                                    <div className="m-2">
+                                        <img
+                                            src={`http://localhost:8080/get-image/users/${profilePic}`}
+                                            width="60"
+                                            height="60"
+                                            onClick={() =>
+                                                navigateTo(`/user/${userId}`)
+                                            }
+                                            style={{
+                                                cursor: "pointer",
+                                                borderRadius: "100%",
+                                                objectFit: "cover",
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="d-flex align-items-center">
+                                        <p
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() =>
+                                                navigateTo(`/user/${userId}`)
+                                            }
+                                            className="card-text"
+                                        >
+                                            {displayName}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="col d-flex align-items-center">
-                                    <p
-                                        style={{ cursor: "pointer" }}
-                                        onClick={() =>
-                                            navigateTo(`/user/${userId}`)
-                                        }
-                                        className="card-text"
-                                    >
-                                        {displayName}
-                                    </p>
-                                </div>
-                                <div className="col-2">
-                                    <small className="text-body-secondary">
-                                        {privacy}
-                                    </small>
-                                </div>
+                                <small
+                                    className="text-body-secondary"
+                                    style={{ marginRight: "20px" }}
+                                >
+                                    {privacy}
+                                </small>
                             </div>
                         </div>
                         {img && (
@@ -159,30 +163,34 @@ function SinglePost({
                             />
                         )}
                         <div className="card-body">
-                        <p 
-                            ref={attachRef}
-                            style={{whiteSpace: "pre-wrap"}}
-                            className={`card-text ${expanded ? "expanded-content" : "posts-content-cut"}`}
-                        >
-                            {content}
-                        </p>
-                             {isContentOverflowing === true && !expanded && (
                             <p
-                                className="expand-post-link expand-link-text clickable-text"
-                                onClick={handlePostClick}
+                                ref={attachRef}
+                                style={{ whiteSpace: "pre-wrap" }}
+                                className={`card-text ${
+                                    expanded
+                                        ? "expanded-content"
+                                        : "posts-content-cut"
+                                }`}
                             >
-                                Show more
+                                {content}
                             </p>
-                        )}
+                            {isContentOverflowing === true && !expanded && (
+                                <p
+                                    className="expand-post-link expand-link-text clickable-text"
+                                    onClick={handlePostClick}
+                                >
+                                    Show more
+                                </p>
+                            )}
 
-                        {userExpanded && expanded && (
-                            <p
-                                className="expand-post-link expand-link-text clickable-text"
-                                onClick={handlePostClick}
-                            >
-                                Show less
-                            </p>
-                        )}
+                            {userExpanded && expanded && (
+                                <p
+                                    className="expand-post-link expand-link-text clickable-text"
+                                    onClick={handlePostClick}
+                                >
+                                    Show less
+                                </p>
+                            )}
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="btn-group">
                                     <div
@@ -231,11 +239,7 @@ function SinglePost({
                                                 : "default",
                                         }}
                                         onClick={() =>
-                                            setShowComments(
-                                                commentAmount
-                                                    ? !showComments
-                                                    : false
-                                            )
+                                            navigateTo(`/post/${postId}`)
                                         }
                                     ></div>
                                     <small>{commentAmount}</small>
@@ -245,12 +249,6 @@ function SinglePost({
                                 </small>
                             </div>
                         </div>
-                        <GetComments
-                            showComments={showComments}
-                            postId={postId}
-                            userId={currentUserId}
-                            commentAmount={commentAmount}
-                        />
                         <CreateComment
                             postCreatorId={userId}
                             currentUserId={currentUserId}
@@ -258,6 +256,12 @@ function SinglePost({
                             updateCommentAmount={updateCommentAmount}
                         />
                     </div>
+                    <GetComments
+                        postId={postId}
+                        currentUserId={currentUserId}
+                        commentAmount={commentAmount}
+                        showComments={showComments}
+                    />
                 </div>
             </div>
         );

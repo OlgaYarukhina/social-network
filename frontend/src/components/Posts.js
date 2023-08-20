@@ -45,6 +45,7 @@ const GetPosts = ({ userId, postAmount }) => {
                         comments={post.commentAmount}
                         currentUserId={userId}
                         profilePic={post.profilePic}
+                        showComments={false}
                     />
                 ))
             ) : (

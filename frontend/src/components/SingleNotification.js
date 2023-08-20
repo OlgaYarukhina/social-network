@@ -9,7 +9,6 @@ function SingleNotification({
     clickedOn,
     created,
 }) {
-    const [notificationPath, setNotificationPath] = useState("");
     const navigateTo = useNavigate();
 
     const getNotificationMsg = () => {
@@ -19,7 +18,13 @@ function SingleNotification({
         }
     };
 
-    const handleNotificationClick = () => {};
+    const handleNotificationClick = () => {
+        switch (notificationType) {
+            case "comment":
+                navigateTo(`/post/${sourceId}`);
+                break;
+        }
+    };
 
     return (
         <Dropdown.Item key={notificationId} onClick={handleNotificationClick}>

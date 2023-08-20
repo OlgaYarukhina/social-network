@@ -20,7 +20,7 @@ function Notifications({ notifications, userId }) {
 
     const showNotificationDropdown = () => {
         setNotificationCount("");
-        setShowNotifications(!showNotifications)
+        setShowNotifications(!showNotifications);
         setAllNotificationsToSeen();
         console.log(notifications);
     };
@@ -60,6 +60,7 @@ function Notifications({ notifications, userId }) {
                 <Dropdown.Menu style={{ width: "200px" }}>
                     {notifications.map((notification) => (
                         <SingleNotification
+                            key={notification.notificationId}
                             notificationId={notification.notificationId}
                             sourceId={notification.sourceId}
                             notificationType={notification.notificationType}
