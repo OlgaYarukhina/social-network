@@ -117,6 +117,16 @@
     background-repeat: no-repeat;
     cursor: pointer;
 }
+.goups-in-icon {
+    width: 30px;
+    height: 30px;
+    margin: 3px 20px 3px 0px;
+    border: none;
+    background-image: url("/./public/icons/Users_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
 
 .follow-requests-icon {
     width: 30px;
@@ -269,4 +279,20 @@ textarea {
     max-width: 80%;
     margin-right: 10px;
     overflow-wrap: break-word;
+}
+
+
+/* Groups */
+.close {
+    font-size: 24px;
+    color: black;
+    opacity: 0.7;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0;
+}
+.close:hover {
+    opacity: 1;
 }

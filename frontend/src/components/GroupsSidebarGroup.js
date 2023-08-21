@@ -11,34 +11,34 @@ function GroupsSidebarGroup({
     return (
         <div key={userId}>
             <div className="user-info">
-                <div
-                    style={{ cursor: "pointer", marginLeft: "10px" }}
-                    className="d-flex align-items-center"
-                >
-                    <img
-                        src={`http://localhost:8080/get-image/groups/${groupPic}`}
-                        width="38"
-                        height="38"
-                    />
-                    <div className="d-flex align-items-center"
+                <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex"
+                        style={{ cursor: "pointer", display: "flex"}}
                         onClick={() => {
                             navigateTo(`/group/${groupId}`);
                         }}
                     >
-                        <h5 style={{marginLeft: "10px"}}>
-                            { title }
-                        </h5>
+                        <img
+                            src={`http://localhost:8080/get-image/groups/${groupPic}`}
+                            width="38"
+                            height="38"
+                        />
+                         <div 
+                         className="d-flex align-items-center card-text"
+                         style={{ marginLeft: "10px", alignItems: "center" }}>
+                        {title}
+                        </div>
                     </div>
                     {isOwner ? (
-                          <img
-                          src={`http://localhost:3000/icons/Star_72px.png`}
-                          width="20"
-                          height="20"
-                          marginLeft="30px"
-                      />
-                         ) : (
-                         null
-                    )}
+                             <div className="d-flex align-items-center">
+                        <img
+                            src={`http://localhost:3000/icons/Star_72px.png`}
+                            width="16"
+                            height="16"
+                            style={{ marginLeft: "20px"}}
+                        />
+                        </div>
+                    ) : null}
                 </div>
             </div>
             <hr />
@@ -47,3 +47,6 @@ function GroupsSidebarGroup({
 }
 
 export default GroupsSidebarGroup;
+
+
+

@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Dropdown } from "react-bootstrap";
 import { useOutletContext, useParams } from "react-router-dom";
+import { sendNotification } from "./Notifications";
 import Popup from "./Popup";
+import PopupCreateGroup from "./PopupCreateGroup.js";
 import CreatePost from "./Poster";
 import GetUserPosts from "./UserPosts.js";
-import { sendNotification } from "./Notifications";
+import GroupsSidebarGroup from "./GroupsSidebarGroup";
+
 
 function User() {
     const [profileData, setProfileData] = useState({});
@@ -21,6 +24,9 @@ function User() {
 
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [showFollowingPopup, setShowFollowingPopup] = useState(false);
+
+    const [showCreateGroupPopup, setShowCreateGroupPopup] = useState(false);
+    const [groups, setGroups] = useState([]);
 
     useEffect(() => {
         setIsProfileOwner(currentUserId === parseInt(userId));
@@ -124,6 +130,28 @@ function User() {
             console.error(error);
         }
     };
+
+    
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/get-groups?userId=${userId}`
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    setGroups(data);
+                } else {
+                    console.error("Failed to fetch groups:", response.status);
+                }
+            } catch (error) {
+                console.error("Error fetching groups:", error);
+            }
+        };
+
+        fetchGroups();
+    });
 
     if (
         Array.isArray(profileData.followers) &&
@@ -269,7 +297,46 @@ function User() {
                                 This profile is private
                             </h4>
                         )}
+                        {isProfileOwner ? (
+                            <div 
+                            className="d-flex align-items-center"
+                            style={{
+                                marginTop: "40px",
+                                marginBottom: "40px",
+                            }}>
+                            <div className="font-weight-bold">
+                                
+                                <button 
+                                type="button" 
+                                class="btn btn-light"
+                                onClick={() => setShowCreateGroupPopup(true)}
+                                >
+                                <span className="btn goups-in-icon"></span>
+                                Create group
+                                </button>
+                            </div>
+                        </div>
+                        ) : null}
+                          {groups.userGroups != null
+                ? groups.userGroups.map((group) => (
+                      <GroupsSidebarGroup
+                          key={group.groupId}
+                          groupId={group.groupId}
+                          userId={group.userId}
+                          title={group.groupTitle}
+                          groupPic={group.title}
+                          isOwner={false}
+                      />
+                  ))
+                : null}
                     </div>
+                  
+                    <PopupCreateGroup
+                                title="Create group"
+                                userId = {sessionData.userData.userId}
+                                show={showCreateGroupPopup}
+                                onClose={() => setShowCreateGroupPopup(false)}
+                            />
                     <div className="col-md-7">
                         {currentUserId == userId ? (
                             <CreatePost userId={sessionData.userData.userId} />

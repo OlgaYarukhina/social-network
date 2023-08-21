@@ -33,6 +33,7 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/create-comment", app.CreateCommentHandler)
 	mux.HandleFunc("/get-comments", app.GetCommentsHandler)
 	mux.HandleFunc("/get-comment-likes", app.GetCommentLikesHandler)
+	mux.HandleFunc("/create-group", app.CreateGroupHandler)
 	mux.HandleFunc("/set-privacy", app.PrivacyHandler)
 	mux.HandleFunc("/search", app.SearchHandler)
 	mux.HandleFunc("/add-notification", app.AddNotificationHandler)

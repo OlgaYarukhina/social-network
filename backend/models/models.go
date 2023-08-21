@@ -79,12 +79,12 @@ type Notification struct {
 }
 
 type Group struct {
-	GroupID   int       `json:"groupId,string"`
-	UserID    int       `json:"userId,string"`
-	Title     string    `json:"groupTitle"`
-	GroupPic  string    `json:"groupPic"`
-	Privacy   string    `json:"privacy"`
-	CreatedAt time.Time `json:"createdAt"`
+	GroupID     int       `json:"groupId,string"`
+	UserID      int       `json:"userId,string"`
+	Title       string    `json:"groupTitle"`
+	Description string    `json:"groupDescription"`
+	GroupPic    string    `json:"groupPic"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 type FollowRequestResponse struct {
