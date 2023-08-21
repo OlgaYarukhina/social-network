@@ -3,6 +3,7 @@ import ChatSidebar from "./ChatSidebar";
 import { Card, ListGroup, Form, Button } from "react-bootstrap";
 import React, { useEffect, useRef, useState } from "react";
 import ChatMsg, { formatDateWithRelativeTime } from "./ChatMsg";
+import EmojiPicker from "emoji-picker-react";
 
 class Event {
     constructor(type, payload) {
@@ -27,6 +28,7 @@ function UserChat() {
     const [pageReady, setPageReady] = useState(false);
     const [otherChatterName, setOtherChatterName] = useState("");
     const [isValidChatRecipient, setIsValidChatRecipient] = useState(false);
+    const [showEmojis, setShowEmojis] = useState(false);
 
     const navigateTo = useNavigate();
 
@@ -108,6 +110,10 @@ function UserChat() {
             ws.current.send(JSON.stringify(event))
         );
         routeEvent(event);
+    };
+
+    const handleEmojiClick = (emoji) => {
+        setMessageInput((prevMsg) => prevMsg + emoji.emoji);
     };
 
     const getMessages = (currentChatterId, otherChatterId) => {
@@ -247,7 +253,7 @@ function UserChat() {
         const diffInMinutes = Math.abs((next - prev) / (1000 * 60));
 
         if (diffInMinutes > 15) {
-            var dateText = formatDateWithRelativeTime(nextTime)
+            var dateText = formatDateWithRelativeTime(nextTime);
             return (
                 <div className="text-center text-secondary mt-5">
                     {dateText.length === 5 ? `Today ${dateText}` : dateText}
@@ -323,9 +329,33 @@ function UserChat() {
                                         }}
                                     />
                                 </Form.Group>
-                                <Button variant="primary" type="submit">
-                                    Send
-                                </Button>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <Button variant="primary" type="submit">
+                                        Send
+                                    </Button>
+                                    <div
+                                        className="emoji-icon"
+                                        onClick={() =>
+                                            setShowEmojis(!showEmojis)
+                                        }
+                                    ></div>
+                                </div>
+                                <div
+                                    style={{
+                                        display: showEmojis ? "block" : "none",
+                                    }}
+                                >
+                                    <EmojiPicker
+                                        searchDisabled={true}
+                                        skinTonesDisabled={true}
+                                        previewConfig={{
+                                            showPreview: false,
+                                        }}
+                                        width="100%"
+                                        height={200}
+                                        onEmojiClick={handleEmojiClick}
+                                    />
+                                </div>
                             </Form>
                         </Card.Footer>
                     </Card>
