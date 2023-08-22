@@ -30,8 +30,6 @@ function User() {
 
     useEffect(() => {
         setIsProfileOwner(currentUserId === parseInt(userId));
-        console.log("Current user");
-        console.log(currentUserId);
 
         const getProfileData = async () => {
             try {

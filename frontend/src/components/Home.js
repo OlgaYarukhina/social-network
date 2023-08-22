@@ -40,6 +40,8 @@ function Home() {
                     <div className="col-5 posts">
                         <CreatePost
                             userId={sessionData.userData.userId}
+                            isGroup={false}
+                            groupId={null}
                             updatePostAmount={updatePostAmount}
                         />
                         <GetPosts

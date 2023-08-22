@@ -252,15 +252,35 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 
 	userIDStr := r.FormValue("userId")
 	userID, err := strconv.Atoi(userIDStr)
+	post.UserID = userID
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	post.UserID = userID
+	groupIDStr := r.FormValue("groupId")
+	if groupIDStr != "" {
+		groupID, err := strconv.Atoi(groupIDStr)
+		post.GroupID = groupID                        
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	}
+
 	post.Content = r.FormValue("content")
 	post.Privacy = r.FormValue("privacy")
 	input := r.FormValue("selectedFollowers")
+
+	post.CreatedAt = time.Now()
+
+		stmt := `INSERT INTO posts (userId, content, img, groupId, privacy, created) VALUES (?, ?, ?, ?, ?, ?)`
+		id, err := app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.GroupID, post.Privacy, post.CreatedAt)
+		if err != nil {
+			log.Println(err)
+		}
+
+		postId, err = id.LastInsertId()
 
 	if input != "" {
 		// Remove brackets and spaces
@@ -283,16 +303,6 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 				arrayFollowersId = append(arrayFollowersId, num)
 			}
 		}
-
-		post.CreatedAt = time.Now()
-
-		stmt := `INSERT INTO posts (userId, content, img, privacy, created) VALUES (?, ?, ?, ?, ?)`
-		id, err := app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.Privacy, post.CreatedAt)
-		if err != nil {
-			log.Println(err)
-		}
-
-		postId, err = id.LastInsertId()
 
 		for _, selectedUserId := range arrayFollowersId {
 			stmt := `INSERT INTO exclusive_posts (postId, selectedUserId) VALUES (?, ?)`
@@ -412,6 +422,74 @@ func (app *application) GetPostLikesHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
 }
+
+
+func (app *application) GetGroupPostsHandler(w http.ResponseWriter, r *http.Request) {
+	var posts []models.Post
+	groupId := r.URL.Query().Get("groupId")
+
+	stmt := `
+          SELECT postId, userId, content, COALESCE(img, ""), privacy, created 
+          FROM posts 
+          WHERE groupId=?
+          ORDER BY created DESC LIMIT 200
+        `
+
+	rows, err := app.db.Query(stmt, groupId)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		post := models.Post{}
+		var img sql.NullString
+		err = rows.Scan(&post.PostID, &post.UserID, &post.Content, &img, &post.Privacy, &post.CreatedAt)
+		if err != nil {
+			log.Fatalf("Err: %s", err)
+		}
+		if img.Valid {
+			post.Img = img.String
+		} else {
+			post.Img = ""
+		}
+
+		err = app.db.QueryRow("SELECT COUNT(*) FROM comments WHERE postId = ?", post.PostID).Scan(&post.CommentAmount)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		var nickname string
+		var firstName string
+		var lastName string
+		if err := app.db.QueryRow(`SELECT COALESCE(nickname, ""), firstName, lastName, profilePic from users WHERE userId = ?`, post.UserID).Scan(&nickname, &firstName, &lastName, &post.ProfilePic); err != nil {
+			if err == sql.ErrNoRows {
+				log.Println(err)
+			}
+			log.Fatalf(err.Error())
+		}
+
+		if nickname == "" {
+			post.DisplayName = firstName + " " + lastName
+		} else {
+			post.DisplayName = nickname
+		}
+
+		posts = append(posts, post)
+	}
+	jsonResp, err := json.Marshal(posts)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+
+	w.Write(jsonResp)
+	return
+}
+
+
+
+
 
 // for home page
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import PopupAddPrivacy from "./PopupPrivacy";
 
-const CreatePost = ({ userId, updatePostAmount }) => {
+const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
     const [formData, setFormData] = useState({
         userId,
         content: "",
@@ -93,15 +93,27 @@ const CreatePost = ({ userId, updatePostAmount }) => {
         if (selectedImg) {
             payload.append("img", selectedImg || "");
         }
-        payload.append(
-            "privacy",
-            !isChecked
-                ? "Public"
-                : selectedFollowers.length === 0
-                ? "Private"
-                : "Specific"
-        );
-        payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
+
+        console.log("here1")
+        console.log(isGroup)
+        console.log(groupId)
+
+        if (!isGroup) {
+            payload.append(
+                "privacy",
+                !isChecked
+                    ? "Public"
+                    : selectedFollowers.length === 0
+                    ? "Private"
+                    : "Specific"
+            );
+            payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
+        } else {
+            console.log("here")
+            payload.append("privacy", "Group");
+            payload.append("groupId", groupId);
+        }
+   
 
         const options = {
             method: "POST",
@@ -177,8 +189,9 @@ const CreatePost = ({ userId, updatePostAmount }) => {
                                 onChange={handleChangeImg}
                                 accept="image/*, .png, .jpg, .gif"
                             />
-                        </div>
-                        <div className="col d-flex align-items-center">
+                        </div>            
+                            <div className="col d-flex align-items-center">
+                            {!isGroup ? (
                             <label className="checkbox-label">
                                 <input
                                     type="checkbox"
@@ -189,7 +202,11 @@ const CreatePost = ({ userId, updatePostAmount }) => {
                                 <span className="checkmark"></span>
                                 Only for followers
                             </label>
-                        </div>
+                         ) : (
+                            null
+                         )}
+                           </div>
+
                         {isChecked && (
                             <PopupAddPrivacy
                                 title="Show to individual followers?"

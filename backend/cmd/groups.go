@@ -108,6 +108,37 @@ func (app *application) CreateGroupHandler(w http.ResponseWriter, r *http.Reques
 
 }
 
+
+func (app *application) GetGroupDataHandler(w http.ResponseWriter, r *http.Request) {
+	
+	groupId := r.URL.Query().Get("groupId")
+	//groupData := make(map[string]interface{})
+	var group models.Group
+	row := app.db.QueryRow("SELECT userId, title, description, img FROM `groups` WHERE groupId = ?", groupId)
+	err := row.Scan(&group.UserID, &group.Title, &group.Description, &group.GroupPic)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// groupData["general"] = group
+	// groupData["owner"] = "Will be later"
+	// groupData["members"] = "[]"
+	
+
+	jsonData, err := json.Marshal(group)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+
+
+
 func (app *application) GetGroupsHandler(w http.ResponseWriter, r *http.Request) {
 	currentUserId := r.URL.Query().Get("userId")
 	groups := make(map[string]interface{})

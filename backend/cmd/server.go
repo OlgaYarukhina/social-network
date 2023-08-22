@@ -34,6 +34,8 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/get-comments", app.GetCommentsHandler)
 	mux.HandleFunc("/get-comment-likes", app.GetCommentLikesHandler)
 	mux.HandleFunc("/create-group", app.CreateGroupHandler)
+	mux.HandleFunc("/get-group-data", app.GetGroupDataHandler)
+	mux.HandleFunc("/get-group-posts", app.GetGroupPostsHandler)
 	mux.HandleFunc("/set-privacy", app.PrivacyHandler)
 	mux.HandleFunc("/search", app.SearchHandler)
 	mux.HandleFunc("/add-notification", app.AddNotificationHandler)

@@ -9,6 +9,7 @@ import Home from "./components/Home";
 import User from "./components/User";
 import UserChat from "./components/UserChat";
 import SinglePostPage from "./components/SinglePostPage";
+import Group from "./components/Group";
 
 const router = createBrowserRouter([
     {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
             { path: "/user/:userId", element: <User /> },
             { path: "/chat/user/:userId", element: <UserChat /> },
             { path: "/post/:postId", element: <SinglePostPage /> },
+            { path: "/group/:groupId", element: <Group /> },
         ],
     },
 ]);
