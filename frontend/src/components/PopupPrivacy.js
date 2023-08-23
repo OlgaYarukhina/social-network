@@ -32,7 +32,7 @@ const PopupAddPrivacy = ({ title, show, currentUserId, onClose, onFollowersSelec
 
     return (
         <Modal show={show} onHide={onClose} centered>
-             <Modal.Header style={{ backgroundColor: "lightgray", color: "rgb(41, 16, 93)" }}>
+             <Modal.Header style={{ backgroundColor: "rgb(200, 236, 248)", color: "rgb(41, 16, 93)" }}>
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ maxHeight: "50vh", overflowY: "auto" }}>

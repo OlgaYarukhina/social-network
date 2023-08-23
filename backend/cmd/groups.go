@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"io"
 	"log"
@@ -8,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"01.kood.tech/git/aaaspoll/social-network/backend/models"
 	"github.com/gofrs/uuid"
@@ -54,7 +54,6 @@ func (app *application) CreateGroupHandler(w http.ResponseWriter, r *http.Reques
 	group.UserID = userID
 	group.Title = r.FormValue("groupTitle")
 	group.Description = r.FormValue("groupDescription")
-	input := r.FormValue("selectedFollowers") // if we add followers directly in popup?
 
 	stmt := `INSERT INTO groups (userId, title, description, img) VALUES (?, ?, ?, ?)`
 	id, err := app.db.Exec(stmt, group.UserID, group.Title, group.Description, group.GroupPic)
@@ -63,37 +62,6 @@ func (app *application) CreateGroupHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	groupId, err := id.LastInsertId()
-
-	if input != "" {
-		input = strings.ReplaceAll(input, "[", "")
-		input = strings.ReplaceAll(input, "]", "")
-		input = strings.ReplaceAll(input, " ", "")
-		values := strings.Split(input, ",")
-
-		var arrayFollowersId []int
-		for _, value := range values {
-			if value != "" {
-				num, err := strconv.Atoi(value)
-				if err != nil {
-					log.Println(err)
-					return
-				}
-				arrayFollowersId = append(arrayFollowersId, num)
-			}
-		}
-		for _, selectedUserId := range arrayFollowersId {
-			stmt := `INSERT INTO group_request (groupId, selectedUserId) VALUES (?, ?)`
-			_, err = app.db.Exec(stmt, groupId, selectedUserId)
-
-			if err != nil {
-				log.Println(err)
-			}
-		}
-		if err != nil {
-			log.Println(err)
-		}
-	}
-
 	group.GroupID = int(groupId)
 
 	jsonResponse, err := json.Marshal(group)
@@ -112,7 +80,7 @@ func (app *application) CreateGroupHandler(w http.ResponseWriter, r *http.Reques
 func (app *application) GetGroupDataHandler(w http.ResponseWriter, r *http.Request) {
 	
 	groupId := r.URL.Query().Get("groupId")
-	//groupData := make(map[string]interface{})
+	groupData := make(map[string]interface{})
 	var group models.Group
 	row := app.db.QueryRow("SELECT userId, title, description, img FROM `groups` WHERE groupId = ?", groupId)
 	err := row.Scan(&group.UserID, &group.Title, &group.Description, &group.GroupPic)
@@ -120,12 +88,46 @@ func (app *application) GetGroupDataHandler(w http.ResponseWriter, r *http.Reque
 		log.Println(err)
 	}
 
-	// groupData["general"] = group
-	// groupData["owner"] = "Will be later"
-	// groupData["members"] = "[]"
+	var nickname string
+	var firstName string
+	var lastName string
+		if err := app.db.QueryRow(`SELECT COALESCE(nickname, ""), firstName, lastName from users WHERE userId = ?`, group.UserID).Scan(&nickname, &firstName, &lastName); err != nil {
+			if err == sql.ErrNoRows {
+				log.Println(err)
+			}
+			log.Fatalf(err.Error())
+		}
+
+		if nickname == "" {
+			groupData["owner"] = firstName + " " + lastName
+		} else {
+			groupData["owner"] = nickname
+		}
+
+	var members []int
+	var memberId int
+
+	stmt := `SELECT memberId FROM group_members WHERE groupId = ?`
+	rows, err := app.db.Query(stmt, groupId)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&memberId)
+		if err != nil {
+			log.Fatalf("Err: %s", err)
+		}
+		members = append(members, memberId)
+	}
+
+	groupData["general"] = group
+	groupData["numberOfMembers"] = len(members)
+	groupData["members"] = "[]"        // not sure if we need it here
 	
 
-	jsonData, err := json.Marshal(group)
+	jsonData, err := json.Marshal(groupData)
 	if err != nil {
 		log.Println(err)
 		return
@@ -147,9 +149,9 @@ func (app *application) GetGroupsHandler(w http.ResponseWriter, r *http.Request)
 
 	// get user's groups
 	stmt := `
-		SELECT g.groupId, g.userId, g.title, g.img
-		FROM groups AS g
-		WHERE g.userId = ?
+		SELECT groupId, userId, title, img
+		FROM groups
+		WHERE userId = ?
 	`
 
 	rows, err := app.db.Query(stmt, currentUserId)

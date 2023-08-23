@@ -94,10 +94,6 @@ const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
             payload.append("img", selectedImg || "");
         }
 
-        console.log("here1")
-        console.log(isGroup)
-        console.log(groupId)
-
         if (!isGroup) {
             payload.append(
                 "privacy",
@@ -109,7 +105,6 @@ const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
             );
             payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
         } else {
-            console.log("here")
             payload.append("privacy", "Group");
             payload.append("groupId", groupId);
         }

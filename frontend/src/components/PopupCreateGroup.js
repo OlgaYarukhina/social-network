@@ -25,7 +25,7 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
         let payload = new FormData();
         payload.append("userId", userId);
         payload.append("groupTitle", groupTitle);
-        payload.append("groupTitle", groupDescription);
+        payload.append("groupDescription", groupDescription);
         if (uploadedImage) {
             payload.append("img", uploadedImage || "");
         }
@@ -71,9 +71,10 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
                             type="text"
                             className="form-control"
                             id="title"
-                            placeholder="Enter group title"
+                            placeholder="Max 20 symbols"
                             value={groupTitle}
                             onChange={(e) => setGroupTitle(e.target.value)}
+                            maxLength={30}
                             required
                         />
                     </div>
@@ -83,9 +84,10 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
                             className="form-control"
                             id="description"
                             rows="3"
-                            placeholder="Enter group description"
+                            placeholder="Max 600 symbols"
                             value={groupDescription}
                             onChange={(e) => setGroupDescription(e.target.value)}
+                            maxLength={600}
                             required
                         ></textarea>
                     </div>
