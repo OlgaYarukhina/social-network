@@ -14,6 +14,7 @@ func (app *application) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	var searchResponse models.SearchResponse
 
 	searchResponse.Users = getUsers(searchValue, app.db)
+	searchResponse.Groups = getGroups(searchValue, app.db)
 
 	jsonData, err := json.Marshal(searchResponse)
 
@@ -56,4 +57,32 @@ func getUsers(searchValue string, db *sql.DB) []models.User {
 	}
 
 	return users
+}
+
+func getGroups(searchValue string, db *sql.DB) []models.Group {
+	var groups = []models.Group{}
+
+	query := `
+        SELECT groupId, title, img
+        FROM groups
+        WHERE (LOWER(title) LIKE LOWER(? || '%'))
+    `
+	rows, err := db.Query(query, searchValue)
+
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var group models.Group
+		err := rows.Scan(&group.GroupID, &group.Title, &group.GroupPic)
+		if err != nil {
+			log.Println(err)
+		}
+
+		groups = append(groups, group)
+	}
+
+	return groups
 }

@@ -5,23 +5,23 @@ import (
 )
 
 type User struct {
-	UserId                  int            `json:"userId,omitempty"`
-	FirstName               string         `json:"firstName"`
-	LastName                string         `json:"lastName"`
-	Email                   string         `json:"email,omitempty"`
-	Nickname                string         `json:"nickname,omitempty"`
-	DateOfBirth             string         `json:"dateOfBirth,omitempty"`
-	Password                string         `json:"password,omitempty"`
-	ProfilePic              string         `json:"profilePic"`
-	AboutMe                 string         `json:"aboutMe,omitempty"`
-	Public                  bool           `json:"public,omitempty"`
-	Online                  bool           `json:"online,omitempty"`
-	CurrentUserFollowStatus string         `json:"currentUserFollowStatus,omitempty"`
-	FollowsCurrentUser      bool           `json:"followsCurrentUser,omitempty"`
-	Followers               []User         `json:"followers"`
-	Following               []User         `json:"following"`
-	ChattableUsers          []User         `json:"chattableUsers"`
-	Notifications           []Notification `json:"notifications"`
+	UserId                      int            `json:"userId,omitempty"`
+	FirstName                   string         `json:"firstName"`
+	LastName                    string         `json:"lastName"`
+	Email                       string         `json:"email,omitempty"`
+	Nickname                    string         `json:"nickname,omitempty"`
+	DateOfBirth                 string         `json:"dateOfBirth,omitempty"`
+	Password                    string         `json:"password,omitempty"`
+	ProfilePic                  string         `json:"profilePic"`
+	AboutMe                     string         `json:"aboutMe,omitempty"`
+	Public                      bool           `json:"public,omitempty"`
+	Online                      bool           `json:"online,omitempty"`
+	CurrentUserFollowStatus     string         `json:"currentUserFollowStatus,omitempty"`
+	RequestsToFollowCurrentUser bool           `json:"requestsToFollowCurrentUser,omitempty"`
+	Followers                   []User         `json:"followers"`
+	Following                   []User         `json:"following"`
+	ChattableUsers              []User         `json:"chattableUsers"`
+	Notifications               []Notification `json:"notifications"`
 }
 
 type LoginResponse struct {
@@ -66,7 +66,8 @@ type Like struct {
 }
 
 type SearchResponse struct {
-	Users []User `json:"users"`
+	Users  []User  `json:"users"`
+	Groups []Group `json:"groups"`
 }
 
 type Notification struct {
@@ -80,16 +81,31 @@ type Notification struct {
 }
 
 type Group struct {
-	GroupID     int       `json:"groupId,string"`
-	UserID      int       `json:"userId,string"`
-	Title       string    `json:"groupTitle"`
-	Description string    `json:"groupDescription"`
-	GroupPic    string    `json:"groupPic"`
-	CreatedAt   time.Time `json:"createdAt"`
+	GroupID                 int       `json:"groupId,string"`
+	UserID                  int       `json:"userId,string"`
+	Title                   string    `json:"groupTitle"`
+	Description             string    `json:"groupDescription"`
+	GroupPic                string    `json:"groupPic"`
+	CreatedAt               time.Time `json:"createdAt"`
+	CurrentUserMemberStatus string    `json:"currentUserMemberStatus"`
+	Owner                   User      `json:"owner"`
+	Members                 []User    `json:"members"`
 }
 
 type FollowRequestResponse struct {
 	UserId     int  `json:"userId"`
 	FollowerId int  `json:"followerId"`
 	Accepted   bool `json:"accepted"`
+}
+
+type GroupInvite struct {
+	GroupId       int `json:"groupId"`
+	InviterId     int `json:"inviterId"`
+	InvitedUserId int `json:"invitedUserId"`
+}
+
+type GroupInviteResponse struct {
+	GroupId  int  `json:"groupId"`
+	UserId   int  `json:"userId"`
+	Accepted bool `json:"accepted"`
 }

@@ -1,13 +1,13 @@
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function SingleFollowRequest({
+function SingleJoinRequest({
     userId,
     firstName,
     lastName,
     nickname,
     profilePic,
-    currentUserId,
+    groupId,
     updateRequests,
     setUpdateRequests
 }) {
@@ -15,8 +15,8 @@ function SingleFollowRequest({
 
     const handleRequest = async (accepted) => {
         const payload = {
-            userId: currentUserId,
-            followerId: userId,
+            groupId: parseInt(groupId),
+            userId,
             accepted
         }
 
@@ -30,7 +30,7 @@ function SingleFollowRequest({
 
         try {
             const response = await fetch(
-                "http://localhost:8080/handle-follow-request",
+                "http://localhost:8080/handle-group-join-request",
                 options
             );
             if (response.ok) {
@@ -97,4 +97,4 @@ function SingleFollowRequest({
     );
 }
 
-export default SingleFollowRequest;
+export default SingleJoinRequest;

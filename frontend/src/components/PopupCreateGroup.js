@@ -6,17 +6,17 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
     const [groupTitle, setGroupTitle] = useState("");
     const [groupDescription, setGroupDescription] = useState("");
     const [uploadedImage, setUploadedImage] = useState(null);
+    const [imgPreviewUrl, setImgPreviewUrl] = useState(null);
 
     const navigateTo = useNavigate();
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setUploadedImage(reader.result);
-            };
-            reader.readAsDataURL(file);
+            setUploadedImage(file);
+            setImgPreviewUrl(URL.createObjectURL(file));
+        } else {
+            setUploadedImage(null);
         }
     };
 
@@ -26,6 +26,7 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
         payload.append("userId", userId);
         payload.append("groupTitle", groupTitle);
         payload.append("groupDescription", groupDescription);
+
         if (uploadedImage) {
             payload.append("img", uploadedImage || "");
         }
@@ -41,9 +42,11 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
                 options
             );
             if (response.ok) {
+                setGroupTitle("");
+                setGroupDescription("");
                 const newGroup = await response.json();
                 navigateTo(`/group/${newGroup.groupId}`);
-                console.log(newGroup)
+                console.log(newGroup);
             } else {
                 console.log("Error creating group:", response.status);
                 const statusMsg = await response.text();
@@ -57,9 +60,19 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
 
     return (
         <Modal show={show} onHide={onClose} centered>
-            <Modal.Header style={{ backgroundColor: "lightgray", color: "rgb(41, 16, 93)" }}>
+            <Modal.Header
+                style={{
+                    backgroundColor: "lightgray",
+                    color: "rgb(41, 16, 93)",
+                }}
+            >
                 <Modal.Title>{title}</Modal.Title>
-                <button type="button" className="close" aria-label="Close" onClick={onClose}>
+                <button
+                    type="button"
+                    className="close"
+                    aria-label="Close"
+                    onClick={onClose}
+                >
                     <span aria-hidden="true">&times;</span>
                 </button>
             </Modal.Header>
@@ -86,7 +99,9 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
                             rows="3"
                             placeholder="Max 600 symbols"
                             value={groupDescription}
-                            onChange={(e) => setGroupDescription(e.target.value)}
+                            onChange={(e) =>
+                                setGroupDescription(e.target.value)
+                            }
                             maxLength={600}
                             required
                         ></textarea>
@@ -97,17 +112,28 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
                             type="file"
                             className="form-control-file"
                             id="groupImage"
-                            accept="image/*"
+                            accept=".png, .jpg, .jpeg"
                             onChange={(e) => handleImageUpload(e)}
                         />
                     </div>
                     {/* Add a preview for the uploaded image */}
                     {uploadedImage && (
                         <div className="form-group">
-                            <img src={uploadedImage} alt="Group" style={{ maxWidth: '80px' }} />
+                            <div
+                                style={{
+                                    height: "156px",
+                                    width: "156px",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                    backgroundImage: `url(${imgPreviewUrl})`,
+                                    backgroundSize: "cover",
+                                }}
+                            ></div>
                         </div>
                     )}
-                    <button type="submit" className="btn btn-danger">Create Group</button>
+                    <button type="submit" className="btn btn-danger">
+                        Create Group
+                    </button>
                 </form>
             </Modal.Body>
         </Modal>

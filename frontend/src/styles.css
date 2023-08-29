@@ -110,12 +110,11 @@
 .goups-icon {
     width: 30px;
     height: 30px;
-    margin: 30px 25px 30px 0px;
+    margin: 10px 10px 10px 0px;
     border: none;
     background-image: url("/./public/icons/Users_72px.png");
     background-size: cover;
     background-repeat: no-repeat;
-    cursor: pointer;
 }
 .goups-in-icon {
     width: 30px;
@@ -131,7 +130,7 @@
 .emoji-icon {
     width: 30px;
     height: 30px;
-    margin: 30px 25px 30px 0px;
+    margin: 10px 10px 10px 0px;
     border: none;
     background-image: url("/./public/icons/Emoji_Icon.png");
     background-size: cover;
@@ -142,14 +141,12 @@
 .follow-requests-icon {
     width: 30px;
     height: 30px;
-    margin: 30px 25px 30px 0px;
+    margin: 10px 10px 10px 0px;
     border: none;
     background-image: url("/./public/avatars/User_72px.png");
     background-size: cover;
     background-repeat: no-repeat;
-    cursor: pointer;
 }
-
 
 .notification-button {
     width: 28px;
@@ -185,6 +182,15 @@
     height: 20px;
     border: none;
     background-image: url("/./public/avatars/User_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.group-icon {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background-image: url("/./public/icons/Users_72px.png");
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -292,7 +298,6 @@ textarea {
     overflow-wrap: break-word;
 }
 
-
 /* Groups */
 .close {
     font-size: 24px;
@@ -306,4 +311,18 @@ textarea {
 }
 .close:hover {
     opacity: 1;
+}
+
+/* Apply this CSS to the scrollable element */
+.scrollable-element {
+    max-height: 95vh; /* Set a maximum height or adjust as needed */
+    overflow-y: auto; /* Enable vertical scrolling when content overflows */
+    padding: 10px; /* Add padding for spacing (optional) */
+    direction: rtl;
+    width: 100%;
+}
+
+/* Hide the default scrollbar */
+.scrollable-element::-webkit-scrollbar {
+    width: 0.1;
 }

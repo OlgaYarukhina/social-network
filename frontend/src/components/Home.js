@@ -5,6 +5,7 @@ import CreatePost from "./Poster";
 import ChatSidebar from "./ChatSidebar";
 import GroupsSidebar from "./GroupsSidebar";
 import FollowRequests from "./FollowRequests";
+import GroupInviteSidebar from "./GroupInviteSidebar";
 
 function Home() {
     const navigateTo = useNavigate();
@@ -25,15 +26,23 @@ function Home() {
         return (
             <>
                 <div className="row" style={{ margin: "auto" }}>
-                    <div className="col-3">
-                        <div className="col-3" style={{ position: "fixed" }}>
-                            <div style={{ width: "100%" }}>
-                                <GroupsSidebar
-                                    userId={sessionData.userData.userId}
-                                />
-                                <FollowRequests
-                                    userId={sessionData.userData.userId}
-                                />
+                    <div className="col-3" style={{ paddingLeft: "0px" }}>
+                        <div
+                            className="col-3"
+                            style={{ position: "fixed", paddingLeft: "0px" }}
+                        >
+                            <div className="scrollable-element">
+                                <div style={{ direction: "ltr", marginTop: "10px"}}>
+                                    <GroupsSidebar
+                                        userId={sessionData.userData.userId}
+                                    />
+                                    <FollowRequests
+                                        userId={sessionData.userData.userId}
+                                    />
+                                    <GroupInviteSidebar
+                                        userId={sessionData.userData.userId}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

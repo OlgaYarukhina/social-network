@@ -54,13 +54,31 @@ func getNotifications(userId string, db *sql.DB) []models.Notification {
 func (app *application) SetAllNotificationsToSeenHandler(w http.ResponseWriter, r *http.Request) {
 	currentUserId := r.URL.Query().Get("userId")
 
-	statement, err := app.db.Prepare("UPDATE notifications SET seen = 'true' WHERE receiverId = ?")
+	statement, err := app.db.Prepare("UPDATE notifications SET seen = true WHERE receiverId = ?")
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	
 	_, err = statement.Exec(currentUserId)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (app *application) UpdateNOtificationStatusHandler(w http.ResponseWriter, r *http.Request) {
+	notificationId := r.URL.Query().Get("notificationId")
+
+	statement, err := app.db.Prepare("UPDATE notifications SET clickedOn = true WHERE notificationId = ?")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	
+	_, err = statement.Exec(notificationId)
 	if err != nil {
 		log.Println(err)
 		return

@@ -1,22 +1,20 @@
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function SingleFollowRequest({
-    userId,
-    firstName,
-    lastName,
-    nickname,
-    profilePic,
+function SingleGroupInvite({
+    groupId,
+    groupTitle,
+    img,
     currentUserId,
-    updateRequests,
-    setUpdateRequests
+    updateInvites,
+    setUpdateInvites
 }) {
     const navigateTo = useNavigate();
 
-    const handleRequest = async (accepted) => {
+    const handleInvite = async (accepted) => {
         const payload = {
-            userId: currentUserId,
-            followerId: userId,
+            groupId: parseInt(groupId),
+            userId: parseInt(currentUserId),
             accepted
         }
 
@@ -30,14 +28,14 @@ function SingleFollowRequest({
 
         try {
             const response = await fetch(
-                "http://localhost:8080/handle-follow-request",
+                "http://localhost:8080/handle-group-invite",
                 options
             );
             if (response.ok) {
-                console.log("successfully handled follow request")
-                setUpdateRequests(!updateRequests)
+                console.log("successfully handled group invite")
+                setUpdateInvites(!updateInvites)
             } else {
-                console.log("error handling follow request")
+                console.log("error handling group invite")
             }
         } catch (error) {
             console.error(error);
@@ -47,7 +45,7 @@ function SingleFollowRequest({
     return (
         <>
             <div
-                key={userId}
+                key={groupId}
                 className="d-flex justify-content-between align-items-center"
             >
                 <div className="user-info">
@@ -56,10 +54,10 @@ function SingleFollowRequest({
                         className="d-flex align-items-center"
                     >
                         <img
-                            src={`http://localhost:8080/get-image/users/${profilePic}`}
+                            src={`http://localhost:8080/get-image/groups/${img}`}
                             width="38"
                             height="38"
-                            onClick={() => navigateTo(`/user/${userId}`)}
+                            onClick={() => navigateTo(`/group/${groupId}`)}
                             style={{
                                 cursor: "pointer",
                                 borderRadius: "100%",
@@ -69,27 +67,20 @@ function SingleFollowRequest({
                         <div
                             className="d-flex align-items-center"
                             onClick={() => {
-                                navigateTo(`/user/${userId}`);
+                                navigateTo(`/group/${groupId}`);
                             }}
                         >
                             <h5 style={{ marginLeft: "10px" }}>
-                                {firstName + " " + lastName}
-                            </h5>
-                            <h5 style={{ marginLeft: "5px" }}>
-                                {nickname && (
-                                    <small className="text-muted">
-                                        ({nickname})
-                                    </small>
-                                )}
+                                {groupTitle}
                             </h5>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <Button onClick={() => handleRequest(true)} style={{ marginRight: "3px", borderRadius: "100px" }} variant="success">
+                    <Button onClick={() => handleInvite(true)} style={{ marginRight: "3px", borderRadius: "100px" }} variant="success">
                         ✓
                     </Button>
-                    <Button onClick={() => handleRequest(false)} style={{ borderRadius: "100px" }} variant="danger">X</Button>
+                    <Button onClick={() => handleInvite(false)} style={{ borderRadius: "100px" }} variant="danger">X</Button>
                 </div>
             </div>
             <hr />
@@ -97,4 +88,4 @@ function SingleFollowRequest({
     );
 }
 
-export default SingleFollowRequest;
+export default SingleGroupInvite;

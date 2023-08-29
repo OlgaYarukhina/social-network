@@ -34,7 +34,7 @@ func getUserInfo(userId, currentUserId string, db *sql.DB) models.User {
 	}
 
 	user.CurrentUserFollowStatus = getCurrentUserFollowStatus(userId, currentUserId, db)
-	user.FollowsCurrentUser = getViewedUserFollowStatus(userId, currentUserId, db)
+	user.RequestsToFollowCurrentUser = hasViewedUserRequestedToFollow(userId, currentUserId, db)
 	user.Followers = getUserFollowers(userId, currentUserId, db)
 	user.Following = getUserFollowing(userId, currentUserId, db)
 
@@ -77,6 +77,25 @@ func getViewedUserFollowStatus(userId, currentUserId string, db *sql.DB) bool {
 	}
 
 	return true
+}
+
+func hasViewedUserRequestedToFollow(userId, currentUserId string, db *sql.DB) bool {
+	var isRequest bool
+	// checks if viewed user is following current user
+	err := db.QueryRow("SELECT isRequest FROM followers WHERE userId = ? AND followerId = ?", currentUserId, userId).Scan(&isRequest)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false
+		} else {
+			log.Println(err)
+		}
+	} else {
+		if isRequest {
+			return true
+		}
+	}
+
+	return false
 }
 
 func getUserFollowers(userId, currentUserId string, db *sql.DB) []models.User {

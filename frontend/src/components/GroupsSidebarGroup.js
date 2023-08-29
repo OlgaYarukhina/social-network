@@ -1,19 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-function GroupsSidebarGroup({
-    userId,
-    groupId,
-    title,
-    groupPic,
-    isOwner,
-}) {
+function GroupsSidebarGroup({ userId, groupId, title, groupPic, isOwner }) {
     const navigateTo = useNavigate();
     return (
         <div key={userId}>
             <div className="user-info">
-                <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex"
-                        style={{ cursor: "pointer", display: "flex"}}
+                    <div
+                        className="d-flex"
+                        style={{ cursor: "pointer", display: "flex" }}
                         onClick={() => {
                             navigateTo(`/group/${groupId}`);
                         }}
@@ -23,23 +17,23 @@ function GroupsSidebarGroup({
                             width="38"
                             height="38"
                         />
-                         <div 
-                         className="d-flex align-items-center card-text"
-                         style={{ marginLeft: "10px", alignItems: "center" }}>
-                        {title}
+                        <div
+                            className="d-flex align-items-center card-text"
+                            style={{ marginLeft: "10px", alignItems: "center" }}
+                        >
+                            {title}
                         </div>
                     </div>
                     {isOwner ? (
-                             <div className="d-flex align-items-center">
-                        <img
-                            src={`http://localhost:3000/icons/Star_72px.png`}
-                            width="16"
-                            height="16"
-                            style={{ marginLeft: "20px"}}
-                        />
+                        <div className="d-flex align-items-center">
+                            <img
+                                src={`http://localhost:3000/icons/Star_72px.png`}
+                                width="16"
+                                height="16"
+                                style={{ marginLeft: "20px" }}
+                            />
                         </div>
                     ) : null}
-                </div>
             </div>
             <hr />
         </div>
@@ -47,6 +41,3 @@ function GroupsSidebarGroup({
 }
 
 export default GroupsSidebarGroup;
-
-
-

@@ -3,6 +3,8 @@ import GroupsSidebarGroup from "./GroupsSidebarGroup";
 
 function GroupsSidebar({ userId }) {
     const [groups, setGroups] = useState([]);
+    const [showGroups, setShowGroups] = useState(false);
+    const [groupAmount, setGroupAmount] = useState(0);
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -12,7 +14,12 @@ function GroupsSidebar({ userId }) {
                 );
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(data);
                     setGroups(data);
+                    setGroupAmount(
+                        (data.memberGroups ? data.memberGroups.length : 0) +
+                            (data.userGroups ? data.userGroups.length : 0)
+                    );
                 } else {
                     console.error("Failed to fetch groups:", response.status);
                 }
@@ -22,40 +29,51 @@ function GroupsSidebar({ userId }) {
         };
 
         fetchGroups();
-    });
+    }, []);
 
     return (
         <>
-            <div className="d-flex align-items-center">
+            <div
+                className="d-flex align-items-center"
+                style={{
+                    cursor:
+                        groups.userGroups || groups.memberGroups
+                            ? "pointer"
+                            : "",
+                }}
+                onClick={() => setShowGroups(!showGroups)}
+            >
                 <div className="p-2 font-weight-bold">
                     <div className="btn goups-icon"></div>
-                    Groups
+                    {`Groups (${groupAmount})`}
                 </div>
             </div>
-            {groups.userGroups != null
-                ? groups.userGroups.map((group) => (
-                      <GroupsSidebarGroup
-                          key={group.groupId}
-                          groupId={group.groupId}
-                          userId={group.userId}
-                          title={group.groupTitle}
-                          groupPic={group.title}
-                          isOwner={true}
-                      />
-                  ))
-                : null}
-            {groups.memberGroups != null
-                ? groups.memberGroups.map((group) => (
-                      <GroupsSidebarGroup
-                          key={group.groupId}
-                          groupId={group.groupId}
-                          userId={group.userId}
-                          title={group.groupTitle}
-                          groupPic={group.title}
-                          isOwner={false}
-                      />
-                  ))
-                : null}
+            <div style={{marginLeft: "10px"}}>
+                {groups.userGroups != null && showGroups
+                    ? groups.userGroups.map((group) => (
+                          <GroupsSidebarGroup
+                              key={group.groupId}
+                              groupId={group.groupId}
+                              userId={group.userId}
+                              title={group.groupTitle}
+                              groupPic={group.groupPic}
+                              isOwner={true}
+                          />
+                      ))
+                    : null}
+                {groups.memberGroups != null && showGroups
+                    ? groups.memberGroups.map((group) => (
+                          <GroupsSidebarGroup
+                              key={group.groupId}
+                              groupId={group.groupId}
+                              userId={group.userId}
+                              title={group.groupTitle}
+                              groupPic={group.groupPic}
+                              isOwner={false}
+                          />
+                      ))
+                    : null}
+            </div>
         </>
     );
 }

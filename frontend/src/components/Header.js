@@ -2,9 +2,12 @@ import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import Notifications from "./Notifications";
+import { useState } from "react";
+import PopupCreateGroup from "./PopupCreateGroup";
 
 function Header({ userId, firstName, lastName, profilePic, notifications }) {
     const navigateTo = useNavigate();
+    const [showCreateGroupPopup, setShowCreateGroupPopup] = useState(false);
 
     const logOut = async (event) => {
         event.preventDefault();
@@ -47,7 +50,17 @@ function Header({ userId, firstName, lastName, profilePic, notifications }) {
                 >
                     SN
                 </Navbar>
-                <Notifications notifications={notifications} userId={userId}/>
+                <Notifications notifications={notifications} userId={userId} />
+                <div className="font-weight-bold" style={{marginLeft: "20px"}}>
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={() => setShowCreateGroupPopup(true)}
+                    >
+                        <span className="btn goups-in-icon"></span>
+                        Create group
+                    </button>
+                </div>
                 <Nav className="mr-auto nav_bar_wrapper"></Nav>
                 <Nav>
                     <SearchBar onSearch={handleSearch} />
@@ -73,6 +86,12 @@ function Header({ userId, firstName, lastName, profilePic, notifications }) {
                         </NavDropdown.Item>
                     </NavDropdown>
                 </Nav>
+                <PopupCreateGroup
+                    title="Create group"
+                    userId={userId}
+                    show={showCreateGroupPopup}
+                    onClose={() => setShowCreateGroupPopup(false)}
+                />
             </Navbar>
         </div>
     );

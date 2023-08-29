@@ -22,7 +22,6 @@ function Notifications({ notifications, userId }) {
         setNotificationCount("");
         setShowNotifications(!showNotifications);
         setAllNotificationsToSeen();
-        console.log(notifications);
     };
 
     const setAllNotificationsToSeen = async () => {
@@ -57,7 +56,13 @@ function Notifications({ notifications, userId }) {
                 </div>
             </div>
             <Dropdown show={showNotifications}>
-                <Dropdown.Menu style={{ width: "200px" }}>
+                <Dropdown.Menu
+                    style={{
+                        width: "250px",
+                        maxHeight: "300px",
+                        overflowY: "auto",
+                    }}
+                >
                     {notifications.map((notification) => (
                         <SingleNotification
                             key={notification.notificationId}
@@ -66,6 +71,7 @@ function Notifications({ notifications, userId }) {
                             notificationType={notification.notificationType}
                             clickedOn={notification.clickedOn}
                             created={notification.created}
+                            setShowNotifications={setShowNotifications}
                         />
                     ))}
                 </Dropdown.Menu>
