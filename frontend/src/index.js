@@ -10,6 +10,7 @@ import User from "./components/User";
 import UserChat from "./components/UserChat";
 import SinglePostPage from "./components/SinglePostPage";
 import Group from "./components/Group";
+import GroupChat from "./components/GroupChat";
 
 const router = createBrowserRouter([
     {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
             { path: "/chat/user/:userId", element: <UserChat /> },
             { path: "/post/:postId", element: <SinglePostPage /> },
             { path: "/group/:groupId", element: <Group /> },
+            { path: "/chat/group/:groupId", element: <GroupChat /> },
         ],
     },
 ]);

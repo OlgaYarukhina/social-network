@@ -48,7 +48,7 @@ const GetUserPosts = ({ userId, currentUserId }) => {
                     />
                 ))
             ) : (
-                <div>Loading posts...</div>
+                <div>Nothing to see here...</div>
             )}
         </div>
     );

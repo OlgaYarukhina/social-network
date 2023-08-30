@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SinglePost from "./SinglePost";
 
-const GetGroupPosts = ({ groupId, postAmount }) => {
+const GetGroupPosts = ({ groupId, postAmount, currentUserId }) => {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -25,7 +25,7 @@ const GetGroupPosts = ({ groupId, postAmount }) => {
     }, [postAmount]);
 
     if (!Array.isArray(posts)) {
-        return <div>Still nothing here</div>;
+        return <div>Nothing to see here...</div>;
     }
 
     return (
@@ -42,13 +42,13 @@ const GetGroupPosts = ({ groupId, postAmount }) => {
                         createdAt={post.createdAt}
                         content={post.content}
                         comments={post.commentAmount}
-                        currentUserId={1}     //?????
+                        currentUserId={currentUserId}
                         profilePic={post.profilePic}
                         showComments={false}
                     />
                 ))
             ) : (
-                <div> Still nothing here</div>
+                <div>Nothing to see here...</div>
             )}
         </div>
     );

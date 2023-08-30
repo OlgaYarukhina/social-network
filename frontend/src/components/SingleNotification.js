@@ -22,6 +22,8 @@ function SingleNotification({
                 return "You have been invited to join a group!";
             case "groupJoinRequest":
                 return "A user has requested to join one of your groups!";
+            case "groupEvent":
+                return "An event has been created in a group you are a part of!";
         }
     };
 
@@ -37,6 +39,9 @@ function SingleNotification({
                 navigateTo(`/group/${sourceId}`);
                 break;
             case "groupJoinRequest":
+                navigateTo(`/group/${sourceId}`);
+                break;
+            case "groupEvent":
                 navigateTo(`/group/${sourceId}`);
                 break;
         }

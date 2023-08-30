@@ -159,13 +159,13 @@ func getCurrentUserMemberStatus(groupId, currentUserId string, groupOwnerId int,
 
 	var tableName string
 	err := db.QueryRow(query, groupId, currentUserId, groupId, currentUserId, groupId, currentUserId).Scan(&tableName)
-    if err != nil {
-        if err == sql.ErrNoRows {
+	if err != nil {
+		if err == sql.ErrNoRows {
 			return "not_a_member"
 		} else {
 			panic(err)
 		}
-    }
+	}
 
 	return tableName
 }
@@ -460,4 +460,125 @@ func (app *application) GroupInviteHandler(w http.ResponseWriter, r *http.Reques
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Group invite successfully handled"))
+}
+
+func (app *application) GetGroupChatDataHandler(w http.ResponseWriter, r *http.Request) {
+	var groupChatData SendGroupChatDataEvent
+
+	err := json.NewDecoder(r.Body).Decode(&groupChatData)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	returnGroupChatData := getGroupChatData(groupChatData, app.db)
+
+	jsonData, err := json.Marshal(returnGroupChatData)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+func getGroupChatMessages(groupId, amount int, db *sql.DB) []ReturnGroupMessageEvent {
+	var groupMessages = []ReturnGroupMessageEvent{}
+
+	rows, err := db.Query(`
+		SELECT messageId, senderId, groupId, content, sent FROM group_messages 
+		WHERE groupId = ?
+		ORDER BY sent DESC LIMIT ?
+	`, groupId, amount)
+
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var message ReturnGroupMessageEvent
+
+		rows.Scan(&message.MessageId, &message.SenderId, &message.GroupId, &message.Content, &message.Sent)
+		groupMessages = append(groupMessages, message)
+	}
+	reverseGroupMsgSlice(groupMessages)
+
+	return groupMessages
+}
+
+func reverseGroupMsgSlice(s []ReturnGroupMessageEvent) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
+func addGroupMessageToTable(messageData ReturnGroupMessageEvent, db *sql.DB) {
+	statement, err := db.Prepare("INSERT INTO group_messages (senderId, groupId, content) VALUES (?, ?, ?)")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = statement.Exec(messageData.SenderId, messageData.GroupId, messageData.Content)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
+func getAllGroupMemberIds(groupId int, db *sql.DB) []int {
+	userIdSlc := []int{}
+
+	var ownerId int
+	db.QueryRow("SELECT userId FROM `groups` WHERE groupId = ?", groupId).Scan(&ownerId)
+	userIdSlc = append(userIdSlc, ownerId)
+
+	query := `
+		SELECT memberId FROM group_members WHERE groupId = ?
+	`
+
+	rows, err := db.Query(query, groupId)
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var userId int
+		rows.Scan(&userId)
+
+		userIdSlc = append(userIdSlc, userId)
+	}
+
+	return userIdSlc
+}
+
+func getGroupChatData(groupChatData SendGroupChatDataEvent, db *sql.DB) ReturnGroupChatDataEvent {
+	var group models.Group
+	var returnGroupChatData ReturnGroupChatDataEvent
+
+	query := `
+		SELECT g.title,
+			u.userId, u.firstName, u.lastName, u.profilePic
+		FROM "groups" AS g
+		JOIN "users" AS u ON g.userId = u.userId
+		WHERE g.groupId = ?
+	`
+
+	row := db.QueryRow(query, groupChatData.GroupId)
+	err := row.Scan(&group.Title, &group.Owner.UserId, &group.Owner.FirstName, &group.Owner.LastName, &group.Owner.ProfilePic)
+	if err != nil {
+		log.Println(err)
+	}
+
+	group.Members = getGroupMembers(strconv.Itoa(groupChatData.GroupId), strconv.Itoa(groupChatData.CurrentUserId), db)
+	group.CurrentUserMemberStatus = getCurrentUserMemberStatus(strconv.Itoa(groupChatData.GroupId), strconv.Itoa(groupChatData.CurrentUserId), group.Owner.UserId, db)
+
+	returnGroupChatData.GroupData = group
+	returnGroupChatData.Messages = getGroupChatMessages(groupChatData.GroupId, groupChatData.Amount, db)
+
+	return returnGroupChatData
 }

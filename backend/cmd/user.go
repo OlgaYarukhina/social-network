@@ -162,13 +162,18 @@ func getChattableUsers(currentUserId string, db *sql.DB) []models.User {
 	var chattableUsers = []models.User{}
 
 	query := `
-		SELECT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
+		SELECT DISTINCT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
 		FROM users AS u
 		INNER JOIN followers AS f ON u.userId = f.userId
-		WHERE f.followerId = ? AND isRequest = false
+		WHERE (f.followerId = ? AND f.isRequest = false)
+		UNION
+		SELECT DISTINCT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
+		FROM users AS u
+		INNER JOIN user_messages AS um ON u.userId = um.senderId
+		WHERE um.receiverId = ?;
 	`
 
-	rows, err := db.Query(query, currentUserId)
+	rows, err := db.Query(query, currentUserId, currentUserId)
 	if err != nil {
 		log.Println(err)
 	}

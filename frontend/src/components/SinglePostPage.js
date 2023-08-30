@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import SinglePost from "./SinglePost";
-import GetComments from "./GetComments";
 
 function SinglePostPage({}) {
     let { postId } = useParams();
     const [post, setPost] = useState(null);
     const sessionData = useOutletContext();
+    const navigateTo = useNavigate();
 
     useEffect(() => {
+        if (!sessionData.sessionExists) {
+            navigateTo("/login");
+            return;
+        }
         const fetchPost = async () => {
             try {
                 const response = await fetch(
@@ -22,7 +26,7 @@ function SinglePostPage({}) {
                     console.error("Failed to fetch posts:", response.status);
                 }
             } catch (error) {
-                console.error("Error fetching posts:", error);
+                navigateTo('/')
             }
         };
 
@@ -41,7 +45,11 @@ function SinglePostPage({}) {
                     createdAt={post.createdAt}
                     content={post.content}
                     comments={post.commentAmount}
-                    currentUserId={sessionData.userData.userId}
+                    currentUserId={
+                        sessionData.sessionExists
+                            ? sessionData.userData.userId
+                            : null
+                    }
                     profilePic={post.profilePic}
                     showComments={true}
                 />

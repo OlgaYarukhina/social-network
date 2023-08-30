@@ -58,6 +58,8 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventSendMessage] = m.SendMessageHandler
 	m.handlers[EventGetMessages] = m.GetMessagesHandler
+	m.handlers[EventSendGroupMessage] = m.SendGroupMessageHandler
+	m.handlers[EventGetGroupMessages] = m.GetGroupMessagesHandler
 }
 
 func (m *Manager) SendMessageHandler(event Event, c *Client) error {
@@ -93,6 +95,41 @@ func (m *Manager) SendMessageHandler(event Event, c *Client) error {
 	return nil
 }
 
+func (m *Manager) SendGroupMessageHandler(event Event, c *Client) error {
+	var groupChatEvent SendGroupMessageEvent
+	if err := json.Unmarshal(event.Payload, &groupChatEvent); err != nil {
+		return fmt.Errorf("bad payload in request: %v", err)
+	}
+
+	var returnMsg ReturnGroupMessageEvent
+	returnMsg.Sent = time.Now().Format("2006-01-02 15:04:05")
+	returnMsg.Content = groupChatEvent.Content
+	returnMsg.GroupId = groupChatEvent.GroupId
+	returnMsg.SenderId = groupChatEvent.SenderId
+
+	allMemberIds := getAllGroupMemberIds(groupChatEvent.GroupId, m.db)
+
+	addGroupMessageToTable(returnMsg, m.db)
+
+	data, err := json.Marshal(returnMsg)
+	if err != nil {
+		return fmt.Errorf("failed to marshal broadcast message: %v", err)
+	}
+
+	var outgoingEvent Event
+	outgoingEvent.Payload = data
+	outgoingEvent.Type = EventNewGroupMessage
+
+	for client := range c.manager.clients {
+		for _, memberId := range allMemberIds {
+			if client.userId == memberId {
+				client.egress <- outgoingEvent
+			}	
+		}
+	}
+	return nil
+}
+
 func (m *Manager) GetMessagesHandler(event Event, c *Client) error {
 	var chatDataEvent SendChatDataEvent
 	if err := json.Unmarshal(event.Payload, &chatDataEvent); err != nil {
@@ -107,6 +144,25 @@ func (m *Manager) GetMessagesHandler(event Event, c *Client) error {
 	var outgoingEvent Event
 	outgoingEvent.Payload = data
 	outgoingEvent.Type = EventGetMessages
+	c.egress <- outgoingEvent
+
+	return nil
+}
+
+func (m *Manager) GetGroupMessagesHandler(event Event, c *Client) error {
+	var groupChatDataEvent SendGroupChatDataEvent
+	if err := json.Unmarshal(event.Payload, &groupChatDataEvent); err != nil {
+		return fmt.Errorf("bad payload in request: %v", err)
+	}
+
+	data, err := json.Marshal(getGroupChatData(groupChatDataEvent, m.db))
+	if err != nil {
+		return fmt.Errorf("failed to marshal broadcast message: %v", err)
+	}
+
+	var outgoingEvent Event
+	outgoingEvent.Payload = data
+	outgoingEvent.Type = EventGetGroupMessages
 	c.egress <- outgoingEvent
 
 	return nil
@@ -156,7 +212,7 @@ func getDisplaynameById(userId int, db *sql.DB) string {
 	return firstName + " " + lastName
 }
 
-func reverseSlice(s []ReturnMessageEvent) {
+func reverseUserMsgSlice(s []ReturnMessageEvent) {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]
 	}

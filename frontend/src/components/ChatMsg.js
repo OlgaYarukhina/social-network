@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { ListGroup } from "react-bootstrap";
 
-function ChatMsg({ messageId, content, sent, timeSeparator, isSender }) {
+function ChatMsg({ messageId, content, sent, timeSeparator, isSender, senderDisplayname, isDifferentUser }) {
     const [isHovering, setIsHovering] = useState(false);
 
     return (
         <React.Fragment>
             {timeSeparator}
+            {(senderDisplayname && isDifferentUser) ? <small className={`senderName${isSender ? "Sent" : "Received"}`}>{senderDisplayname}</small> : null}
             <ListGroup.Item
                 key={messageId}
                 className="list-group-item-no-border"

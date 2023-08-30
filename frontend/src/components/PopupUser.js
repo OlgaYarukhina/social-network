@@ -62,6 +62,9 @@ function PopupUser({
                         src={`http://localhost:8080/get-image/users/${profilePic}`}
                         width="50"
                         height="50"
+                        style={{
+                            objectFit: "cover",
+                        }}
                     />
                     <div
                         onClick={() => {

@@ -1,0 +1,1 @@
+DELETE FROM events_attendance WHERE userId = 2

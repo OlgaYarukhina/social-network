@@ -1,6 +1,10 @@
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"01.kood.tech/git/aaaspoll/social-network/backend/models"
+)
 
 type Event struct {
 	Type    string          `json:"type"`
@@ -33,8 +37,34 @@ type SendChatDataEvent struct {
 	Amount           int `json:"amount"`
 }
 
+type SendGroupMessageEvent struct {
+	Content  string `json:"content"`
+	SenderId int    `json:"senderId"`
+	GroupId  int    `json:"groupId"`
+}
+
+type ReturnGroupMessageEvent struct {
+	MessageId int `json:"messageId"`
+	SendGroupMessageEvent
+	Sent string `json:"sent"`
+}
+
+type ReturnGroupChatDataEvent struct {
+	GroupData models.Group         `json:"groupData"`
+	Messages  []ReturnGroupMessageEvent `json:"messages"`
+}
+
+type SendGroupChatDataEvent struct {
+	GroupId       int `json:"groupId"`
+	CurrentUserId int `json:"currentUserId"`
+	Amount        int `json:"amount"`
+}
+
 const (
-	EventSendMessage = "send_message"
-	EventNewMessage  = "new_message"
-	EventGetMessages = "get_messages"
+	EventSendMessage      = "send_message"
+	EventNewMessage       = "new_message"
+	EventGetMessages      = "get_messages"
+	EventSendGroupMessage = "send_group_message"
+	EventNewGroupMessage  = "new_group_message"
+	EventGetGroupMessages = "get_group_messages"
 )

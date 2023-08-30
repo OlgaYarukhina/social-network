@@ -64,7 +64,7 @@ func getChatData(currentChatterId, otherChatterId, amount int, db *sql.DB) Retur
 		rows.Scan(&messageData.MessageId, &messageData.SenderId, &messageData.ReceiverId, &messageData.Content, &messageData.Sent)
 		returnChatData.Messages = append(returnChatData.Messages, messageData)
 	}
-	reverseSlice(returnChatData.Messages)
+	reverseUserMsgSlice(returnChatData.Messages)
 
 	return returnChatData
 }

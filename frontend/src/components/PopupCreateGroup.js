@@ -87,7 +87,7 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
                             placeholder="Max 20 symbols"
                             value={groupTitle}
                             onChange={(e) => setGroupTitle(e.target.value)}
-                            maxLength={30}
+                            maxLength={20}
                             required
                         />
                     </div>

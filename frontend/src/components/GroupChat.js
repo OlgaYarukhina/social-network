@@ -1,9 +1,10 @@
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import ChatSidebar from "./ChatSidebar";
 import { Card, ListGroup, Form, Button } from "react-bootstrap";
 import React, { useEffect, useRef, useState } from "react";
 import ChatMsg, { formatDateWithRelativeTime } from "./ChatMsg";
 import EmojiPicker from "emoji-picker-react";
+import { throttle, waitForSocketConnection } from "./UserChat";
+import ChatSidebarUser from "./ChatSidebarUser";
 
 class Event {
     constructor(type, payload) {
@@ -12,8 +13,8 @@ class Event {
     }
 }
 
-function UserChat() {
-    let { userId } = useParams();
+function GroupChat() {
+    let { groupId } = useParams();
     const sessionData = useOutletContext();
 
     const formRef = useRef(null);
@@ -22,16 +23,17 @@ function UserChat() {
     const scrollHeightBeforeLoad = useRef(null);
     const messageAmount = useRef(20);
     const messagesRendered = useRef(null);
-    const currentUserId = sessionData.sessionExists
-        ? sessionData.userData.userId
-        : null;
 
     const [messageInput, setMessageInput] = useState("");
     const [messages, setMessages] = useState([]);
     const [pageReady, setPageReady] = useState(false);
-    const [otherChatterName, setOtherChatterName] = useState("");
-    const [isValidChatRecipient, setIsValidChatRecipient] = useState(false);
+    const [groupChatName, setGroupChatName] = useState("");
+    const [isValidChatter, setIsValidChatter] = useState(false);
+    const [chatUsers, setChatUsers] = useState([]);
     const [showEmojis, setShowEmojis] = useState(false);
+    const currentUserId = sessionData.sessionExists
+        ? sessionData.userData.userId
+        : null;
 
     const navigateTo = useNavigate();
 
@@ -40,37 +42,76 @@ function UserChat() {
             navigateTo("/login");
             return;
         }
+        const getChatData = async () => {
+            const payload = {
+                groupId: parseInt(groupId),
+                currentUserId: currentUserId,
+                amount: 20,
+            };
 
-        const validateRecipient = () => {
-            var isValid = false;
-            sessionData.userData.chattableUsers.forEach((user) => {
-                if (parseInt(userId) === user.userId) {
-                    isValid = true;
-                    return;
+            const options = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            };
+
+            try {
+                const response = await fetch(
+                    "http://localhost:8080/get-group-chat-data",
+                    options
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    if (
+                        data.groupData.currentUserMemberStatus === "owner" ||
+                        data.groupData.currentUserMemberStatus ===
+                            "group_members"
+                    ) {
+                        setIsValidChatter(true);
+                    } else {
+                        navigateTo("/");
+                        return;
+                    }
+
+                    setChatUsers([
+                        ...data.groupData.members,
+                        data.groupData.owner,
+                    ]);
+                    setGroupChatName(data.groupData.groupTitle);
+                    console.log(data);
+                    setMessages(data.messages ? data.messages : []);
+                    messagesRendered.current = data.messages
+                        ? data.messages.length
+                        : 0;
+                } else {
+                    const statusMsg = await response.text();
+                    console.log(statusMsg);
                 }
-            });
-            if (!isValid) {
-                navigateTo("/");
+            } catch (error) {
+                console.error(error);
             }
-            setIsValidChatRecipient(isValid);
         };
 
         if (sessionData.sessionExists) {
-            validateRecipient();
+            getChatData();
+            setPageReady(true);
         }
-    });
+        messageAmount.current = 20;
+    }, [groupId, currentUserId]);
 
     const submitMsgForm = (e) => {
         e.preventDefault();
         if (messageInput.trim()) {
             const msgBody = {
                 senderId: currentUserId,
-                receiverId: parseInt(userId),
+                groupId: parseInt(groupId),
                 content: messageInput,
             };
 
             setMessageInput("");
-            sendEvent("send_message", msgBody);
+            sendEvent("send_group_message", msgBody);
         }
     };
 
@@ -80,23 +121,20 @@ function UserChat() {
         }
 
         switch (event.type) {
-            case "send_message":
+            case "send_group_message":
                 messageAmount.current = messageAmount.current + 1;
-                getMessages(event.payload.senderId, event.payload.receiverId);
+                getMessages(event.payload.groupId);
                 break;
-            case "new_message":
+            case "new_group_message":
                 if (
                     window.location.pathname ===
-                    `/chat/user/${event.payload.senderId}`
+                    `/chat/group/${event.payload.groupId}`
                 ) {
                     messageAmount.current = messageAmount.current + 1;
-                    getMessages(
-                        event.payload.senderId,
-                        event.payload.receiverId
-                    );
+                    getMessages(event.payload.groupId);
                 }
                 break;
-            case "get_messages":
+            case "get_group_messages":
                 if (event.payload.messages) {
                     setMessages(event.payload.messages);
                     messagesRendered.current = event.payload.messages.length;
@@ -124,57 +162,14 @@ function UserChat() {
         setMessageInput((prevMsg) => prevMsg + emoji.emoji);
     };
 
-    const getMessages = (currentChatterId, otherChatterId) => {
+    const getMessages = (groupId) => {
         const payload = {
-            currentChatterId,
-            otherChatterId,
+            groupId,
             amount: messageAmount.current,
         };
 
-        sendEvent("get_messages", payload);
+        sendEvent("get_group_messages", payload);
     };
-
-    useEffect(() => {
-        const getChatData = async () => {
-            const payload = {
-                currentChatterId: currentUserId,
-                otherChatterId: parseInt(userId),
-                amount: 20,
-            };
-
-            const options = {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            };
-
-            try {
-                const response = await fetch(
-                    "http://localhost:8080/get-chat-data",
-                    options
-                );
-                if (response.ok) {
-                    const data = await response.json();
-                    setMessages(data.messages ? data.messages : []);
-                    setOtherChatterName(data.otherChatterDisplayname);
-                    messagesRendered.current = data.messages
-                        ? data.messages.length
-                        : 0;
-                } else {
-                    const statusMsg = await response.text();
-                    console.log(statusMsg);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        getChatData();
-        setPageReady(true);
-        messageAmount.current = 20;
-    }, [userId, currentUserId]);
 
     useEffect(() => {
         if (pageReady) {
@@ -214,7 +209,7 @@ function UserChat() {
     }, [pageReady, currentUserId]);
 
     useEffect(() => {
-        if (!isValidChatRecipient) {
+        if (!isValidChatter) {
             return;
         }
         const divElement = chatBoxRef.current;
@@ -233,17 +228,17 @@ function UserChat() {
             ) {
                 messageAmount.current += 10;
                 scrollHeightBeforeLoad.current = divElement.scrollHeight;
-                getMessages(currentUserId, parseInt(userId));
+                getMessages(parseInt(groupId));
             }
         };
 
         return () => {
             divElement.removeEventListener("scroll", handleScroll);
         };
-    }, [chatBoxRef, userId, currentUserId, isValidChatRecipient]);
+    }, [chatBoxRef, groupId, currentUserId, isValidChatter]);
 
     useEffect(() => {
-        if (!isValidChatRecipient) {
+        if (!isValidChatter) {
             return;
         }
         if (chatBoxRef.current.scrollTop > 0) {
@@ -253,7 +248,7 @@ function UserChat() {
                 chatBoxRef.current.scrollHeight -
                 scrollHeightBeforeLoad.current;
         }
-    }, [messages, isValidChatRecipient]);
+    }, [messages, isValidChatter]);
 
     const addTimeSeparator = (prevTime, nextTime) => {
         const prev = new Date(prevTime);
@@ -274,17 +269,23 @@ function UserChat() {
         return null;
     };
 
-    if (
-        Array.isArray(messages) &&
-        isValidChatRecipient &&
-        sessionData.sessionExists
-    ) {
+    const getSenderDisplayname = (senderId) => {
+        var displayName = "";
+        chatUsers.forEach((user) => {
+            if (user.userId === senderId) {
+                displayName = `${user.firstName} ${user.lastName}`;
+            }
+        });
+        return displayName;
+    };
+
+    if (Array.isArray(messages) && isValidChatter) {
         return (
             <div className="row">
                 <div className="col-8">
                     <h1
                         style={{ textAlign: "center", marginTop: "5px" }}
-                    >{`Chatting with ${otherChatterName}`}</h1>
+                    >{`${groupChatName} chatroom`}</h1>
                     <Card style={{ margin: "10px", border: "3px grey solid" }}>
                         <div ref={chatBoxRef} className="chat-container">
                             <ListGroup variant="flush">
@@ -297,6 +298,11 @@ function UserChat() {
                                         prevTime,
                                         message.sent
                                     );
+                                    const isDifferentUser =
+                                        index > 0
+                                            ? messages[index - 1].senderId !==
+                                              message.senderId
+                                            : true;
                                     return (
                                         <ChatMsg
                                             key={message.messageId}
@@ -304,10 +310,14 @@ function UserChat() {
                                             content={message.content}
                                             sent={message.sent}
                                             timeSeparator={timeSeparator}
+                                            senderDisplayname={getSenderDisplayname(
+                                                message.senderId
+                                            )}
                                             isSender={
                                                 message.senderId ===
                                                 currentUserId
                                             }
+                                            isDifferentUser={isDifferentUser}
                                         />
                                     );
                                 })}
@@ -373,36 +383,21 @@ function UserChat() {
                     </Card>
                 </div>
                 <div className="col-3">
-                    <ChatSidebar />
+                    <h1 style={{ marginTop: "5px" }}>Users in chat:</h1>
+                    {chatUsers.map((user) => (
+                        <ChatSidebarUser
+                            key={user.userId}
+                            userId={user.userId}
+                            firstName={user.firstName}
+                            lastName={user.lastName}
+                            profilePic={user.profilePic}
+                            isGroupChat={true}
+                        />
+                    ))}
                 </div>
             </div>
         );
     }
 }
 
-export function waitForSocketConnection(socket, callback) {
-    setTimeout(function () {
-        if (socket && socket.readyState === 1) {
-            console.log("Connection is made");
-            if (callback != null) {
-                callback();
-            }
-        } else {
-            console.log("wait for connection...");
-            waitForSocketConnection(socket, callback);
-        }
-    }, 5);
-}
-
-export function throttle(func, wait) {
-    var lastEvent = 0;
-    return function () {
-        var currentTime = new Date();
-        if (currentTime - lastEvent > wait) {
-            func.apply(this, arguments);
-            lastEvent = currentTime;
-        }
-    };
-}
-
-export default UserChat;
+export default GroupChat;

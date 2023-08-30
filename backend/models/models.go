@@ -109,3 +109,26 @@ type GroupInviteResponse struct {
 	UserId   int  `json:"userId"`
 	Accepted bool `json:"accepted"`
 }
+
+type Event struct {
+	EventId     int         `json:"eventId"`
+	GroupId     int         `json:"groupId"`
+	UserId      int         `json:"userId"`
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	StartDate   time.Time   `json:"startDate"`
+	EndDate     time.Time   `json:"endDate"`
+	EventUsers  []EventUser `json:"eventUsers"`
+	Creator     User        `json:"creator"`
+}
+
+type EventUser struct {
+	User
+	Going bool `json:"going"`
+}
+
+type Attendance struct {
+	EventId int    `json:"eventId"`
+	UserId  int    `json:"userId"`
+	Status  string `json:"status"`
+}

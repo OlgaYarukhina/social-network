@@ -7,19 +7,28 @@ import Popup from "./Popup";
 import { Button } from "react-bootstrap";
 import GroupJoinRequests from "./GroupJoinRequests";
 import { sendNotification } from "./Notifications";
+import CreateEvent from "./PopupCreateEvent";
+import PopupCreateEvent from "./PopupCreateEvent";
+import GetGroupEvents from "./GetGroupEvents";
 
 function Group() {
     const [groupData, setGroupData] = useState({});
+    const [activeTab, setActiveTab] = useState("posts");
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [showMembersPopup, setShowMembersPopup] = useState(false);
+    const [showEventPopup, setShowEventPopup] = useState(false);
     const [currentUserMemberStatus, setCurrentUserMemberStatus] =
         useState(null);
 
     const [postAmount, setPostAmount] = useState(null);
+    const [eventAmount, setEventAmount] = useState(null);
     const sessionData = useOutletContext();
     const { groupId } = useParams();
     const [dataLoaded, setDataLoaded] = useState(false);
     const [groupOwnerId, setGroupOwnerId] = useState(null);
+    const currentUserId = sessionData.sessionExists
+        ? sessionData.userData.userId
+        : null;
 
     const navigateTo = useNavigate();
 
@@ -27,10 +36,14 @@ function Group() {
         setPostAmount((prevAmount) => prevAmount + 1);
     };
 
+    const updateEventAmount = () => {
+        setEventAmount((prevAmount) => prevAmount + 1);
+    };
+
     const handleInvite = async (accepted) => {
         const payload = {
             groupId: parseInt(groupData.groupId),
-            userId: sessionData.userData.userId,
+            userId: currentUserId,
             accepted,
         };
 
@@ -61,7 +74,7 @@ function Group() {
     const handleJoinRequest = async () => {
         const payload = {
             groupId: parseInt(groupData.groupId),
-            userId: sessionData.userData.userId,
+            userId: currentUserId,
         };
 
         const options = {
@@ -94,14 +107,21 @@ function Group() {
     };
 
     useEffect(() => {
+        if (!sessionData.sessionExists) {
+            navigateTo("/login");
+            return;
+        }
         const getGroupData = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:8080/get-group-data?groupId=${groupId}&currentUserId=${sessionData.userData.userId}`
+                    `http://localhost:8080/get-group-data?groupId=${groupId}&currentUserId=${currentUserId}`
                 );
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
+                    if(!data.groupTitle) {
+                        navigateTo('/')
+                    }
                     setGroupData(data);
                     setGroupOwnerId(data.userId);
                     setCurrentUserMemberStatus(data.currentUserMemberStatus);
@@ -242,24 +262,61 @@ function Group() {
                     ) : (
                         <p>Loading group data...</p>
                     )}
-                    <div
-                        className="d-flex align-items-center"
-                        style={{
-                            marginTop: "40px",
-                            marginBottom: "40px",
-                        }}
-                    >
-                        <div className="font-weight-bold">
-                            <button
-                                type="button"
-                                className="btn btn-light"
-                                onClick={() => setShowFollowersPopup(true)}
+                    {currentUserMemberStatus === "owner" ||
+                    currentUserMemberStatus === "group_members" ? (
+                        <>
+                            <div
+                                className="d-flex align-items-center"
+                                style={{
+                                    marginTop: "40px",
+                                    marginBottom: "20px",
+                                }}
                             >
-                                <span className="btn goups-in-icon"></span>
-                                Invite members
-                            </button>
-                        </div>
-                    </div>
+                                <div className="font-weight-bold">
+                                    <button
+                                        type="button"
+                                        className="btn btn-light"
+                                        onClick={() =>
+                                            setShowFollowersPopup(true)
+                                        }
+                                    >
+                                        <span className="btn goups-in-icon"></span>
+                                        Invite members
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="font-weight-bold">
+                                <button
+                                    type="button"
+                                    className="btn btn-light"
+                                    onClick={() => setShowEventPopup(true)}
+                                >
+                                    <span className="btn chatroom-btn"></span>
+                                    Create Event
+                                </button>
+                            </div>
+                            <div
+                                className="d-flex align-items-center"
+                                style={{
+                                    marginTop: "20px",
+                                    marginBottom: "20px",
+                                }}
+                            >
+                                <div className="font-weight-bold">
+                                    <button
+                                        type="button"
+                                        className="btn btn-light"
+                                        onClick={() =>
+                                            navigateTo(`/chat/group/${groupId}`)
+                                        }
+                                    >
+                                        <span className="btn chatroom-btn"></span>
+                                        View Chatroom
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    ) : null}
                     {currentUserMemberStatus === "owner" ? (
                         <GroupJoinRequests
                             groupId={groupId}
@@ -270,36 +327,94 @@ function Group() {
                 <GroupInvitePopup
                     title={"Invite users"}
                     show={showFollowersPopup}
-                    currentUserId={sessionData.userData.userId}
+                    currentUserId={currentUserId}
                     onClose={() => setShowFollowersPopup(false)}
                     groupId={groupId}
+                />
+                <PopupCreateEvent
+                    title={"Create event"}
+                    show={showEventPopup}
+                    currentUserId={currentUserId}
+                    onClose={() => setShowEventPopup(false)}
+                    groupId={groupId}
+                    updateEventAmount={updateEventAmount}
+                    groupMembers={
+                        Array.isArray(groupData.members)
+                            ? [...groupData.members, groupData.owner]
+                            : null
+                    }
                 />
                 {groupData.members ? (
                     <Popup
                         title="Members"
                         users={groupData.members}
                         show={showMembersPopup}
-                        currentUserId={sessionData.userData.userId}
+                        currentUserId={currentUserId}
                         onClose={() => setShowMembersPopup(false)}
                     />
                 ) : null}
                 {currentUserMemberStatus === "owner" ||
                 currentUserMemberStatus === "group_members" ? (
-                    <div className="col-md-7">
-                        <CreatePost
-                            userId={sessionData.userData.userId}
-                            isGroup={true}
-                            groupId={groupId}
-                            updatePostAmount={updatePostAmount}
-                        />
-                        <GetGroupPosts
-                            groupId={groupId}
-                            postAmount={postAmount}
-                        />
-                    </div>
+                    <>
+                        <div className="col-md-7">
+                            <div className="tab-container">
+                                <button
+                                    onClick={() => setActiveTab("posts")}
+                                    className={`tab-button ${
+                                        activeTab === "posts" ? "active" : ""
+                                    }`}
+                                >
+                                    Posts
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("events")}
+                                    className={`tab-button ${
+                                        activeTab === "events" ? "active" : ""
+                                    }`}
+                                >
+                                    Events
+                                </button>
+                            </div>
+                            <div
+                                style={{
+                                    display:
+                                        activeTab === "posts"
+                                            ? "block"
+                                            : "none",
+                                }}
+                            >
+                                <CreatePost
+                                    userId={currentUserId}
+                                    isGroup={true}
+                                    groupId={groupId}
+                                    updatePostAmount={updatePostAmount}
+                                />
+                                <GetGroupPosts
+                                    groupId={groupId}
+                                    postAmount={postAmount}
+                                    currentUserId={currentUserId}
+                                />
+                            </div>
+                            <div
+                                style={{
+                                    display:
+                                        activeTab === "events"
+                                            ? "block"
+                                            : "none",
+                                }}
+                            >
+                                <GetGroupEvents
+                                    groupId={groupId}
+                                    eventAmount={eventAmount}
+                                    currentUserId={currentUserId}
+                                    updateEventAmount={updateEventAmount}
+                                />
+                            </div>
+                        </div>
+                    </>
                 ) : (
                     <h1 style={{ marginTop: "50px", color: "grey" }}>
-                        Posts are only visible to members
+                        Posts and events are only visible to members
                     </h1>
                 )}
             </div>

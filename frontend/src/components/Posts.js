@@ -26,7 +26,7 @@ const GetPosts = ({ userId, postAmount }) => {
     }, [postAmount]);
 
     if (!Array.isArray(posts)) {
-        return <div>The user has not creted any post yet or they are not avaible for you</div>;
+        return <div>Nothing to see here...</div>;
     }
 
     return (
@@ -49,7 +49,7 @@ const GetPosts = ({ userId, postAmount }) => {
                     />
                 ))
             ) : (
-                <div> The user has not creted any post yet or they are not avaible for you</div>
+                <div>Nothing to see here...</div>
             )}
         </div>
     );

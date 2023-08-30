@@ -6,6 +6,7 @@ function ChatSidebarUser({
     lastName,
     nickname,
     profilePic,
+    isGroupChat,
 }) {
     const navigateTo = useNavigate();
     return (
@@ -20,7 +21,11 @@ function ChatSidebarUser({
                         width="38"
                         height="38"
                         onClick={() =>
-                            navigateTo(`/chat/user/${userId}`)
+                            navigateTo(
+                                isGroupChat
+                                    ? `/user/${userId}`
+                                    : `/chat/user/${userId}`
+                            )
                         }
                         style={{
                             cursor: "pointer",
@@ -28,16 +33,28 @@ function ChatSidebarUser({
                             objectFit: "cover",
                         }}
                     />
-                    <div className="d-flex align-items-center"
+                    <div
+                        className="d-flex align-items-center"
                         onClick={() => {
-                            navigateTo(`/chat/user/${userId}`);
+                            navigateTo(
+                                isGroupChat
+                                    ? `/user/${userId}`
+                                    : `/chat/user/${userId}`
+                            );
                         }}
                     >
-                        <h5 style={{marginLeft: "10px"}}>
-                            {firstName + " " + lastName}
+                        <h5 style={{ marginLeft: "10px" }}>
+                            {(firstName + " " + lastName).slice(
+                                0,
+                                15
+                            ) +
+                                ((firstName + " " + lastName).length >
+                                16
+                                    ? "..."
+                                    : "")}
                         </h5>
-                        <h5 style={{marginLeft: "5px"}}>
-                        {nickname && (
+                        <h5 style={{ marginLeft: "5px" }}>
+                            {nickname && (
                                 <small className="text-muted">
                                     ({nickname})
                                 </small>

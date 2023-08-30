@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Dropdown } from "react-bootstrap";
-import { useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { sendNotification } from "./Notifications";
 import Popup from "./Popup";
 import CreatePost from "./Poster";
@@ -20,14 +20,27 @@ function User() {
     const { userId } = useParams();
 
     const sessionData = useOutletContext();
-    const currentUserId = sessionData.userData.userId;
+    const currentUserId = sessionData.sessionExists
+        ? sessionData.userData.userId
+        : null;
+    const navigateTo = useNavigate();
 
     const [showFollowersPopup, setShowFollowersPopup] = useState(false);
     const [showFollowingPopup, setShowFollowingPopup] = useState(false);
 
     const [groups, setGroups] = useState([]);
 
+    const formatOptions = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    };
+
     useEffect(() => {
+        if (!sessionData.sessionExists) {
+            navigateTo("/login");
+            return;
+        }
         setIsProfileOwner(currentUserId === parseInt(userId));
 
         const getProfileData = async () => {
@@ -38,6 +51,9 @@ function User() {
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
+                    if(!data.firstName) {
+                        navigateTo('/')
+                    }
                     setPrivacy(data.public ? "Public" : "Private");
                     handleCurrentUserAuth(data);
                     setCurrentUserFollowStatus(data.currentUserFollowStatus);
@@ -267,7 +283,12 @@ function User() {
                         {currentUserCanView ? (
                             <>
                                 <br></br>
-                                <p>Born: {profileData.dateOfBirth}</p>
+                                <p>
+                                    Born:{" "}
+                                    {new Date(
+                                        profileData.dateOfBirth
+                                    ).toLocaleString(undefined, formatOptions)}
+                                </p>
                                 <p>Email: {profileData.email}</p>
                                 {profileData.aboutMe && (
                                     <p>About me: {profileData.aboutMe}</p>
