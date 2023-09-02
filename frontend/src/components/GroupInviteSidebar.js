@@ -14,7 +14,6 @@ function GroupInviteSidebar({ userId }) {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setGroupInvites(data);
                 } else {
                     console.error(

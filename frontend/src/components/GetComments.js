@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import SingleComment from "./SingleComment";
 
-function GetComments({ showComments, postId, userId, commentAmount }) {
+function GetComments({ showComments, postId, currentUserId, commentAmount }) {
     const [comments, setComments] = useState([]);
 
     useEffect(() => {
@@ -36,7 +36,7 @@ function GetComments({ showComments, postId, userId, commentAmount }) {
                 img={comment.img}
                 createdAt={comment.createdAt}
                 content={comment.content}
-                currentUserId={userId}
+                currentUserId={currentUserId}
                 profilePic={comment.profilePic}
             />
         ));

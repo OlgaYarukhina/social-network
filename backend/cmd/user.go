@@ -165,15 +165,10 @@ func getChattableUsers(currentUserId string, db *sql.DB) []models.User {
 		SELECT DISTINCT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
 		FROM users AS u
 		INNER JOIN followers AS f ON u.userId = f.userId
-		WHERE (f.followerId = ? AND f.isRequest = false)
-		UNION
-		SELECT DISTINCT u.userId, u.firstName, u.lastName, u.nickname, u.profilePic, u.public
-		FROM users AS u
-		INNER JOIN user_messages AS um ON u.userId = um.senderId
-		WHERE um.receiverId = ?;
+		WHERE ((f.followerId = ? AND f.isRequest = false) OR (f.userId = ? AND f.isRequest = false)) AND u.userId != ?
 	`
 
-	rows, err := db.Query(query, currentUserId, currentUserId)
+	rows, err := db.Query(query, currentUserId, currentUserId, currentUserId, currentUserId)
 	if err != nil {
 		log.Println(err)
 	}
@@ -193,7 +188,6 @@ func getChattableUsers(currentUserId string, db *sql.DB) []models.User {
 	return chattableUsers
 }
 
-
 func (app *application) FollowersHandler(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("userId")
 	var followers = []models.User{}
@@ -204,22 +198,22 @@ func (app *application) FollowersHandler(w http.ResponseWriter, r *http.Request)
 		INNER JOIN followers AS f ON u.userId = f.followerId
 		WHERE f.userId = ? AND f.isRequest = false
 	`
-	
+
 	rows, err := app.db.Query(query, userId)
 	if err != nil {
 		log.Println(err)
 	}
-	
+
 	for rows.Next() {
 		var follower models.User
 		err := rows.Scan(&follower.UserId, &follower.FirstName, &follower.LastName, &follower.ProfilePic, &follower.Public)
 		if err != nil {
 			log.Println(err)
 		}
-	
+
 		followers = append(followers, follower)
 	}
-	
+
 	jsonResp, err := json.Marshal(followers)
 	if err != nil {
 		log.Fatalf("Err: %s", err)
@@ -242,7 +236,15 @@ func (app *application) PrivacyHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	
+
+	if isPublic {
+		_, err = app.db.Exec("UPDATE followers SET isRequest = false WHERE userId = ?", userId)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+
 	_, err = statement.Exec(isPublic, userId)
 	if err != nil {
 		log.Println(err)
@@ -251,5 +253,3 @@ func (app *application) PrivacyHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
-
-

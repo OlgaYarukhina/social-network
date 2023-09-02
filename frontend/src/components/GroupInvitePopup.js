@@ -3,12 +3,14 @@ import { Modal, Button } from "react-bootstrap";
 import PopupUserInvite from "./PopupUserInvite";
 
 const GroupInvitePopup = ({ title, show, currentUserId, onClose, groupId }) => {
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         const getInvitableUsers = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/get-invitable-users?userId=${currentUserId}&groupId=${groupId}`);
+                const response = await fetch(
+                    `http://localhost:8080/get-invitable-users?userId=${currentUserId}&groupId=${groupId}`
+                );
                 if (response.ok) {
                     const followersData = await response.json();
                     setUsers(followersData);
@@ -31,18 +33,22 @@ const GroupInvitePopup = ({ title, show, currentUserId, onClose, groupId }) => {
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ maxHeight: "50vh", overflowY: "auto" }}>
-                {users.map((user) => (
-                    <PopupUserInvite
-                        key={user.userId}
-                        userId={user.userId}
-                        firstName={user.firstName}
-                        lastName={user.lastName}
-                        currentUserId={currentUserId}
-                        onClose={onClose}
-                        profilePic={user.profilePic}
-                        groupId={groupId}
-                    />
-                ))}
+                {users.length ? (
+                    users.map((user) => (
+                        <PopupUserInvite
+                            key={user.userId}
+                            userId={user.userId}
+                            firstName={user.firstName}
+                            lastName={user.lastName}
+                            currentUserId={currentUserId}
+                            onClose={onClose}
+                            profilePic={user.profilePic}
+                            groupId={groupId}
+                        />
+                    ))
+                ) : (
+                    <div>No users to invite</div>
+                )}
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={onClose}>

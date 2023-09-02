@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { ListGroup } from "react-bootstrap";
 
-function ChatMsg({ messageId, content, sent, timeSeparator, isSender, senderDisplayname, isDifferentUser }) {
+function ChatMsg({
+    messageId,
+    content,
+    sent,
+    timeSeparator,
+    isSender,
+    senderDisplayname,
+    isDifferentUser,
+}) {
     const [isHovering, setIsHovering] = useState(false);
 
     return (
         <React.Fragment>
             {timeSeparator}
-            {(senderDisplayname && isDifferentUser) ? <small className={`senderName${isSender ? "Sent" : "Received"}`}>{senderDisplayname}</small> : null}
+            {senderDisplayname && isDifferentUser ? (
+                <small
+                    className={`senderName${isSender ? "Sent" : "Received"}`}
+                >
+                    {senderDisplayname}
+                </small>
+            ) : null}
             <ListGroup.Item
                 key={messageId}
                 className="list-group-item-no-border"
@@ -89,7 +103,7 @@ export function formatDateWithRelativeTime(inputDate) {
         const minutes = String(date.getMinutes()).padStart(2, "0");
         return `${dayOfWeek} ${hours}:${minutes}`;
     } else {
-        return formatDate(inputDate)
+        return formatDate(inputDate);
     }
 }
 

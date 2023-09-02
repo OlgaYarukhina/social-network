@@ -3,7 +3,6 @@ import { Modal, Button } from "react-bootstrap";
 import PopupUser from "./PopupUser";
 
 const Popup = ({ title, users, show, currentUserId, onClose }) => {
-
     return (
         <Modal show={show} onHide={onClose} centered>
             <Modal.Header>

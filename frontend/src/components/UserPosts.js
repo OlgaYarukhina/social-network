@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import SinglePost from "./SinglePost";
 
-const GetUserPosts = ({ userId, currentUserId }) => {
+const GetUserPosts = ({ userId, currentUserId, postAmount }) => {
     const [posts, setUserPosts] = useState([]);
-
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -23,7 +22,7 @@ const GetUserPosts = ({ userId, currentUserId }) => {
         };
 
         fetchPosts();
-    }, [userId]);
+    }, [userId, postAmount]);
 
     if (!Array.isArray(posts)) {
         return <div>Loading posts...</div>;
@@ -42,13 +41,13 @@ const GetUserPosts = ({ userId, currentUserId }) => {
                         img={post.img}
                         createdAt={post.createdAt}
                         content={post.content}
-                        commentAmount={post.commentAmount}
+                        comments={post.commentAmount}
                         currentUserId={currentUserId}
                         profilePic={post.profilePic}
                     />
                 ))
             ) : (
-                <div>Nothing to see here...</div>
+                <div style={{ marginTop: "10px" }}>Nothing to see here...</div>
             )}
         </div>
     );

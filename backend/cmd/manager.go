@@ -37,7 +37,7 @@ func NewManager() *Manager {
 	m := &Manager{
 		clients:  make(ClientList),
 		handlers: make(map[string]EventHandler),
-		db: db,
+		db:       db,
 	}
 
 	m.setupEventHandlers()
@@ -124,7 +124,7 @@ func (m *Manager) SendGroupMessageHandler(event Event, c *Client) error {
 		for _, memberId := range allMemberIds {
 			if client.userId == memberId {
 				client.egress <- outgoingEvent
-			}	
+			}
 		}
 	}
 	return nil

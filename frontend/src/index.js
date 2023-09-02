@@ -11,11 +11,14 @@ import UserChat from "./components/UserChat";
 import SinglePostPage from "./components/SinglePostPage";
 import Group from "./components/Group";
 import GroupChat from "./components/GroupChat";
+import AllGroups from "./components/AllGroups";
+import ErrorPage from "./components/ErrorPage";
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <App />,
+        errorElement: <ErrorPage />,
         children: [
             { index: true, element: <Home /> },
             { path: "/register", element: <Register /> },
@@ -25,6 +28,7 @@ const router = createBrowserRouter([
             { path: "/post/:postId", element: <SinglePostPage /> },
             { path: "/group/:groupId", element: <Group /> },
             { path: "/chat/group/:groupId", element: <GroupChat /> },
+            { path: "/groups", element: <AllGroups /> },
         ],
     },
 ]);

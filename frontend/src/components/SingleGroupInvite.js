@@ -7,7 +7,7 @@ function SingleGroupInvite({
     img,
     currentUserId,
     updateInvites,
-    setUpdateInvites
+    setUpdateInvites,
 }) {
     const navigateTo = useNavigate();
 
@@ -15,8 +15,8 @@ function SingleGroupInvite({
         const payload = {
             groupId: parseInt(groupId),
             userId: parseInt(currentUserId),
-            accepted
-        }
+            accepted,
+        };
 
         const options = {
             method: "POST",
@@ -32,15 +32,14 @@ function SingleGroupInvite({
                 options
             );
             if (response.ok) {
-                console.log("successfully handled group invite")
-                setUpdateInvites(!updateInvites)
+                setUpdateInvites(!updateInvites);
             } else {
-                console.log("error handling group invite")
+                console.log("error handling group invite");
             }
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     return (
         <>
@@ -70,17 +69,25 @@ function SingleGroupInvite({
                                 navigateTo(`/group/${groupId}`);
                             }}
                         >
-                            <h5 style={{ marginLeft: "10px" }}>
-                                {groupTitle}
-                            </h5>
+                            <h5 style={{ marginLeft: "10px" }}>{groupTitle}</h5>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <Button onClick={() => handleInvite(true)} style={{ marginRight: "3px", borderRadius: "100px" }} variant="success">
+                    <Button
+                        onClick={() => handleInvite(true)}
+                        style={{ marginRight: "3px", borderRadius: "100px" }}
+                        variant="success"
+                    >
                         ✓
                     </Button>
-                    <Button onClick={() => handleInvite(false)} style={{ borderRadius: "100px" }} variant="danger">X</Button>
+                    <Button
+                        onClick={() => handleInvite(false)}
+                        style={{ borderRadius: "100px" }}
+                        variant="danger"
+                    >
+                        X
+                    </Button>
                 </div>
             </div>
             <hr />

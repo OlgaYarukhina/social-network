@@ -9,11 +9,9 @@ function PopupGetChecked({
     onFollowersSelection,
     selectedFollowers,
 }) {
-  
     const navigateTo = useNavigate();
 
     const handleFollow = (isChecked) => {
-        console.log("isChecked:", isChecked);
         if (isChecked) {
             onFollowersSelection((prevSelected) => [...prevSelected, userId]);
         } else {
@@ -46,7 +44,6 @@ function PopupGetChecked({
                     type="checkbox"
                     checked={selectedFollowers.includes(userId)}
                     onChange={(e) => handleFollow(e.target.checked)}
-                    
                 />
             </div>
             <hr />

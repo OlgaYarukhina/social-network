@@ -20,13 +20,12 @@ function SinglePostPage({}) {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setPost(data);
                 } else {
                     console.error("Failed to fetch posts:", response.status);
                 }
             } catch (error) {
-                navigateTo('/')
+                navigateTo("/");
             }
         };
 
@@ -35,7 +34,7 @@ function SinglePostPage({}) {
 
     if (post) {
         return (
-            <>
+            <div style={{ width: "80%", margin: "auto" }}>
                 <SinglePost
                     postId={postId}
                     userId={post.userId}
@@ -53,7 +52,7 @@ function SinglePostPage({}) {
                     profilePic={post.profilePic}
                     showComments={true}
                 />
-            </>
+            </div>
         );
     }
 }

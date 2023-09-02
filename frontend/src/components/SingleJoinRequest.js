@@ -9,7 +9,7 @@ function SingleJoinRequest({
     profilePic,
     groupId,
     updateRequests,
-    setUpdateRequests
+    setUpdateRequests,
 }) {
     const navigateTo = useNavigate();
 
@@ -17,8 +17,8 @@ function SingleJoinRequest({
         const payload = {
             groupId: parseInt(groupId),
             userId,
-            accepted
-        }
+            accepted,
+        };
 
         const options = {
             method: "POST",
@@ -34,15 +34,14 @@ function SingleJoinRequest({
                 options
             );
             if (response.ok) {
-                console.log("successfully handled follow request")
-                setUpdateRequests(!updateRequests)
+                setUpdateRequests(!updateRequests);
             } else {
-                console.log("error handling follow request")
+                console.log("error handling follow request");
             }
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     return (
         <>
@@ -86,10 +85,20 @@ function SingleJoinRequest({
                     </div>
                 </div>
                 <div>
-                    <Button onClick={() => handleRequest(true)} style={{ marginRight: "3px", borderRadius: "100px" }} variant="success">
+                    <Button
+                        onClick={() => handleRequest(true)}
+                        style={{ marginRight: "3px", borderRadius: "100px" }}
+                        variant="success"
+                    >
                         ✓
                     </Button>
-                    <Button onClick={() => handleRequest(false)} style={{ borderRadius: "100px" }} variant="danger">X</Button>
+                    <Button
+                        onClick={() => handleRequest(false)}
+                        style={{ borderRadius: "100px" }}
+                        variant="danger"
+                    >
+                        X
+                    </Button>
                 </div>
             </div>
             <hr />

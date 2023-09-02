@@ -85,7 +85,6 @@ function Login() {
                 const data = await response.json();
                 const expirationDate = new Date();
                 expirationDate.setDate(expirationDate.getDate() + 7);
-                console.log(data);
 
                 document.cookie = `session=${
                     data.cookieId

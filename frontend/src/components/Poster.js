@@ -13,7 +13,6 @@ const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
     const textAreaRef = useRef(null);
     const imgPicker = useRef(null);
     const imagePreviewRef = useRef(null);
-    
 
     const handleFocus = () => {
         textAreaRef.current.style.height = `10rem`;
@@ -72,13 +71,13 @@ const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
             event.preventDefault();
         }
 
-        if (!(/\S/.test(formData.content)) && !selectedImg) {
+        if (!/\S/.test(formData.content) && !selectedImg) {
             alert("Please add either some text or an image to create a post.");
             textAreaRef.current.style.height = `2rem`;
             return;
         }
 
-        if (!(/\S/.test(formData.content)) && selectedImg) {
+        if (!/\S/.test(formData.content) && selectedImg) {
             formData.content = "";
         }
 
@@ -103,18 +102,19 @@ const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
                     ? "Private"
                     : "Specific"
             );
-            payload.append("selectedFollowers", JSON.stringify(selectedFollowers));
+            payload.append(
+                "selectedFollowers",
+                JSON.stringify(selectedFollowers)
+            );
         } else {
             payload.append("privacy", "Group");
             payload.append("groupId", groupId);
         }
-   
 
         const options = {
             method: "POST",
             body: payload,
         };
-        console.log(payload);
 
         try {
             const response = await fetch(
@@ -143,7 +143,7 @@ const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
                 <div className=" card-header posts">
                     <div className="mb-3">
                         <textarea
-                            style={{ resize: 'vertical' }}
+                            style={{ resize: "vertical" }}
                             className="form-control textarea-resize"
                             rows="1"
                             placeholder="What do you want to say to this World?"
@@ -184,23 +184,21 @@ const CreatePost = ({ userId, isGroup, groupId, updatePostAmount }) => {
                                 onChange={handleChangeImg}
                                 accept="image/*, .png, .jpg, .gif"
                             />
-                        </div>            
-                            <div className="col d-flex align-items-center">
+                        </div>
+                        <div className="col d-flex align-items-center">
                             {!isGroup ? (
-                            <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={isChecked}
-                                    onChange={handlePrivacyClick}
-                                    className="custom-checkbox"
-                                />
-                                <span className="checkmark"></span>
-                                Only for followers
-                            </label>
-                         ) : (
-                            null
-                         )}
-                           </div>
+                                <label className="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={handlePrivacyClick}
+                                        className="custom-checkbox"
+                                    />
+                                    <span className="checkmark"></span>
+                                    Only for followers
+                                </label>
+                            ) : null}
+                        </div>
 
                         {isChecked && (
                             <PopupAddPrivacy

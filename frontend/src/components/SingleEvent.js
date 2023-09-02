@@ -67,7 +67,6 @@ function SingleEvent({
                 options
             );
             if (response.ok) {
-                console.log("Attendance updated");
                 updateEventAmount();
             } else {
                 console.log("Attendance update failed");

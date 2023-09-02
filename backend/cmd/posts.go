@@ -21,21 +21,21 @@ func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) 
 	currentUserId := r.URL.Query().Get("userId")
 
 	stmt := `
-          SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
-          FROM posts AS p
-          LEFT JOIN group_members AS gm ON p.groupId = gm.groupId
-          LEFT JOIN followers AS f ON p.userId = f.userId 
-          LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
-          WHERE (
-          (p.userId = ? OR (f.followerId = ? AND f.isRequest = false) OR gm.memberId = ?) 
-          ) 
-          AND (
-          (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
-          OR
-          (p.privacy = 'Group' AND gm.memberId IS NOT NULL)
-          )
-          ORDER BY p.created DESC LIMIT 200
-        `
+        SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
+        FROM posts AS p
+        LEFT JOIN group_members AS gm ON p.groupId = gm.groupId
+        LEFT JOIN followers AS f ON p.userId = f.userId 
+        LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
+        WHERE (
+        (p.userId = ? OR (f.followerId = ? AND f.isRequest = false) OR gm.memberId = ?) 
+        ) 
+        AND (
+        (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
+        OR
+        (p.privacy = 'Group' AND gm.memberId IS NOT NULL)
+        )
+        ORDER BY p.created DESC
+    `
 
 	rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId, currentUserId)
 	if err != nil {
@@ -86,7 +86,6 @@ func (app *application) GetPostsHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.Write(jsonResp)
-	return
 }
 
 func (app *application) GetSinglePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -158,15 +157,18 @@ func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Reque
 	currentUserId := r.URL.Query().Get("currentUserId")
 
 	stmt := `
-         SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
-         FROM posts AS p
-         LEFT JOIN followers AS f ON p.userId = f.userId 
-         LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
-         WHERE (p.userId = ? AND (p.userId = ? OR (f.followerId = ? AND f.isRequest = false))) 
-         AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
-         ORDER BY p.created DESC LIMIT 200
-         `
-	rows, err := app.db.Query(stmt, userId, currentUserId, currentUserId, currentUserId, currentUserId)
+        SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created 
+        FROM posts AS p
+        LEFT JOIN followers AS f ON p.userId = f.userId 
+        LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
+        WHERE p.userId = ? AND (p.privacy = 'Public' OR 
+		(p.privacy = 'Private' AND (f.followerId = ? AND f.isRequest = false)) OR 
+		(p.privacy = 'Specific' AND s.selectedUserId = ?) OR 
+		p.userId = ?)
+        ORDER BY p.created DESC
+    `
+
+	rows, err := app.db.Query(stmt, userId, currentUserId, currentUserId, currentUserId, currentUserId, currentUserId)
 	if err != nil {
 		log.Fatalf("Err: %s", err)
 	}
@@ -215,7 +217,6 @@ func (app *application) GetUserPostsHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.Write(jsonResp)
-	return
 }
 
 func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -261,11 +262,11 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 	groupIDStr := r.FormValue("groupId")
 	if groupIDStr != "" {
 		groupID, err := strconv.Atoi(groupIDStr)
-		post.GroupID = groupID                        
-	if err != nil {
-		log.Println(err)
-		return
-	}
+		post.GroupID = groupID
+		if err != nil {
+			log.Println(err)
+			return
+		}
 	}
 
 	post.Content = r.FormValue("content")
@@ -274,13 +275,13 @@ func (app *application) CreatePostHandler(w http.ResponseWriter, r *http.Request
 
 	post.CreatedAt = time.Now()
 
-		stmt := `INSERT INTO posts (userId, content, img, groupId, privacy, created) VALUES (?, ?, ?, ?, ?, ?)`
-		id, err := app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.GroupID, post.Privacy, post.CreatedAt)
-		if err != nil {
-			log.Println(err)
-		}
+	stmt := `INSERT INTO posts (userId, content, img, groupId, privacy, created) VALUES (?, ?, ?, ?, ?, ?)`
+	id, err := app.db.Exec(stmt, post.UserID, post.Content, post.Img, post.GroupID, post.Privacy, post.CreatedAt)
+	if err != nil {
+		log.Println(err)
+	}
 
-		postId, err = id.LastInsertId()
+	postId, err = id.LastInsertId()
 
 	if input != "" {
 		// Remove brackets and spaces
@@ -423,17 +424,16 @@ func (app *application) GetPostLikesHandler(w http.ResponseWriter, r *http.Reque
 	w.Write(jsonData)
 }
 
-
 func (app *application) GetGroupPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var posts []models.Post
 	groupId := r.URL.Query().Get("groupId")
 
 	stmt := `
-          SELECT postId, userId, content, COALESCE(img, ""), privacy, created 
-          FROM posts 
-          WHERE groupId=?
-          ORDER BY created DESC LIMIT 200
-        `
+        SELECT postId, userId, content, COALESCE(img, ""), privacy, created 
+        FROM posts 
+        WHERE groupId=?
+        ORDER BY created DESC
+    `
 
 	rows, err := app.db.Query(stmt, groupId)
 	if err != nil {
@@ -484,35 +484,4 @@ func (app *application) GetGroupPostsHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Write(jsonResp)
-	return
 }
-
-
-
-
-
-// for home page
-
-// stmt := `
-// SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created
-// FROM posts AS p
-// LEFT JOIN followers AS f ON p.userId = f.userId AND f.followerId = ?
-// LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
-// WHERE (
-// (p.userId = ? OR f.followerId IS NOT NULL) AND (f.isRequest = false OR f.followerId IS NULL)
-// )
-// AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
-// ORDER BY p.created DESC LIMIT 200;
-// `
-
-// stmt := `
-// SELECT DISTINCT p.postId, p.userId, p.content, COALESCE(p.img, ""), p.privacy, p.created
-// FROM posts AS p
-// LEFT JOIN followers AS f ON p.userId = f.userId
-// LEFT JOIN exclusive_posts AS s ON p.postId = s.postId
-// WHERE (p.userId = ? OR (f.followerId = ? AND f.isRequest = false))
-// AND (s.selectedUserId = ? OR (p.userId = ? AND p.privacy = 'Specific') OR s.postId IS NULL)
-// ORDER BY p.created DESC LIMIT 200
-// `
-
-//rows, err := app.db.Query(stmt, currentUserId, currentUserId, currentUserId, currentUserId)

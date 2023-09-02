@@ -61,7 +61,6 @@ function Group() {
                 options
             );
             if (response.ok) {
-                console.log("successfully handled group invite");
                 setDataLoaded(false);
             } else {
                 console.log("error handling group invite");
@@ -91,7 +90,6 @@ function Group() {
                 options
             );
             if (response.ok) {
-                console.log("successfully sent join request");
                 setCurrentUserMemberStatus("group_request");
                 sendNotification(
                     parseInt(groupId),
@@ -118,9 +116,8 @@ function Group() {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
-                    if(!data.groupTitle) {
-                        navigateTo('/')
+                    if (!data.groupTitle) {
+                        navigateTo("/");
                     }
                     setGroupData(data);
                     setGroupOwnerId(data.userId);
@@ -272,26 +269,37 @@ function Group() {
                                     marginBottom: "20px",
                                 }}
                             >
-                                <div className="font-weight-bold">
+                                <div
+                                    style={{ width: "100%" }}
+                                    className="font-weight-bold"
+                                >
                                     <button
                                         type="button"
                                         className="btn btn-light"
                                         onClick={() =>
                                             setShowFollowersPopup(true)
                                         }
+                                        style={{
+                                            width: "100%",
+                                            textAlign: "left",
+                                        }}
                                     >
-                                        <span className="btn goups-in-icon"></span>
-                                        Invite members
+                                        <span className="btn invite-btn"></span>
+                                        Invite users
                                     </button>
                                 </div>
                             </div>
-                            <div className="font-weight-bold">
+                            <div
+                                style={{ width: "100%" }}
+                                className="font-weight-bold"
+                            >
                                 <button
                                     type="button"
                                     className="btn btn-light"
                                     onClick={() => setShowEventPopup(true)}
+                                    style={{ width: "100%", textAlign: "left" }}
                                 >
-                                    <span className="btn chatroom-btn"></span>
+                                    <span className="btn goups-in-icon"></span>
                                     Create Event
                                 </button>
                             </div>
@@ -302,13 +310,20 @@ function Group() {
                                     marginBottom: "20px",
                                 }}
                             >
-                                <div className="font-weight-bold">
+                                <div
+                                    style={{ width: "100%" }}
+                                    className="font-weight-bold"
+                                >
                                     <button
                                         type="button"
                                         className="btn btn-light"
                                         onClick={() =>
                                             navigateTo(`/chat/group/${groupId}`)
                                         }
+                                        style={{
+                                            width: "100%",
+                                            textAlign: "left",
+                                        }}
                                     >
                                         <span className="btn chatroom-btn"></span>
                                         View Chatroom

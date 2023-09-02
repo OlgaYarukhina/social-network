@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Modal, Button, Nav, Tab } from "react-bootstrap";
+import { Modal, Button, Tab } from "react-bootstrap";
 import PopupUser from "./PopupUser";
 
-function AttendancePopup({ title, users, show, currentUserId, onClose, pastEvent }) {
+function AttendancePopup({ users, show, currentUserId, onClose, pastEvent }) {
     const [activeTab, setActiveTab] = useState("going");
 
     return (

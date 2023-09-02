@@ -37,33 +37,30 @@ function Header({ userId, firstName, lastName, profilePic, notifications }) {
         }
     };
 
-    const handleSearch = (text) => {
-        console.log(text);
-    };
-
     return (
         <div>
             <Navbar bg="info" variant="light" className="fixed-top">
-                <Navbar
+                <Navbar className="home-button"
                     onClick={() => navigateTo("/")}
-                    style={{ cursor: "pointer" }}
                 >
-                    SN
                 </Navbar>
-                <Notifications notifications={notifications} userId={userId} />
-                <div className="font-weight-bold" style={{marginLeft: "20px"}}>
-                    <button
-                        type="button"
-                        className="btn"
+                <NavDropdown
+                    style={{ marginRight: "20px" }}
+                    className="btn goups-in-icon"
+                >
+                    <NavDropdown.Item
                         onClick={() => setShowCreateGroupPopup(true)}
                     >
-                        <span className="btn goups-in-icon"></span>
                         Create group
-                    </button>
-                </div>
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => navigateTo("/groups")}>
+                        Explore groups
+                    </NavDropdown.Item>
+                </NavDropdown>
+                <Notifications notifications={notifications} userId={userId} />
                 <Nav className="mr-auto nav_bar_wrapper"></Nav>
                 <Nav>
-                    <SearchBar onSearch={handleSearch} />
+                    <SearchBar />
                     <img
                         src={`http://localhost:8080/get-image/users/${profilePic}`}
                         alt="Small Image"
@@ -71,6 +68,7 @@ function Header({ userId, firstName, lastName, profilePic, notifications }) {
                             width: "40px",
                             height: "40px",
                             borderRadius: "50%",
+                            objectFit: "cover",
                         }}
                     />
                     <NavDropdown title={`${firstName} ${lastName} `}>

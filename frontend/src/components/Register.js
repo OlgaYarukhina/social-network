@@ -85,8 +85,8 @@ function Register() {
                 }
                 break;
             case "dateOfBirth":
-                if(validateDateOfBirth(value)) {
-                    return validateDateOfBirth(value)
+                if (validateDateOfBirth(value)) {
+                    return validateDateOfBirth(value);
                 }
                 break;
             case "password":
@@ -116,7 +116,11 @@ function Register() {
         event.preventDefault();
 
         for (const key in formData) {
-            if (formData[key] === "" && key !== "aboutMe" && key !== "nickname") {
+            if (
+                formData[key] === "" &&
+                key !== "aboutMe" &&
+                key !== "nickname"
+            ) {
                 setFormErrors((prevErrs) => ({
                     ...prevErrs,
                     [key]: "This field is required",
@@ -143,20 +147,17 @@ function Register() {
             body: payload,
         };
 
-        console.log(payload);
-
         try {
             const response = await fetch(
                 "http://localhost:8080/register",
                 options
             );
             if (response.ok) {
-                console.log("user added");
                 navigateTo("/login");
             } else {
                 const statusMsg = await response.text();
-                console.log(statusMsg)
-                if(statusMsg.includes("email")) {
+                console.log(statusMsg);
+                if (statusMsg.includes("email")) {
                     setFormErrors((prevErrs) => ({
                         ...prevErrs,
                         email: "This email address is already in use",
@@ -391,7 +392,7 @@ function validateDateOfBirth(dateString) {
     const today = new Date();
     const birthDate = new Date(dateString);
 
-    const age = calculateAge(dateString)
+    const age = calculateAge(dateString);
 
     if (age < 13 && age >= 0) {
         return "You have to be at least 13 years old to register";
@@ -410,20 +411,20 @@ function validateDateOfBirth(dateString) {
 }
 
 const calculateAge = (dateOfBirth) => {
-    const dob = new Date(dateOfBirth)
-    const currentDate = new Date()
-  
-    let age = currentDate.getFullYear() - dob.getFullYear()
-  
+    const dob = new Date(dateOfBirth);
+    const currentDate = new Date();
+
+    let age = currentDate.getFullYear() - dob.getFullYear();
+
     if (
         currentDate.getMonth() < dob.getMonth() ||
         (currentDate.getMonth() === dob.getMonth() &&
-        currentDate.getDate() < dob.getDate())
+            currentDate.getDate() < dob.getDate())
     ) {
-        age--
+        age--;
     }
-  
-    return age
-}
+
+    return age;
+};
 
 export default Register;

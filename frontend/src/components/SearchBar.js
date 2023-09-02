@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Dropdown, Form, FormControl } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function SearchBar({ onSearch }) {
+function SearchBar() {
     const [searchText, setSearchText] = useState("");
     const [showOptions, setShowOptions] = useState(false);
     const [users, setUsers] = useState([]);
@@ -20,7 +20,6 @@ function SearchBar({ onSearch }) {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setShowOptions(
                         data.users.length + data.groups.length ? true : false
                     );
@@ -39,7 +38,6 @@ function SearchBar({ onSearch }) {
 
     const handleSearchSubmit = (event) => {
         event.preventDefault();
-        onSearch(searchText);
     };
 
     const handleOptionSelect = (option) => {

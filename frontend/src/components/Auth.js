@@ -4,7 +4,7 @@ export async function hasSession() {
         if (cookie.includes("session=")) {
             var authData = await checkAuth(cookie.replace("session=", ""));
             if (authData.isAuthorized) {
-                return authData
+                return authData;
             }
         }
     }
@@ -17,12 +17,12 @@ const checkAuth = async (cookieId) => {
         const response = await fetch(url);
         if (response.ok) {
             const data = await response.json();
-            return {isAuthorized: true, user: data};
+            return { isAuthorized: true, user: data };
         } else {
-            return {isAuthorized: false };
+            return { isAuthorized: false };
         }
     } catch (error) {
         console.error("Error:", error);
-        return {isAuthorized: false };
+        return { isAuthorized: false };
     }
 };

@@ -14,8 +14,8 @@ const CreateComment = ({
         content: "",
     });
     const [selectedImg, setSelectedImg] = useState(null);
-    // const [uploaded, setUploaded] = useState();
     const imgPicker = useRef(null);
+    const imagePreviewRef = useRef(null);
 
     const sessionData = useOutletContext();
 
@@ -28,7 +28,26 @@ const CreateComment = ({
     };
 
     const handleChangeImg = (event) => {
-        setSelectedImg(event.target.files[0]);
+        if (event.target.files.length > 0) {
+            setSelectedImg(event.target.files[0]);
+            showImagePreview(event.target.files[0]);
+        } else {
+            setSelectedImg(null);
+            hideImagePreview();
+        }
+    };
+
+    const showImagePreview = (file) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            imagePreviewRef.current.src = e.target.result;
+            imagePreviewRef.current.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const hideImagePreview = () => {
+        imagePreviewRef.current.style.display = "none";
     };
 
     const handleImg = () => {
@@ -36,6 +55,28 @@ const CreateComment = ({
     };
 
     const handleSubmit = async (event) => {
+        if (event) {
+            event.preventDefault();
+        }
+
+        if (!/\S/.test(formData.content) && !selectedImg) {
+            alert(
+                "Please add either some text or an image to create a comment."
+            );
+            return;
+        }
+
+        if (!/\S/.test(formData.content) && selectedImg) {
+            formData.content = "";
+        }
+
+        if (!formData.content && !selectedImg) {
+            alert(
+                "Please add either some text or an image to create a comment."
+            );
+            return;
+        }
+
         event.preventDefault();
         let payload = new FormData();
         payload.append("userId", formData.currentUserId);
@@ -58,7 +99,10 @@ const CreateComment = ({
                 options
             );
             if (response.ok) {
+                setFormData({ currentUserId, postId, content: "" });
+                setSelectedImg(null);
                 updateCommentAmount();
+                hideImagePreview();
                 if (postCreatorId != currentUserId) {
                     sendNotification(
                         parseInt(postId),
@@ -66,7 +110,6 @@ const CreateComment = ({
                         "comment"
                     );
                 }
-                console.log("posted");
             } else {
                 const statusMsg = await response.text();
                 console.log(statusMsg);
@@ -97,13 +140,25 @@ const CreateComment = ({
                                 value={formData.content}
                                 onChange={handleChange}
                                 maxLength="100"
-                                required
                             ></textarea>
+                        </div>
+                        <div className="image-preview">
+                            <img
+                                ref={imagePreviewRef}
+                                src=""
+                                alt="Image preview"
+                                style={{
+                                    maxWidth: "100%",
+                                    maxHeight: "80px",
+                                    display: "none",
+                                }}
+                            />
                         </div>
                         <div>
                             <button
                                 className="btn image-comment-button"
                                 onClick={handleImg}
+                                type="button"
                             ></button>
                             <input
                                 className="hidden"
@@ -127,9 +182,3 @@ const CreateComment = ({
 };
 
 export default CreateComment;
-
-{
-    /* 
-
- */
-}

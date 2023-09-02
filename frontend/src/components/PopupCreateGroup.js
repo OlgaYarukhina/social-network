@@ -46,7 +46,6 @@ const PopupCreateGroup = ({ userId, title, show, onClose }) => {
                 setGroupDescription("");
                 const newGroup = await response.json();
                 navigateTo(`/group/${newGroup.groupId}`);
-                console.log(newGroup);
             } else {
                 console.log("Error creating group:", response.status);
                 const statusMsg = await response.text();

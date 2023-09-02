@@ -64,6 +64,9 @@ func (app *application) CreateGroupHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	groupId, err := id.LastInsertId()
+	if err != nil {
+		log.Println(err)
+	}
 	group.GroupID = int(groupId)
 
 	jsonResponse, err := json.Marshal(group)
@@ -139,6 +142,43 @@ func getGroupMembers(groupId, currentUserId string, db *sql.DB) []models.User {
 	}
 
 	return members
+}
+
+func (app *application) GetAllGroupsHandler(w http.ResponseWriter, r *http.Request) {
+	var allGroups = []models.Group{}
+
+	query := `
+		SELECT g.groupId, g.userId, g.title, g.description, g.img,
+			u.userId, u.firstName, u.lastName, u.profilePic
+		FROM "groups" AS g
+		JOIN "users" AS u ON g.userId = u.userId
+	`
+	rows, err := app.db.Query(query)
+	if err != nil {
+		log.Fatalf("Err: %s", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var group models.Group
+
+		err = rows.Scan(&group.GroupID, &group.UserID, &group.Title, &group.Description, &group.GroupPic, &group.Owner.UserId, &group.Owner.FirstName, &group.Owner.LastName, &group.Owner.ProfilePic)
+		if err != nil {
+			log.Fatalf("Err: %s", err)
+		}
+
+		allGroups = append(allGroups, group)
+	}
+
+	jsonData, err := json.Marshal(allGroups)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
 }
 
 func getCurrentUserMemberStatus(groupId, currentUserId string, groupOwnerId int, db *sql.DB) string {
@@ -233,7 +273,6 @@ func (app *application) GetGroupsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Write(jsonResp)
-	return
 }
 
 func (app *application) GetInvitableUsersHandler(w http.ResponseWriter, r *http.Request) {

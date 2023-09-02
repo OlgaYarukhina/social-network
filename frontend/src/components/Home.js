@@ -32,7 +32,12 @@ function Home() {
                             style={{ position: "fixed", paddingLeft: "0px" }}
                         >
                             <div className="scrollable-element">
-                                <div style={{ direction: "ltr", marginTop: "10px"}}>
+                                <div
+                                    style={{
+                                        direction: "ltr",
+                                        marginTop: "10px",
+                                    }}
+                                >
                                     <GroupsSidebar
                                         userId={sessionData.userData.userId}
                                     />

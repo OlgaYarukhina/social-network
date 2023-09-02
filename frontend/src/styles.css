@@ -136,6 +136,17 @@
     cursor: pointer;
 }
 
+.invite-btn {
+    width: 3px;
+    height: 30px;
+    margin: 3px 20px 3px 0px;
+    border: none;
+    background-image: url("/./public/icons/Mail_72px.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
 .emoji-icon {
     width: 30px;
     height: 30px;
@@ -162,6 +173,18 @@
     height: 33px;
     border: none;
     background-image: url("/./public/icons/Notification_72px.png");
+    margin-left: 20px;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.home-button {
+    width: 35px;
+    height: 35px;
+    border: none;
+    cursor: pointer;
+    margin-right: 30px;
+    background-image: url("/./public/icons/Home_icon.png");
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -184,6 +207,7 @@
     position: relative;
     display: inline-block;
     cursor: pointer;
+    top: 2px;
 }
 
 .user-icon {

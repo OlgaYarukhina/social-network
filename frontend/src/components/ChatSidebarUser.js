@@ -44,12 +44,8 @@ function ChatSidebarUser({
                         }}
                     >
                         <h5 style={{ marginLeft: "10px" }}>
-                            {(firstName + " " + lastName).slice(
-                                0,
-                                15
-                            ) +
-                                ((firstName + " " + lastName).length >
-                                16
+                            {(firstName + " " + lastName).slice(0, 15) +
+                                ((firstName + " " + lastName).length > 16
                                     ? "..."
                                     : "")}
                         </h5>

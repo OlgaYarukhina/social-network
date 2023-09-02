@@ -41,7 +41,7 @@ function FollowRequests({ userId }) {
                     {`Follow Requests (${followRequests.length})`}
                 </div>
             </div>
-            <div style={{marginLeft: "10px"}}>
+            <div style={{ marginLeft: "10px" }}>
                 {showRequests &&
                     followRequests.map((request) => (
                         <SingleFollowRequest

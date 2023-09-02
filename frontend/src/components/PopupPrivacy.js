@@ -2,13 +2,22 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import PopupGetChecked from "./PopupCheckBox";
 
-const PopupAddPrivacy = ({ title, show, currentUserId, onClose, onFollowersSelection, selectedFollowers }) => {
+const PopupAddPrivacy = ({
+    title,
+    show,
+    currentUserId,
+    onClose,
+    onFollowersSelection,
+    selectedFollowers,
+}) => {
     const [followers, setFollowers] = useState([]);
-  
+
     useEffect(() => {
         const fetchFollowers = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/followers?userId=${currentUserId}`);
+                const response = await fetch(
+                    `http://localhost:8080/followers?userId=${currentUserId}`
+                );
                 if (response.ok) {
                     const followersData = await response.json();
                     setFollowers(followersData);
@@ -25,14 +34,18 @@ const PopupAddPrivacy = ({ title, show, currentUserId, onClose, onFollowersSelec
         }
     }, [currentUserId, show]);
 
-
     if (followers.length === 0) {
         return null;
     }
 
     return (
         <Modal show={show} onHide={onClose} centered>
-             <Modal.Header style={{ backgroundColor: "rgb(200, 236, 248)", color: "rgb(41, 16, 93)" }}>
+            <Modal.Header
+                style={{
+                    backgroundColor: "rgb(200, 236, 248)",
+                    color: "rgb(41, 16, 93)",
+                }}
+            >
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ maxHeight: "50vh", overflowY: "auto" }}>

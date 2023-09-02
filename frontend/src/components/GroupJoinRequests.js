@@ -27,7 +27,7 @@ function GroupJoinRequests({ groupId, setDataLoaded }) {
         };
 
         fetchJoinRequests();
-        setDataLoaded(false)
+        setDataLoaded(false);
     }, [updateRequests]);
 
     return (
@@ -42,7 +42,7 @@ function GroupJoinRequests({ groupId, setDataLoaded }) {
                     {`Join Requests (${joinRequests.length})`}
                 </div>
             </div>
-            <div style={{marginLeft: "10px"}}>
+            <div style={{ marginLeft: "10px" }}>
                 {showRequests &&
                     joinRequests.map((request) => (
                         <SingleJoinRequest

@@ -40,6 +40,7 @@ func (app *application) server() http.Handler {
 	mux.HandleFunc("/get-group-invites", app.GetGroupInvitesHandler)
 	mux.HandleFunc("/get-group-join-requests", app.GetGroupJoinRequestsHandler)
 	mux.HandleFunc("/get-group-chat-data", app.GetGroupChatDataHandler)
+	mux.HandleFunc("/get-all-groups", app.GetAllGroupsHandler)
 	mux.HandleFunc("/create-event", app.CreateEventHandler)
 	mux.HandleFunc("/get-events", app.GetEventsHandler)
 	mux.HandleFunc("/update-attendance", app.UpdateAttendanceHandler)

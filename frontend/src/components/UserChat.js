@@ -100,8 +100,6 @@ function UserChat() {
                 if (event.payload.messages) {
                     setMessages(event.payload.messages);
                     messagesRendered.current = event.payload.messages.length;
-                } else {
-                    console.log("getting msgs");
                 }
                 break;
             default:
@@ -208,7 +206,6 @@ function UserChat() {
 
             return () => {
                 wsCurrent.close();
-                console.log("Websocket connection closed");
             };
         }
     }, [pageReady, currentUserId]);

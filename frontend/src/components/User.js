@@ -12,6 +12,7 @@ function User() {
     const [isProfileOwner, setIsProfileOwner] = useState(false);
     const [privacy, setPrivacy] = useState(null);
     const [followBtnVariant, setFollowBtnVariant] = useState("");
+    const [postAmount, setPostAmount] = useState(null);
 
     const [currentUserFollowStatus, setCurrentUserFollowStatus] = useState("");
     const [currentUserCanView, setCurrentUserCanView] = useState(null);
@@ -36,6 +37,10 @@ function User() {
         day: "numeric",
     };
 
+    const updatePostAmount = () => {
+        setPostAmount((prevAmount) => prevAmount + 1);
+    };
+
     useEffect(() => {
         if (!sessionData.sessionExists) {
             navigateTo("/login");
@@ -50,9 +55,8 @@ function User() {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
-                    if(!data.firstName) {
-                        navigateTo('/')
+                    if (!data.firstName) {
+                        navigateTo("/");
                     }
                     setPrivacy(data.public ? "Public" : "Private");
                     handleCurrentUserAuth(data);
@@ -71,7 +75,7 @@ function User() {
         };
 
         getProfileData();
-    }, [currentUserId, userId, currentUserFollowStatus]);
+    }, [currentUserId, userId, currentUserFollowStatus, currentUserCanView]);
 
     const handleFollow = () => {
         if (currentUserFollowStatus === "Follow") {
@@ -141,9 +145,7 @@ function User() {
             const response = await fetch(
                 `http://localhost:8080/set-privacy?userId=${userId}&privacy=${privacy}`
             );
-            if (response.ok) {
-                console.log("Privacy status updated");
-            } else {
+            if (!response.ok) {
                 console.log("Privacy status update failed");
             }
         } catch (error) {
@@ -173,7 +175,6 @@ function User() {
             );
             if (response.ok) {
                 setRequestsToFollowCurrentUser(false);
-                console.log("successfully handled follow request");
             } else {
                 console.log("error handling follow request");
             }
@@ -380,7 +381,7 @@ function User() {
                                 </>
                             ) : null}
                         </div>
-                        {groups.userGroups != null ? (
+                        {groups.userGroups != null && currentUserCanView ? (
                             <>
                                 <h5>Groups user owns:</h5>
                                 <br></br>
@@ -396,7 +397,7 @@ function User() {
                                 ))}
                             </>
                         ) : null}
-                        {groups.memberGroups != null ? (
+                        {groups.memberGroups != null && currentUserCanView ? (
                             <>
                                 <h5>Groups user is a member of:</h5>
                                 <br></br>
@@ -415,12 +416,16 @@ function User() {
                     </div>
                     <div className="col-md-7">
                         {currentUserId == userId ? (
-                            <CreatePost userId={sessionData.userData.userId} />
+                            <CreatePost
+                                userId={sessionData.userData.userId}
+                                updatePostAmount={updatePostAmount}
+                            />
                         ) : null}
                         {currentUserCanView && (
                             <GetUserPosts
                                 userId={userId}
                                 currentUserId={sessionData.userData.userId}
+                                postAmount={postAmount}
                             />
                         )}
                     </div>
@@ -447,9 +452,7 @@ export const sendFollowRequest = async (followType, userId, followerId) => {
 
     try {
         const response = await fetch("http://localhost:8080/follow", options);
-        if (response.ok) {
-            console.log("ok");
-        } else {
+        if (!response.ok) {
             const statusMsg = await response.text();
             console.log(statusMsg);
         }

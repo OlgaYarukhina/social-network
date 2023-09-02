@@ -56,9 +56,8 @@ function SingleNotification({
                 `http://localhost:8080/update-notification-status?notificationId=${notificationId}`
             );
             if (response.ok) {
-                console.log("notification status updated");
             } else {
-                console.log(":(");
+                console.log("error updating notification status");
             }
         } catch (error) {
             console.error(error);
@@ -66,24 +65,17 @@ function SingleNotification({
     };
 
     return (
-        <>
-            <Dropdown.Item
-                key={notificationId}
-                onClick={handleNotificationClick}
-            >
-                <div style={{ whiteSpace: "normal" }}>
-                    <p>{getNotificationMsg()}</p>
-                </div>
-                <div className="d-flex justify-content-between">
-                    <small style={{ color: "grey" }}>
-                        {getTimeDiff(created)}
-                    </small>
-                    <small style={{ color: "grey" }}>
-                        {clickedOn ? "" : "new"}
-                    </small>
-                </div>
-            </Dropdown.Item>
-        </>
+        <Dropdown.Item key={notificationId} onClick={handleNotificationClick}>
+            <div style={{ whiteSpace: "normal" }}>
+                <p>{getNotificationMsg()}</p>
+            </div>
+            <div className="d-flex justify-content-between">
+                <small style={{ color: "grey" }}>{getTimeDiff(created)}</small>
+                <small style={{ color: "grey" }}>
+                    {clickedOn ? "" : "new"}
+                </small>
+            </div>
+        </Dropdown.Item>
     );
 }
 

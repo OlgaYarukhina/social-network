@@ -12,7 +12,6 @@ const GetPosts = ({ userId, postAmount }) => {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setPosts(data);
                 } else {
                     console.error("Failed to fetch posts:", response.status);

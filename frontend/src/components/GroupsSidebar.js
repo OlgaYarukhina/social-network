@@ -14,7 +14,6 @@ function GroupsSidebar({ userId }) {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setGroups(data);
                     setGroupAmount(
                         (data.memberGroups ? data.memberGroups.length : 0) +
@@ -48,7 +47,7 @@ function GroupsSidebar({ userId }) {
                     {`Groups (${groupAmount})`}
                 </div>
             </div>
-            <div style={{marginLeft: "10px"}}>
+            <div style={{ marginLeft: "10px" }}>
                 {groups.userGroups != null && showGroups
                     ? groups.userGroups.map((group) => (
                           <GroupsSidebarGroup

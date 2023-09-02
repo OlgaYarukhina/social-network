@@ -35,7 +35,6 @@ function SingleComment({
                         }
                     });
 
-                    console.log(data);
                     setLikeAmount(data.length);
                     setCurrentUserLike(hasLiked);
                     setLikes(data);
@@ -71,9 +70,8 @@ function SingleComment({
                 options
             );
             if (response.ok) {
-                console.log("ok");
             } else {
-                console.log(":(");
+                console.log("Error liking post");
             }
         } catch (error) {
             console.error(error);
@@ -91,7 +89,7 @@ function SingleComment({
                         height="30"
                         className="rounded-circle mr-2"
                         onClick={() => navigateTo(`/user/${userId}`)}
-                        style={{ cursor: "pointer", borderRadius: "100%", }}
+                        style={{ cursor: "pointer", borderRadius: "100%" }}
                     />
                     <div>
                         <small
@@ -101,11 +99,11 @@ function SingleComment({
                         >
                             {displayName}
                         </small>
-                        <p style={{whiteSpace: "pre-wrap"}}>{content}</p>
+                        <p style={{ whiteSpace: "pre-wrap" }}>{content}</p>
                     </div>
                 </div>
                 {img && (
-                    <div className="d-flex justify-content-center mt-3">
+                    <div className="d-flex mt-3">
                         <img
                             src={`http://localhost:8080/get-image/comments/${img}`}
                             style={{ maxWidth: "100%", maxHeight: "150px" }}

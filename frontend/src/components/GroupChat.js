@@ -80,7 +80,6 @@ function GroupChat() {
                         data.groupData.owner,
                     ]);
                     setGroupChatName(data.groupData.groupTitle);
-                    console.log(data);
                     setMessages(data.messages ? data.messages : []);
                     messagesRendered.current = data.messages
                         ? data.messages.length
@@ -138,8 +137,6 @@ function GroupChat() {
                 if (event.payload.messages) {
                     setMessages(event.payload.messages);
                     messagesRendered.current = event.payload.messages.length;
-                } else {
-                    console.log("getting msgs");
                 }
                 break;
             default:
@@ -203,7 +200,6 @@ function GroupChat() {
 
             return () => {
                 wsCurrent.close();
-                console.log("Websocket connection closed");
             };
         }
     }, [pageReady, currentUserId]);

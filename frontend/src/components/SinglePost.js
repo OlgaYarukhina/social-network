@@ -69,7 +69,6 @@ function SinglePost({
                         }
                     });
 
-                    //  console.log(data);
                     setLikeAmount(data.length);
                     setCurrentUserLike(hasLiked);
                     setLikes(data);
@@ -105,9 +104,8 @@ function SinglePost({
                 options
             );
             if (response.ok) {
-                console.log("ok");
             } else {
-                console.log(":(");
+                console.log("error liking post");
             }
         } catch (error) {
             console.error(error);
@@ -159,6 +157,11 @@ function SinglePost({
                         </div>
                         {img && (
                             <img
+                                style={{
+                                    width: "100%",
+                                    maxWidth: "700px",
+                                    margin: "auto",
+                                }}
                                 src={`http://localhost:8080/get-image/posts/${img}`}
                             />
                         )}

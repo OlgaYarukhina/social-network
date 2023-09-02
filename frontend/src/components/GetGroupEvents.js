@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import SingleEvent from "./SingleEvent";
 
-function GetGroupEvents({ groupId, eventAmount, currentUserId, updateEventAmount }) {
+function GetGroupEvents({
+    groupId,
+    eventAmount,
+    currentUserId,
+    updateEventAmount,
+}) {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
@@ -12,7 +17,6 @@ function GetGroupEvents({ groupId, eventAmount, currentUserId, updateEventAmount
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setEvents(data);
                 } else {
                     console.error("Failed to fetch events:", response.status);
@@ -52,7 +56,7 @@ function GetGroupEvents({ groupId, eventAmount, currentUserId, updateEventAmount
                             currentDate >= startDate && currentDate <= endDate
                         );
                     }).length > 0 && (
-                        <div style={{marginTop: "50px"}}>
+                        <div style={{ marginTop: "50px" }}>
                             <h3>Active Events</h3>
                             {events
                                 .filter((event) => {
@@ -96,7 +100,7 @@ function GetGroupEvents({ groupId, eventAmount, currentUserId, updateEventAmount
                             (a, b) =>
                                 new Date(a.startDate) - new Date(b.startDate)
                         ).length > 0 && ( // Sort by start date
-                        <div style={{marginTop: "50px"}}>
+                        <div style={{ marginTop: "50px" }}>
                             <h3>Upcoming Events</h3>
                             {events
                                 .filter((event) => {
@@ -140,7 +144,7 @@ function GetGroupEvents({ groupId, eventAmount, currentUserId, updateEventAmount
                         .sort(
                             (a, b) => new Date(b.endDate) - new Date(a.endDate)
                         ).length > 0 && ( // Sort by end date in descending order
-                        <div style={{marginTop: "50px"}}>
+                        <div style={{ marginTop: "50px" }}>
                             <h3>Past Events</h3>
                             {events
                                 .filter((event) => {

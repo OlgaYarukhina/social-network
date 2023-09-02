@@ -35,7 +35,7 @@ function PopupUserInvite({
                 options
             );
             if (response.ok) {
-                sendNotification(parseInt(groupId), userId, "groupInvite")
+                sendNotification(parseInt(groupId), userId, "groupInvite");
                 setInvited(true);
             } else {
                 const statusMsg = await response.text();
