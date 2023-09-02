@@ -34,15 +34,8 @@ function Register() {
 
     const handleChangeImg = (event) => {
         if (event.target.files.length > 0) {
-            if (
-                event.target.files[0].type === "image/jpeg" ||
-                event.target.files[0].type === "image/png"
-            ) {
-                setSelectedImg(event.target.files[0]);
-                setImgPreviewUrl(URL.createObjectURL(event.target.files[0]));
-            } else {
-                alert("Unsupported image type, png and jpeg only");
-            }
+            setSelectedImg(event.target.files[0]);
+            setImgPreviewUrl(URL.createObjectURL(event.target.files[0]));
         } else {
             setSelectedImg(null);
             setImgPreviewUrl(
@@ -355,7 +348,7 @@ function Register() {
                                             type="file"
                                             ref={imgPicker}
                                             onChange={handleChangeImg}
-                                            accept="image/*, .png, .jpg"
+                                            accept=".png, .jpg, .jpeg"
                                         />
                                     </div>
                                 </div>

@@ -82,8 +82,6 @@ func (c *Client) writeMessages() {
 			if err := c.connection.WriteMessage(websocket.TextMessage, data); err != nil {
 				log.Println("failed to send message: ", err)
 			}
-
-			log.Println("message sent")
 		}
 	}
 }

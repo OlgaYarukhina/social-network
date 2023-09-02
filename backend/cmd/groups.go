@@ -19,7 +19,7 @@ func (app *application) CreateGroupHandler(w http.ResponseWriter, r *http.Reques
 
 	var group models.Group
 
-	group.GroupPic = "defaultProfilePic.png"
+	group.GroupPic = "defaultGroupPic.png"
 
 	file, handler, err := r.FormFile("img")
 	if err == nil {
@@ -42,8 +42,6 @@ func (app *application) CreateGroupHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 		group.GroupPic = imgName
-	} else {
-		log.Println(err)
 	}
 
 	userIDStr := r.FormValue("userId")

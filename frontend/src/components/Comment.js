@@ -139,7 +139,6 @@ const CreateComment = ({
                                 name="content"
                                 value={formData.content}
                                 onChange={handleChange}
-                                maxLength="100"
                             ></textarea>
                         </div>
                         <div className="image-preview">

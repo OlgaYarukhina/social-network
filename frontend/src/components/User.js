@@ -201,7 +201,7 @@ function User() {
         };
 
         fetchGroups();
-    }, []);
+    }, [currentUserId, userId, currentUserFollowStatus, currentUserCanView]);
 
     if (
         Array.isArray(profileData.followers) &&

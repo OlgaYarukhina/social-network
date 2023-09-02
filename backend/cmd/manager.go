@@ -169,8 +169,6 @@ func (m *Manager) GetGroupMessagesHandler(event Event, c *Client) error {
 }
 
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
-
-	log.Println("new conn")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err, "18")
